@@ -5,8 +5,50 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>RV Automoviles - Sistema de Gestión Automotora</title>
+
+    <!-- Script para prevenir flash de contenido al cargar el tema -->
+    <script>
+      // Ejecutar ANTES de que el DOM se cargue para prevenir flash
+      (function () {
+        // Obtener tema guardado o preferencia del sistema
+        const savedTheme = localStorage.getItem("theme");
+        let theme = savedTheme;
+
+        if (!theme) {
+          // Detectar preferencia del sistema
+          const prefersDark =
+            window.matchMedia &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches;
+          theme = prefersDark ? "dark" : "light";
+        }
+
+        // Aplicar tema INMEDIATAMENTE al HTML
+        document.documentElement.classList.add(theme);
+
+        // Agregar estilo inline para transiciones suaves
+        const style = document.createElement("style");
+        style.innerHTML = `
+          * {
+            transition: background-color 0.3s ease-in-out, 
+                        border-color 0.3s ease-in-out, 
+                        color 0.3s ease-in-out !important;
+          }
+          
+          /* Prevenir transiciones en la carga inicial */
+          .preload * {
+            transition: none !important;
+          }
+        `;
+        document.head.appendChild(style);
+
+        // Remover clase preload después de la carga
+        window.addEventListener("load", () => {
+          document.body.classList.remove("preload");
+        });
+      })();
+    </script>
   </head>
-  <body>
+  <body class="preload">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

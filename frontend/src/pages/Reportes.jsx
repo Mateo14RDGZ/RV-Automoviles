@@ -600,8 +600,8 @@ const Reportes = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Reportes y Exportación</h1>
-        <p className="text-gray-600 mt-1">Genera y descarga reportes del sistema</p>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Reportes y Exportación</h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-1">Genera y descarga reportes del sistema</p>
       </div>
 
       {/* Estadísticas Generales */}
@@ -645,10 +645,10 @@ const Reportes = () => {
 
       {/* Rango de Fechas */}
       <div className="card">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Rango de Fechas</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Rango de Fechas</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Fecha Inicio
             </label>
             <input
@@ -659,7 +659,7 @@ const Reportes = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Fecha Fin
             </label>
             <input
@@ -677,14 +677,14 @@ const Reportes = () => {
         {/* Exportar Autos */}
         <div className="card hover-lift">
           <div className="flex items-start gap-4">
-            <div className="p-3 bg-blue-100 rounded-lg">
-              <Car className="w-6 h-6 text-blue-600" />
+            <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+              <Car className="w-6 h-6 text-blue-600 dark:text-blue-400" />
             </div>
             <div className="flex-1">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                 Inventario de Autos
               </h3>
-              <p className="text-sm text-gray-600 mb-4">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                 Exporta la lista completa de autos con toda su información
               </p>
               <div className="flex gap-2">
@@ -692,7 +692,7 @@ const Reportes = () => {
                   <FileDown className="w-4 h-4" />
                   CSV
                 </button>
-                <button onClick={handleExportAutosPDF} className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-colors">
+                <button onClick={handleExportAutosPDF} className="bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800 text-white px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-colors">
                   <FileText className="w-4 h-4" />
                   PDF
                 </button>
@@ -704,14 +704,14 @@ const Reportes = () => {
         {/* Exportar Clientes */}
         <div className="card hover-lift">
           <div className="flex items-start gap-4">
-            <div className="p-3 bg-purple-100 rounded-lg">
-              <Users className="w-6 h-6 text-purple-600" />
+            <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+              <Users className="w-6 h-6 text-purple-600 dark:text-purple-400" />
             </div>
             <div className="flex-1">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                 Base de Clientes
               </h3>
-              <p className="text-sm text-gray-600 mb-4">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                 Exporta la información completa de todos los clientes
               </p>
               <div className="flex gap-2">
@@ -719,7 +719,7 @@ const Reportes = () => {
                   <FileDown className="w-4 h-4" />
                   CSV
                 </button>
-                <button onClick={handleExportClientesPDF} className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-colors">
+                <button onClick={handleExportClientesPDF} className="bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800 text-white px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-colors">
                   <FileText className="w-4 h-4" />
                   PDF
                 </button>
@@ -731,14 +731,14 @@ const Reportes = () => {
         {/* Exportar Pagos */}
         <div className="card hover-lift">
           <div className="flex items-start gap-4">
-            <div className="p-3 bg-green-100 rounded-lg">
-              <DollarSign className="w-6 h-6 text-green-600" />
+            <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-lg">
+              <DollarSign className="w-6 h-6 text-green-600 dark:text-green-400" />
             </div>
             <div className="flex-1">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                 Historial de Pagos
               </h3>
-              <p className="text-sm text-gray-600 mb-4">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                 Exporta el registro completo de pagos y cuotas
               </p>
               <div className="flex gap-2">
@@ -746,7 +746,7 @@ const Reportes = () => {
                   <FileDown className="w-4 h-4" />
                   CSV
                 </button>
-                <button onClick={handleExportPagosPDF} className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-colors">
+                <button onClick={handleExportPagosPDF} className="bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800 text-white px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-colors">
                   <FileText className="w-4 h-4" />
                   PDF
                 </button>
@@ -758,14 +758,14 @@ const Reportes = () => {
         {/* Reporte General */}
         <div className="card hover-lift">
           <div className="flex items-start gap-4">
-            <div className="p-3 bg-yellow-100 rounded-lg">
-              <FileText className="w-6 h-6 text-yellow-600" />
+            <div className="p-3 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg">
+              <FileText className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
             </div>
             <div className="flex-1">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                 Reporte General
               </h3>
-              <p className="text-sm text-gray-600 mb-4">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                 Exporta un resumen completo de todas las estadísticas
               </p>
               <div className="flex gap-2">
@@ -773,7 +773,7 @@ const Reportes = () => {
                   <FileDown className="w-4 h-4" />
                   JSON
                 </button>
-                <button onClick={handleExportGeneralPDF} className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-colors">
+                <button onClick={handleExportGeneralPDF} className="bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800 text-white px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-colors">
                   <FileText className="w-4 h-4" />
                   PDF
                 </button>
@@ -785,16 +785,16 @@ const Reportes = () => {
 
       {/* Resumen de Pagos Vencidos */}
       {stats && stats.pagos.vencidos > 0 && (
-        <div className="card bg-red-50 border border-red-200">
+        <div className="card bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900">
           <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 bg-red-100 rounded-lg">
-              <Calendar className="w-5 h-5 text-red-600" />
+            <div className="p-2 bg-red-100 dark:bg-red-900/40 rounded-lg">
+              <Calendar className="w-5 h-5 text-red-600 dark:text-red-400" />
             </div>
-            <h3 className="text-lg font-semibold text-red-900">
+            <h3 className="text-lg font-semibold text-red-900 dark:text-red-300">
               Atención: Pagos Vencidos
             </h3>
           </div>
-          <p className="text-red-800 mb-4">
+          <p className="text-red-800 dark:text-red-300 mb-4">
             Tienes <strong>{stats.pagos.vencidos}</strong> cuotas vencidas que requieren seguimiento inmediato.
           </p>
           <button className="btn btn-danger text-sm">
@@ -804,12 +804,12 @@ const Reportes = () => {
       )}
 
       {/* Información adicional */}
-      <div className="card bg-blue-50 border border-blue-200">
+      <div className="card bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-900">
         <div className="flex items-start gap-3">
-          <FileText className="w-5 h-5 text-blue-600 mt-0.5" />
+          <FileText className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" />
           <div>
-            <h4 className="font-semibold text-blue-900 mb-2">Sobre los Reportes</h4>
-            <ul className="text-sm text-blue-800 space-y-1">
+            <h4 className="font-semibold text-blue-900 dark:text-blue-300 mb-2">Sobre los Reportes</h4>
+            <ul className="text-sm text-blue-800 dark:text-blue-300 space-y-1">
               <li>• Los archivos <strong>PDF</strong> son ideales para impresión y presentaciones profesionales</li>
               <li>• Los archivos <strong>CSV</strong> pueden abrirse con Excel o Google Sheets para análisis</li>
               <li>• Los reportes <strong>JSON</strong> contienen datos estructurados para integración con otros sistemas</li>

@@ -224,7 +224,14 @@ router.put('/:id', async (req, res) => {
 
     // Verificar si el pago existe
     const existingPago = await prisma.pago.findUnique({
-      where: { id: parseInt(id) }
+      where: { id: parseInt(id) },
+      include: {
+        auto: {
+          include: {
+            cliente: true
+          }
+        }
+      }
     });
 
     if (!existingPago) {
@@ -253,6 +260,40 @@ router.put('/:id', async (req, res) => {
         }
       }
     });
+
+    // Si el pago fue marcado como "pagado", verificar si todas las cuotas del cliente están pagadas
+    if (estado === 'pagado' && pago.auto.clienteId) {
+      const clienteId = pago.auto.clienteId;
+      
+      // Obtener todos los pagos del cliente
+      const todosPagosCliente = await prisma.pago.findMany({
+        where: {
+          auto: {
+            clienteId: clienteId
+          }
+        }
+      });
+
+      // Verificar si todas las cuotas están pagadas
+      const todasPagadas = todosPagosCliente.every(p => p.estado === 'pagado');
+
+      // Si todas están pagadas, marcar cliente y sus autos como inactivos (archivados)
+      if (todasPagadas && todosPagosCliente.length > 0) {
+        // Archivar el cliente
+        await prisma.cliente.update({
+          where: { id: clienteId },
+          data: { activo: false }
+        });
+        
+        // Archivar todos los autos del cliente
+        await prisma.auto.updateMany({
+          where: { clienteId: clienteId },
+          data: { activo: false }
+        });
+        
+        console.log(`✅ Cliente ID ${clienteId} y sus autos completaron todos los pagos y fueron archivados automáticamente`);
+      }
+    }
 
     res.json(pago);
   } catch (error) {

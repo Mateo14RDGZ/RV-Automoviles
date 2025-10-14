@@ -97,8 +97,8 @@ const Clientes = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Gestión de Clientes</h1>
-          <p className="text-gray-600 mt-1">Administra la información de tus clientes</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Gestión de Clientes</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">Administra la información de tus clientes</p>
         </div>
         <button
           onClick={() => {
@@ -116,7 +116,7 @@ const Clientes = () => {
       <div className="card">
         <div className="flex gap-4">
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5" />
             <input
               type="text"
               placeholder="Buscar por nombre, cédula, teléfono o email..."
@@ -139,8 +139,8 @@ const Clientes = () => {
         </div>
       ) : clientes.length === 0 ? (
         <div className="card text-center py-12">
-          <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-500">No se encontraron clientes</p>
+          <Users className="w-12 h-12 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
+          <p className="text-gray-500 dark:text-gray-400">No se encontraron clientes</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -148,29 +148,29 @@ const Clientes = () => {
             <div key={cliente.id} className="card hover:shadow-lg transition-shadow">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
-                    <Users className="w-6 h-6 text-primary-600" />
+                  <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center">
+                    <Users className="w-6 h-6 text-primary-600 dark:text-primary-400" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900">{cliente.nombre}</h3>
-                    <p className="text-sm text-gray-600">CI: {cliente.cedula}</p>
+                    <h3 className="font-semibold text-gray-900 dark:text-white">{cliente.nombre}</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">CI: {cliente.cedula}</p>
                   </div>
                 </div>
               </div>
 
               <div className="space-y-2 mb-4">
-                <div className="flex items-center gap-2 text-sm text-gray-600">
+                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                   <Phone className="w-4 h-4" />
                   <span>{cliente.telefono}</span>
                 </div>
                 {cliente.email && (
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                     <Mail className="w-4 h-4" />
                     <span>{cliente.email}</span>
                   </div>
                 )}
                 {cliente.direccion && (
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                     <MapPin className="w-4 h-4" />
                     <span className="line-clamp-2">{cliente.direccion}</span>
                   </div>
@@ -178,12 +178,12 @@ const Clientes = () => {
               </div>
 
               {cliente.autos && cliente.autos.length > 0 && (
-                <div className="mb-4 pb-4 border-t pt-4">
-                  <p className="text-xs text-gray-500 mb-2">Autos asociados:</p>
+                <div className="mb-4 pb-4 border-t border-gray-200 dark:border-gray-700 pt-4">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Autos asociados:</p>
                   <div className="space-y-1">
                     {cliente.autos.map((auto) => (
                       <div key={auto.id} className="flex items-center justify-between text-xs">
-                        <span className="text-gray-700">
+                        <span className="text-gray-700 dark:text-gray-300">
                           {auto.marca} {auto.modelo}
                         </span>
                         <span className={`badge badge-${auto.estado === 'disponible' ? 'success' : auto.estado === 'vendido' ? 'info' : 'warning'}`}>
@@ -195,7 +195,7 @@ const Clientes = () => {
                 </div>
               )}
 
-              <div className="flex gap-2 pt-4 border-t">
+              <div className="flex gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
                 <button
                   onClick={() => handleEdit(cliente)}
                   className="flex-1 btn btn-secondary text-sm py-2 flex items-center justify-center gap-2"
@@ -218,16 +218,16 @@ const Clientes = () => {
 
       {/* Modal de formulario */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black dark:bg-black bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-gray-300 dark:border-gray-700">
             <div className="p-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
                 {editingCliente ? 'Editar Cliente' : 'Nuevo Cliente'}
               </h2>
               
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Nombre Completo *
                   </label>
                   <input
@@ -241,7 +241,7 @@ const Clientes = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Cédula *
                     </label>
                     <input
@@ -254,7 +254,7 @@ const Clientes = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Teléfono *
                     </label>
                     <input
@@ -268,7 +268,7 @@ const Clientes = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Email
                   </label>
                   <input
@@ -280,7 +280,7 @@ const Clientes = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Dirección
                   </label>
                   <textarea

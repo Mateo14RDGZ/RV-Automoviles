@@ -295,10 +295,10 @@ const Pagos = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
             {user?.rol === 'admin' ? 'Gestión de Pagos' : 'Mis Cuotas'}
           </h1>
-          <p className="text-gray-600 mt-1">
+          <p className="text-gray-600 dark:text-gray-400 mt-1">
             {user?.rol === 'admin' 
               ? 'Administra las cuotas y pagos' 
               : 'Consulta tus cuotas pagadas y pendientes'}
@@ -374,35 +374,35 @@ const Pagos = () => {
         /* Vista Admin: Clientes agrupados */
         <div className="space-y-4">
           {clientesConPagos.length === 0 ? (
-            <div className="card">
+            <div className="card dark:bg-gray-800 dark:border-gray-700">
               <div className="text-center py-12">
-                <User className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500">No se encontraron clientes con pagos</p>
+                <User className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+                <p className="text-gray-500 dark:text-gray-400">No se encontraron clientes con pagos</p>
               </div>
             </div>
           ) : (
             clientesConPagos.map((clienteData) => (
-              <div key={clienteData.cliente.id} className="card overflow-hidden">
+              <div key={clienteData.cliente.id} className="card dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
                 {/* Header del cliente */}
                 <div 
-                  className="bg-gradient-to-r from-gray-50 to-white p-6 cursor-pointer hover:from-gray-100 hover:to-gray-50 transition-all duration-200"
+                  className="bg-gradient-to-r from-gray-50 to-white dark:from-gray-700 dark:to-gray-800 p-6 cursor-pointer hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-600 dark:hover:to-gray-700 transition-all duration-200"
                   onClick={() => toggleCliente(clienteData.cliente.id)}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg">
+                      <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 dark:from-red-600 dark:to-red-700 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg">
                         {clienteData.cliente.nombre.charAt(0).toUpperCase()}
                       </div>
                       <div>
-                        <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
                           {clienteData.cliente.nombre}
                           {clientesExpandidos[clienteData.cliente.id] ? (
-                            <ChevronUp className="w-5 h-5 text-gray-400" />
+                            <ChevronUp className="w-5 h-5 text-gray-400 dark:text-gray-500" />
                           ) : (
-                            <ChevronDown className="w-5 h-5 text-gray-400" />
+                            <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-500" />
                           )}
                         </h3>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
                           Cédula: {clienteData.cliente.cedula} • Tel: {clienteData.cliente.telefono}
                         </p>
                       </div>
@@ -412,29 +412,29 @@ const Pagos = () => {
                     <div className="flex gap-6">
                       {clienteData.totales.vencidos > 0 && (
                         <div className="text-center">
-                          <div className="text-2xl font-bold text-red-600">
+                          <div className="text-2xl font-bold text-red-600 dark:text-red-400">
                             {formatCurrency(clienteData.totales.vencidos)}
                           </div>
-                          <div className="text-xs text-red-600 font-medium uppercase">
+                          <div className="text-xs text-red-600 dark:text-red-400 font-medium uppercase">
                             Vencidos ({clienteData.pagos.vencidos.length})
                           </div>
                         </div>
                       )}
                       {clienteData.totales.pendientes > 0 && (
                         <div className="text-center">
-                          <div className="text-2xl font-bold text-yellow-600">
+                          <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
                             {formatCurrency(clienteData.totales.pendientes)}
                           </div>
-                          <div className="text-xs text-yellow-600 font-medium uppercase">
+                          <div className="text-xs text-yellow-600 dark:text-yellow-400 font-medium uppercase">
                             Pendientes ({clienteData.pagos.pendientes.length})
                           </div>
                         </div>
                       )}
                       <div className="text-center">
-                        <div className="text-2xl font-bold text-green-600">
+                        <div className="text-2xl font-bold text-green-600 dark:text-green-400">
                           {formatCurrency(clienteData.totales.pagados)}
                         </div>
-                        <div className="text-xs text-green-600 font-medium uppercase">
+                        <div className="text-xs text-green-600 dark:text-green-400 font-medium uppercase">
                           Pagados ({clienteData.pagos.pagados.length})
                         </div>
                       </div>
@@ -444,29 +444,29 @@ const Pagos = () => {
 
                 {/* Contenido expandible */}
                 {clientesExpandidos[clienteData.cliente.id] && (
-                  <div className="p-6 space-y-6 bg-gray-50">
+                  <div className="p-6 space-y-6 bg-gray-50 dark:bg-gray-900/50">
                     {/* Pagos Vencidos */}
                     {clienteData.pagos.vencidos.length > 0 && (
                       <div>
-                        <h4 className="text-sm font-bold text-red-700 uppercase mb-3 flex items-center gap-2">
+                        <h4 className="text-sm font-bold text-red-700 dark:text-red-400 uppercase mb-3 flex items-center gap-2">
                           <AlertCircle className="w-4 h-4" />
                           Pagos Vencidos ({clienteData.pagos.vencidos.length})
                         </h4>
                         <div className="space-y-2">
                           {clienteData.pagos.vencidos.map(pago => (
-                            <div key={pago.id} className="bg-red-50 border border-red-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                            <div key={pago.id} className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900 rounded-lg p-4 hover:shadow-md transition-shadow">
                               <div className="flex items-center justify-between">
                                 <div className="flex-1">
-                                  <div className="font-medium text-gray-900">
+                                  <div className="font-medium text-gray-900 dark:text-white">
                                     {pago.auto.marca} {pago.auto.modelo} - Cuota #{pago.numeroCuota}
                                   </div>
-                                  <div className="text-sm text-gray-600 mt-1">
+                                  <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                                     Matrícula: {pago.auto.matricula} • Vencimiento: {formatDate(pago.fechaVencimiento)}
                                   </div>
                                 </div>
                                 <div className="flex items-center gap-4">
                                   <div className="text-right">
-                                    <div className="text-lg font-bold text-red-700">{formatCurrency(pago.monto)}</div>
+                                    <div className="text-lg font-bold text-red-700 dark:text-red-400">{formatCurrency(pago.monto)}</div>
                                   </div>
                                   <button
                                     onClick={() => handleMarcarPagado(pago.id)}
@@ -485,25 +485,25 @@ const Pagos = () => {
                     {/* Pagos Pendientes */}
                     {clienteData.pagos.pendientes.length > 0 && (
                       <div>
-                        <h4 className="text-sm font-bold text-yellow-700 uppercase mb-3 flex items-center gap-2">
+                        <h4 className="text-sm font-bold text-yellow-700 dark:text-yellow-400 uppercase mb-3 flex items-center gap-2">
                           <Calendar className="w-4 h-4" />
                           Pagos Pendientes ({clienteData.pagos.pendientes.length})
                         </h4>
                         <div className="space-y-2">
                           {clienteData.pagos.pendientes.map(pago => (
-                            <div key={pago.id} className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                            <div key={pago.id} className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-900 rounded-lg p-4 hover:shadow-md transition-shadow">
                               <div className="flex items-center justify-between">
                                 <div className="flex-1">
-                                  <div className="font-medium text-gray-900">
+                                  <div className="font-medium text-gray-900 dark:text-white">
                                     {pago.auto.marca} {pago.auto.modelo} - Cuota #{pago.numeroCuota}
                                   </div>
-                                  <div className="text-sm text-gray-600 mt-1">
+                                  <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                                     Matrícula: {pago.auto.matricula} • Vencimiento: {formatDate(pago.fechaVencimiento)}
                                   </div>
                                 </div>
                                 <div className="flex items-center gap-4">
                                   <div className="text-right">
-                                    <div className="text-lg font-bold text-yellow-700">{formatCurrency(pago.monto)}</div>
+                                    <div className="text-lg font-bold text-yellow-700 dark:text-yellow-400">{formatCurrency(pago.monto)}</div>
                                   </div>
                                   <button
                                     onClick={() => handleMarcarPagado(pago.id)}
@@ -522,25 +522,25 @@ const Pagos = () => {
                     {/* Pagos Realizados */}
                     {clienteData.pagos.pagados.length > 0 && (
                       <div>
-                        <h4 className="text-sm font-bold text-green-700 uppercase mb-3 flex items-center gap-2">
+                        <h4 className="text-sm font-bold text-green-700 dark:text-green-400 uppercase mb-3 flex items-center gap-2">
                           <CheckCircle className="w-4 h-4" />
                           Pagos Realizados ({clienteData.pagos.pagados.length})
                         </h4>
                         <div className="space-y-2">
                           {clienteData.pagos.pagados.map(pago => (
-                            <div key={pago.id} className="bg-white border border-green-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                            <div key={pago.id} className="bg-white dark:bg-gray-800 border border-green-200 dark:border-green-900 rounded-lg p-4 hover:shadow-md transition-shadow">
                               <div className="flex items-center justify-between">
                                 <div className="flex-1">
-                                  <div className="font-medium text-gray-900">
+                                  <div className="font-medium text-gray-900 dark:text-white">
                                     {pago.auto.marca} {pago.auto.modelo} - Cuota #{pago.numeroCuota}
                                   </div>
-                                  <div className="text-sm text-gray-600 mt-1">
+                                  <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                                     Matrícula: {pago.auto.matricula} • Pagado: {formatDate(pago.fechaPago)}
                                   </div>
                                 </div>
                                 <div className="text-right">
-                                  <div className="text-lg font-bold text-green-600">{formatCurrency(pago.monto)}</div>
-                                  <div className="text-xs text-green-600 font-medium">✓ PAGADO</div>
+                                  <div className="text-lg font-bold text-green-600 dark:text-green-400">{formatCurrency(pago.monto)}</div>
+                                  <div className="text-xs text-green-600 dark:text-green-400 font-medium">✓ PAGADO</div>
                                 </div>
                               </div>
                             </div>
@@ -559,63 +559,63 @@ const Pagos = () => {
         <div className="card overflow-hidden">
           {pagos.length === 0 ? (
             <div className="text-center py-12">
-              <CreditCard className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500">No se encontraron pagos</p>
+              <CreditCard className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+              <p className="text-gray-500 dark:text-gray-400">No se encontraron pagos</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead className="bg-gray-50 dark:bg-gray-800">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                       Auto
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                       Cuota
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                       Monto
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                       Vencimiento
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                       Fecha Pago
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                       Estado
                     </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                       Acciones
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                   {pagos.map((pago) => (
                     <tr 
                       key={pago.id} 
-                      className={`hover:bg-gray-50 ${isVencido(pago) ? 'bg-red-50' : ''}`}
+                      className={`hover:bg-gray-50 dark:hover:bg-gray-700 ${isVencido(pago) ? 'bg-red-50 dark:bg-red-900/20' : ''}`}
                     >
                       <td className="px-6 py-4">
                         <div className="text-sm">
-                          <div className="font-medium text-gray-900">
+                          <div className="font-medium text-gray-900 dark:text-white">
                             {pago.auto.marca} {pago.auto.modelo}
                           </div>
-                          <div className="text-gray-600">
+                          <div className="text-gray-600 dark:text-gray-400">
                             {pago.auto.matricula}
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                      <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
                         Cuota #{pago.numeroCuota}
                       </td>
-                      <td className="px-6 py-4 text-sm font-semibold text-gray-900">
+                      <td className="px-6 py-4 text-sm font-semibold text-gray-900 dark:text-white">
                         {formatCurrency(pago.monto)}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
+                      <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
                         {formatDate(pago.fechaVencimiento)}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
+                      <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
                         {pago.fechaPago ? formatDate(pago.fechaPago) : '-'}
                       </td>
                       <td className="px-6 py-4">
@@ -643,14 +643,14 @@ const Pagos = () => {
 
       {/* Modal crear cuota individual */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-md w-full">
+        <div className="fixed inset-0 bg-black dark:bg-black bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full">
             <div className="p-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">Nueva Cuota</h2>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Nueva Cuota</h2>
               
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Auto *
                   </label>
                   <select
@@ -698,7 +698,7 @@ const Pagos = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Fecha de Vencimiento *
                   </label>
                   <input
@@ -733,16 +733,16 @@ const Pagos = () => {
 
       {/* Modal generar cuotas */}
       {showGenerateModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
-          <div className="bg-white rounded-xl max-w-2xl w-full shadow-xl border border-gray-300 animate-scale-in max-h-[90vh] flex flex-col">
+        <div className="fixed inset-0 bg-black dark:bg-black bg-opacity-60 dark:bg-opacity-70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
+          <div className="bg-white dark:bg-gray-800 rounded-xl max-w-2xl w-full shadow-xl border border-gray-300 dark:border-gray-700 animate-scale-in max-h-[90vh] flex flex-col">
             {/* Header - Fijo */}
-            <div className="bg-gray-800 p-4 rounded-t-xl flex-shrink-0">
+            <div className="bg-gray-800 dark:bg-gray-900 p-4 rounded-t-xl flex-shrink-0">
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-lg font-bold text-white">
                     Generar Plan de Cuotas
                   </h2>
-                  <p className="text-gray-300 text-sm mt-1">Configure el plan de financiamiento</p>
+                  <p className="text-gray-300 dark:text-gray-400 text-sm mt-1">Configure el plan de financiamiento</p>
                 </div>
                 <button
                   type="button"
@@ -761,8 +761,8 @@ const Pagos = () => {
             <div className="overflow-y-auto flex-1 custom-scrollbar">
               <form onSubmit={handleGenerateCuotas} className="p-5 space-y-4">
                 {/* Sección 1: Selección de Auto */}
-                <div className="bg-gray-50 rounded-lg p-4 border border-gray-300">
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-300 dark:border-gray-600">
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                     Seleccionar Vehículo *
                   </label>
                   <select
@@ -788,18 +788,18 @@ const Pagos = () => {
                 </div>
 
                 {/* Sección 2: Detalles Financieros */}
-                <div className="bg-gray-50 rounded-lg p-4 border border-gray-300">
-                  <h3 className="text-sm font-bold text-gray-700 mb-3">
+                <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-300 dark:border-gray-600">
+                  <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">
                     Detalles Financieros
                   </h3>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Precio Total del Auto *
                       </label>
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">$</span>
                         <input
                           type="number"
                           required
@@ -817,11 +817,11 @@ const Pagos = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Entrega Inicial
                       </label>
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">$</span>
                         <input
                           type="number"
                           min="0"
@@ -835,11 +835,11 @@ const Pagos = () => {
                           placeholder="0.00"
                         />
                       </div>
-                      <p className="text-xs text-gray-500 mt-1">Pago inicial del cliente</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Pago inicial del cliente</p>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Interés (%)
                       </label>
                       <div className="relative">
@@ -856,39 +856,39 @@ const Pagos = () => {
                           className="input pr-8"
                           placeholder="0.0"
                         />
-                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">%</span>
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">%</span>
                       </div>
-                      <p className="text-xs text-gray-500 mt-1">Tasa de interés anual</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Tasa de interés anual</p>
                     </div>
 
                   </div>
 
                   {/* Resumen Financiero Dinámico */}
                   {generateData.precioTotal && (
-                    <div className="mt-3 bg-white rounded-lg p-3 border border-gray-300 animate-fade-in">
+                    <div className="mt-3 bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-300 dark:border-gray-600 animate-fade-in">
                       <div className="space-y-2">
-                        <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                          <span className="text-sm text-gray-600">Saldo a Financiar:</span>
-                          <span className="font-semibold text-gray-900">
+                        <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-600">
+                          <span className="text-sm text-gray-600 dark:text-gray-400">Saldo a Financiar:</span>
+                          <span className="font-semibold text-gray-900 dark:text-white">
                             ${((parseFloat(generateData.precioTotal) || 0) - (parseFloat(generateData.entregaInicial) || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </span>
                         </div>
                         
                         {generateData.porcentajeInteres && parseFloat(generateData.porcentajeInteres) > 0 && (
                           <>
-                            <div className="flex justify-between items-center py-2 border-b border-gray-200 animate-fade-in">
-                              <span className="text-sm text-gray-600">
+                            <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-600 animate-fade-in">
+                              <span className="text-sm text-gray-600 dark:text-gray-400">
                                 Interés ({generateData.porcentajeInteres}%):
                               </span>
-                              <span className="font-semibold text-gray-900">
+                              <span className="font-semibold text-gray-900 dark:text-white">
                                 +${(((parseFloat(generateData.precioTotal) || 0) - (parseFloat(generateData.entregaInicial) || 0)) * (parseFloat(generateData.porcentajeInteres) / 100)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                               </span>
                             </div>
-                            <div className="flex justify-between items-center py-2 bg-gray-100 rounded px-2">
-                              <span className="font-bold text-gray-900">
+                            <div className="flex justify-between items-center py-2 bg-gray-100 dark:bg-gray-700 rounded px-2">
+                              <span className="font-bold text-gray-900 dark:text-white">
                                 TOTAL A PAGAR:
                               </span>
-                              <span className="font-bold text-gray-900 text-lg">
+                              <span className="font-bold text-gray-900 dark:text-white text-lg">
                                 ${(((parseFloat(generateData.precioTotal) || 0) - (parseFloat(generateData.entregaInicial) || 0)) * (1 + parseFloat(generateData.porcentajeInteres) / 100)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                               </span>
                             </div>
@@ -896,11 +896,11 @@ const Pagos = () => {
                         )}
                         
                         {(!generateData.porcentajeInteres || parseFloat(generateData.porcentajeInteres) === 0) && (
-                          <div className="flex justify-between items-center py-2 bg-gray-100 rounded px-2">
-                            <span className="font-bold text-gray-900">
+                          <div className="flex justify-between items-center py-2 bg-gray-100 dark:bg-gray-700 rounded px-2">
+                            <span className="font-bold text-gray-900 dark:text-white">
                               TOTAL A PAGAR:
                             </span>
-                            <span className="font-bold text-gray-900 text-lg">
+                            <span className="font-bold text-gray-900 dark:text-white text-lg">
                               ${((parseFloat(generateData.precioTotal) || 0) - (parseFloat(generateData.entregaInicial) || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                             </span>
                           </div>
@@ -911,14 +911,14 @@ const Pagos = () => {
                 </div>
 
                 {/* Sección 3: Configuración de Cuotas */}
-                <div className="bg-gray-50 rounded-lg p-4 border border-gray-300">
-                  <h3 className="text-sm font-bold text-gray-700 mb-3">
+                <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-300 dark:border-gray-600">
+                  <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">
                     Configuración del Plan
                   </h3>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Número de Cuotas *
                       </label>
                       <input
@@ -936,7 +936,7 @@ const Pagos = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Intervalo (meses)
                       </label>
                       <input
@@ -950,7 +950,7 @@ const Pagos = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Fecha de Inicio *
                       </label>
                       <input
@@ -964,7 +964,7 @@ const Pagos = () => {
                   </div>
 
                   {/* Checkbox para financiamiento en progreso */}
-                  <div className="mt-4 pt-4 border-t border-gray-300">
+                  <div className="mt-4 pt-4 border-t border-gray-300 dark:border-gray-600">
                     <label className="flex items-center gap-3 cursor-pointer">
                       <input
                         type="checkbox"
@@ -976,13 +976,13 @@ const Pagos = () => {
                             cuotasPagadas: e.target.checked ? generateData.cuotasPagadas : 0
                           });
                         }}
-                        className="w-4 h-4 text-blue-400 border-gray-300 rounded focus:ring-blue-400"
+                        className="w-4 h-4 text-blue-400 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-400"
                       />
                       <div>
-                        <span className="text-sm font-semibold text-gray-700">
+                        <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                           Auto con financiamiento en progreso
                         </span>
-                        <p className="text-xs text-gray-500 mt-0.5">
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                           Marcar cuotas anteriores como ya pagadas
                         </p>
                       </div>
@@ -990,8 +990,8 @@ const Pagos = () => {
 
                     {/* Campo de cuotas pagadas */}
                     {generateData.esFinanciamientoEnProgreso && (
-                      <div className="mt-3 bg-blue-50 rounded-lg p-3 border border-blue-200">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <div className="mt-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3 border border-blue-200 dark:border-blue-900">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           Número de Cuotas Ya Pagadas *
                         </label>
                         <input
@@ -1004,7 +1004,7 @@ const Pagos = () => {
                           className="input text-center"
                           placeholder="0"
                         />
-                        <p className="text-xs text-gray-600 mt-2">
+                        <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">
                           Estas cuotas se marcarán automáticamente como pagadas.
                           Quedarán {(parseInt(generateData.numeroCuotas) || 0) - (parseInt(generateData.cuotasPagadas) || 0)} cuotas pendientes.
                         </p>
@@ -1014,22 +1014,22 @@ const Pagos = () => {
                 </div>
 
                 {/* Sección 4: Resultado - Monto por Cuota */}
-                <div className="bg-gray-50 rounded-lg p-4 border border-gray-300">
+                <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-300 dark:border-gray-600">
                   <div className="flex items-center justify-between mb-2">
-                    <label className="text-sm font-bold text-gray-700">
+                    <label className="text-sm font-bold text-gray-700 dark:text-gray-300">
                       Monto por Cuota *
                     </label>
                     <button
                       type="button"
                       onClick={calcularMontoCuota}
-                      className="px-3 py-1.5 bg-gray-700 hover:bg-gray-800 text-white text-xs font-medium rounded transition-all duration-200"
+                      className="px-3 py-1.5 bg-gray-700 hover:bg-gray-800 dark:bg-gray-600 dark:hover:bg-gray-500 text-white text-xs font-medium rounded transition-all duration-200"
                     >
                       Calcular
                     </button>
                   </div>
                   
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">$</span>
                     <input
                       type="number"
                       required
@@ -1041,33 +1041,33 @@ const Pagos = () => {
                       placeholder="0.00"
                     />
                   </div>
-                  <p className="text-xs text-gray-500 mt-1 text-center">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 text-center">
                     Valor de cada cuota mensual
                   </p>
                 </div>
 
                 {/* Resumen del Plan (si hay financiamiento en progreso) */}
                 {generateData.esFinanciamientoEnProgreso && generateData.numeroCuotas && generateData.cuotasPagadas && (
-                  <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-                    <h4 className="text-sm font-bold text-gray-800 mb-3">Resumen del Plan</h4>
+                  <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-900">
+                    <h4 className="text-sm font-bold text-gray-800 dark:text-gray-200 mb-3">Resumen del Plan</h4>
                     <div className="grid grid-cols-2 gap-3 text-sm">
-                      <div className="bg-white rounded p-2 border border-gray-200">
-                        <div className="text-gray-600 text-xs">Total de Cuotas</div>
-                        <div className="font-bold text-gray-900 text-lg">{generateData.numeroCuotas}</div>
+                      <div className="bg-white dark:bg-gray-800 rounded p-2 border border-gray-200 dark:border-gray-700">
+                        <div className="text-gray-600 dark:text-gray-400 text-xs">Total de Cuotas</div>
+                        <div className="font-bold text-gray-900 dark:text-white text-lg">{generateData.numeroCuotas}</div>
                       </div>
-                      <div className="bg-green-50 rounded p-2 border border-green-200">
-                        <div className="text-green-700 text-xs">Ya Pagadas</div>
-                        <div className="font-bold text-green-700 text-lg">{generateData.cuotasPagadas}</div>
+                      <div className="bg-green-50 dark:bg-green-900/20 rounded p-2 border border-green-200 dark:border-green-900">
+                        <div className="text-green-700 dark:text-green-400 text-xs">Ya Pagadas</div>
+                        <div className="font-bold text-green-700 dark:text-green-400 text-lg">{generateData.cuotasPagadas}</div>
                       </div>
-                      <div className="bg-orange-50 rounded p-2 border border-orange-200">
-                        <div className="text-orange-700 text-xs">Pendientes</div>
-                        <div className="font-bold text-orange-700 text-lg">
+                      <div className="bg-orange-50 dark:bg-orange-900/20 rounded p-2 border border-orange-200 dark:border-orange-900">
+                        <div className="text-orange-700 dark:text-orange-400 text-xs">Pendientes</div>
+                        <div className="font-bold text-orange-700 dark:text-orange-400 text-lg">
                           {parseInt(generateData.numeroCuotas) - parseInt(generateData.cuotasPagadas)}
                         </div>
                       </div>
-                      <div className="bg-blue-50 rounded p-2 border border-blue-200">
-                        <div className="text-blue-700 text-xs">Monto Pendiente</div>
-                        <div className="font-bold text-blue-700 text-lg">
+                      <div className="bg-blue-50 dark:bg-blue-900/30 rounded p-2 border border-blue-200 dark:border-blue-900">
+                        <div className="text-blue-700 dark:text-blue-400 text-xs">Monto Pendiente</div>
+                        <div className="font-bold text-blue-700 dark:text-blue-400 text-lg">
                           ${((parseInt(generateData.numeroCuotas) - parseInt(generateData.cuotasPagadas)) * parseFloat(generateData.montoCuota || 0)).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                         </div>
                       </div>
@@ -1083,13 +1083,13 @@ const Pagos = () => {
                       setShowGenerateModal(false);
                       resetGenerateForm();
                     }}
-                    className="px-6 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium rounded-lg transition-all duration-200"
+                    className="px-6 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-medium rounded-lg transition-all duration-200"
                   >
                     Cancelar
                   </button>
                   <button 
                     type="submit" 
-                    className="flex-1 bg-blue-400 hover:bg-blue-500 text-white py-2.5 px-4 rounded-lg font-semibold transition-all duration-200"
+                    className="flex-1 bg-blue-400 hover:bg-blue-500 dark:bg-blue-500 dark:hover:bg-blue-600 text-white py-2.5 px-4 rounded-lg font-semibold transition-all duration-200"
                   >
                     Generar Plan de Cuotas
                   </button>
@@ -1103,19 +1103,19 @@ const Pagos = () => {
 
       {/* Modal de Pago Online */}
       {showPagoOnlineModal && pagoSeleccionado && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] flex flex-col">
+        <div className="fixed inset-0 bg-black dark:bg-black bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full max-h-[90vh] flex flex-col border border-gray-300 dark:border-gray-700">
             {/* Header fijo */}
-            <div className="p-6 pb-4 border-b border-gray-200">
+            <div className="p-6 pb-4 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-900">Pago Online</h2>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Pago Online</h2>
                 <button
                   onClick={() => {
                     setShowPagoOnlineModal(false);
                     setPagoSeleccionado(null);
                     setMetodoPago('tarjeta');
                   }}
-                  className="text-gray-400 hover:text-gray-600 text-3xl leading-none"
+                  className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 text-3xl leading-none"
                 >
                   ×
                 </button>
@@ -1127,31 +1127,31 @@ const Pagos = () => {
               <div className="p-6 pt-4">
 
               {/* Resumen del Pago */}
-              <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg p-4 mb-6 border border-blue-200">
-                <h3 className="font-semibold text-gray-900 mb-3">Resumen del Pago</h3>
+              <div className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-lg p-4 mb-6 border border-blue-200 dark:border-blue-900">
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Resumen del Pago</h3>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Auto:</span>
-                    <span className="font-medium text-gray-900">
+                    <span className="text-gray-600 dark:text-gray-400">Auto:</span>
+                    <span className="font-medium text-gray-900 dark:text-white">
                       {pagoSeleccionado.auto?.marca} {pagoSeleccionado.auto?.modelo}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Matrícula:</span>
-                    <span className="font-medium text-gray-900">{pagoSeleccionado.auto?.matricula}</span>
+                    <span className="text-gray-600 dark:text-gray-400">Matrícula:</span>
+                    <span className="font-medium text-gray-900 dark:text-white">{pagoSeleccionado.auto?.matricula}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Cuota #:</span>
-                    <span className="font-medium text-gray-900">{pagoSeleccionado.numeroCuota}</span>
+                    <span className="text-gray-600 dark:text-gray-400">Cuota #:</span>
+                    <span className="font-medium text-gray-900 dark:text-white">{pagoSeleccionado.numeroCuota}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Vencimiento:</span>
-                    <span className="font-medium text-gray-900">{formatDate(pagoSeleccionado.fechaVencimiento)}</span>
+                    <span className="text-gray-600 dark:text-gray-400">Vencimiento:</span>
+                    <span className="font-medium text-gray-900 dark:text-white">{formatDate(pagoSeleccionado.fechaVencimiento)}</span>
                   </div>
-                  <div className="border-t border-blue-200 pt-2 mt-2">
+                  <div className="border-t border-blue-200 dark:border-blue-900 pt-2 mt-2">
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-900 font-semibold">Total a Pagar:</span>
-                      <span className="text-2xl font-bold text-blue-600">
+                      <span className="text-gray-900 dark:text-white font-semibold">Total a Pagar:</span>
+                      <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                         ${pagoSeleccionado.monto.toFixed(2)}
                       </span>
                     </div>
@@ -1164,7 +1164,7 @@ const Pagos = () => {
                 <div className="space-y-4">
                   {/* Método de Pago */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Método de Pago
                     </label>
                     <div className="grid grid-cols-2 gap-3">
@@ -1173,24 +1173,24 @@ const Pagos = () => {
                         onClick={() => setMetodoPago('tarjeta')}
                         className={`p-3 rounded-lg border-2 transition-all ${
                           metodoPago === 'tarjeta'
-                            ? 'border-blue-500 bg-blue-50'
-                            : 'border-gray-200 hover:border-gray-300'
+                            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-400'
+                            : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
                         }`}
                       >
-                        <CreditCard className="w-6 h-6 mx-auto mb-1 text-blue-600" />
-                        <span className="text-sm font-medium">Tarjeta</span>
+                        <CreditCard className="w-6 h-6 mx-auto mb-1 text-blue-600 dark:text-blue-400" />
+                        <span className="text-sm font-medium dark:text-gray-300">Tarjeta</span>
                       </button>
                       <button
                         type="button"
                         onClick={() => setMetodoPago('transferencia')}
                         className={`p-3 rounded-lg border-2 transition-all ${
                           metodoPago === 'transferencia'
-                            ? 'border-blue-500 bg-blue-50'
-                            : 'border-gray-200 hover:border-gray-300'
+                            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-400'
+                            : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
                         }`}
                       >
-                        <DollarSign className="w-6 h-6 mx-auto mb-1 text-green-600" />
-                        <span className="text-sm font-medium">Transferencia</span>
+                        <DollarSign className="w-6 h-6 mx-auto mb-1 text-green-600 dark:text-green-400" />
+                        <span className="text-sm font-medium dark:text-gray-300">Transferencia</span>
                       </button>
                     </div>
                   </div>
@@ -1199,7 +1199,7 @@ const Pagos = () => {
                     <>
                       {/* Número de Tarjeta */}
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           Número de Tarjeta
                         </label>
                         <input
@@ -1214,7 +1214,7 @@ const Pagos = () => {
                       <div className="grid grid-cols-2 gap-3">
                         {/* Fecha de Expiración */}
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             Vencimiento
                           </label>
                           <input
@@ -1228,7 +1228,7 @@ const Pagos = () => {
 
                         {/* CVV */}
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             CVV
                           </label>
                           <input
@@ -1243,7 +1243,7 @@ const Pagos = () => {
 
                       {/* Nombre del Titular */}
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           Nombre del Titular
                         </label>
                         <input
@@ -1257,17 +1257,17 @@ const Pagos = () => {
                   )}
 
                   {metodoPago === 'transferencia' && (
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                      <p className="text-sm text-yellow-800 mb-3">
+                    <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-900 rounded-lg p-4">
+                      <p className="text-sm text-yellow-800 dark:text-yellow-400 mb-3">
                         <strong>Datos para transferencia:</strong>
                       </p>
-                      <div className="space-y-1 text-sm text-gray-700">
+                      <div className="space-y-1 text-sm text-gray-700 dark:text-gray-300">
                         <p><strong>Banco:</strong> Banco Pichincha</p>
                         <p><strong>Cuenta:</strong> 2100123456</p>
                         <p><strong>Beneficiario:</strong> RV Automoviles</p>
                         <p><strong>RUC:</strong> 1234567890001</p>
                       </div>
-                      <p className="text-xs text-yellow-700 mt-3">
+                      <p className="text-xs text-yellow-700 dark:text-yellow-500 mt-3">
                         * Al confirmar, tu pago quedará en estado "Procesando" hasta que sea verificado.
                       </p>
                     </div>
@@ -1275,8 +1275,8 @@ const Pagos = () => {
                 </div>
 
                 {/* Seguridad */}
-                <div className="mt-4 pt-4 border-t border-gray-200">
-                  <div className="flex items-center gap-2 text-xs text-gray-500">
+                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
                     </svg>
@@ -1288,7 +1288,7 @@ const Pagos = () => {
             </div>
 
             {/* Footer fijo con botones */}
-            <div className="p-6 pt-4 border-t border-gray-200 bg-gray-50">
+            <div className="p-6 pt-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
               <div className="flex gap-3">
                 <button
                   type="submit"

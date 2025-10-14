@@ -13,7 +13,7 @@ const Autos = () => {
   const [formData, setFormData] = useState({
     marca: '',
     modelo: '',
-    año: new Date().getFullYear(),
+    anio: new Date().getFullYear(),
     matricula: '',
     precio: '',
     estado: 'disponible',
@@ -86,7 +86,7 @@ const Autos = () => {
     setFormData({
       marca: auto.marca,
       modelo: auto.modelo,
-      año: auto.año,
+      anio: auto.anio,
       matricula: auto.matricula,
       precio: auto.precio,
       estado: auto.estado,
@@ -100,7 +100,7 @@ const Autos = () => {
     setFormData({
       marca: '',
       modelo: '',
-      año: new Date().getFullYear(),
+      anio: new Date().getFullYear(),
       matricula: '',
       precio: '',
       estado: 'disponible',
@@ -121,8 +121,8 @@ const Autos = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Gestión de Autos</h1>
-          <p className="text-gray-600 mt-1">Administra el inventario de vehículos</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Gestión de Autos</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">Administra el inventario de vehículos</p>
         </div>
         <button
           onClick={() => {
@@ -141,7 +141,7 @@ const Autos = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="md:col-span-2">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5" />
               <input
                 type="text"
                 placeholder="Buscar por marca, modelo o matrícula..."
@@ -178,58 +178,58 @@ const Autos = () => {
           </div>
         ) : autos.length === 0 ? (
           <div className="text-center py-12">
-            <Car className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500">No se encontraron autos</p>
+            <Car className="w-12 h-12 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
+            <p className="text-gray-500 dark:text-gray-400">No se encontraron autos</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+              <thead className="bg-gray-50 dark:bg-gray-800">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                     Vehículo
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                     Matrícula
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                     Año
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                     Precio
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                     Cliente
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                     Estado
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                     Acciones
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                 {autos.map((auto) => (
-                  <tr key={auto.id} className="hover:bg-gray-50">
+                  <tr key={auto.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                     <td className="px-6 py-4">
                       <div className="flex items-center">
-                        <div className="flex-shrink-0 h-10 w-10 bg-primary-100 rounded-full flex items-center justify-center">
-                          <Car className="h-5 w-5 text-primary-600" />
+                        <div className="flex-shrink-0 h-10 w-10 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center">
+                          <Car className="h-5 w-5 text-primary-600 dark:text-primary-400" />
                         </div>
                         <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">
+                          <div className="text-sm font-medium text-gray-900 dark:text-white">
                             {auto.marca} {auto.modelo}
                           </div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-900">{auto.matricula}</td>
-                    <td className="px-6 py-4 text-sm text-gray-900">{auto.año}</td>
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                    <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-300">{auto.matricula}</td>
+                    <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-300">{auto.anio}</td>
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
                       ${auto.precio.toLocaleString()}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
+                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
                       {auto.cliente ? auto.cliente.nombre : '-'}
                     </td>
                     <td className="px-6 py-4">
@@ -241,13 +241,13 @@ const Autos = () => {
                       <div className="flex justify-end gap-2">
                         <button
                           onClick={() => handleEdit(auto)}
-                          className="text-blue-600 hover:text-blue-900"
+                          className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
                         >
                           <Edit2 className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleDelete(auto.id)}
-                          className="text-red-600 hover:text-red-900"
+                          className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -263,17 +263,17 @@ const Autos = () => {
 
       {/* Modal de formulario */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black dark:bg-black bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-gray-300 dark:border-gray-700">
             <div className="p-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
                 {editingAuto ? 'Editar Auto' : 'Nuevo Auto'}
               </h2>
               
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Marca *
                     </label>
                     <input
@@ -286,7 +286,7 @@ const Autos = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Modelo *
                     </label>
                     <input
@@ -299,7 +299,7 @@ const Autos = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Año *
                     </label>
                     <input
@@ -307,14 +307,14 @@ const Autos = () => {
                       required
                       min="1900"
                       max={new Date().getFullYear() + 1}
-                      value={formData.año}
-                      onChange={(e) => setFormData({ ...formData, año: e.target.value })}
+                      value={formData.anio}
+                      onChange={(e) => setFormData({ ...formData, anio: e.target.value })}
                       className="input"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Matrícula *
                     </label>
                     <input
@@ -327,7 +327,7 @@ const Autos = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Precio *
                     </label>
                     <input
@@ -342,7 +342,7 @@ const Autos = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Estado *
                     </label>
                     <select
@@ -357,7 +357,7 @@ const Autos = () => {
                   </div>
 
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Cliente
                     </label>
                     <select

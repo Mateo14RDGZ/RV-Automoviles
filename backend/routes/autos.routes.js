@@ -11,9 +11,12 @@ router.use(authMiddleware);
 // Obtener todos los autos
 router.get('/', async (req, res) => {
   try {
-    const { buscar, estado } = req.query;
+    const { buscar, estado, incluirInactivos } = req.query;
     
-    const where = {};
+    const where = {
+      // Por defecto, solo mostrar autos activos (no archivados)
+      activo: incluirInactivos === 'true' ? undefined : true
+    };
     
     // Si es cliente, solo puede ver sus propios autos
     if (req.user.rol === 'cliente') {

@@ -32,8 +32,10 @@ router.get('/stats', async (req, res) => {
       where: autoFilter
     });
 
-    // Total de clientes (solo para admin)
-    const totalClientes = req.user.rol === 'admin' ? await prisma.cliente.count() : 0;
+    // Total de clientes activos (solo para admin)
+    const totalClientes = req.user.rol === 'admin' 
+      ? await prisma.cliente.count({ where: { activo: true } }) 
+      : 0;
 
     // Estadísticas de pagos
     const pagosPagados = await prisma.pago.count({

@@ -15,9 +15,12 @@ router.use(isAdmin);
 // Obtener todos los clientes
 router.get('/', async (req, res) => {
   try {
-    const { buscar } = req.query;
+    const { buscar, incluirInactivos } = req.query;
     
-    const where = {};
+    const where = {
+      // Por defecto, solo mostrar clientes activos (no archivados)
+      activo: incluirInactivos === 'true' ? undefined : true
+    };
     
     if (buscar) {
       where.OR = [
