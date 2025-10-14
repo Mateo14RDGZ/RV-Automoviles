@@ -26,9 +26,9 @@ const validateLogin = [
 const validateClienteLogin = [
   body('cedula')
     .trim()
-    .isLength({ min: 10, max: 10 })
+    .isLength({ min: 8, max: 13 })
     .isNumeric()
-    .withMessage('La cédula debe tener 10 dígitos numéricos')
+    .withMessage('La cédula debe tener entre 8 y 13 dígitos numéricos')
 ];
 
 // Registro de usuario
