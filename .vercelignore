@@ -6,9 +6,6 @@ node_modules/
 # Testing
 coverage/
 
-# Producción
-build/
-
 # Archivos locales
 .DS_Store
 .env
@@ -41,16 +38,16 @@ tmp/
 *.sqlite
 *.sqlite3
 
-# Prisma
-backend/prisma/migrations/
-
-# Documentación de desarrollo (opcional)
-docs/
-*.md
-
 # Archivos de Git
 .git/
-.gitignore
 
 # Archivos de sistema
 Thumbs.db
+
+# Scripts de desarrollo
+*.ps1
+deploy.sh
+
+# Documentación (opcional - comenta si quieres incluirla)
+# docs/
+# *.md

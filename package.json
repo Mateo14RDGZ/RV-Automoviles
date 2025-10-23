@@ -1,16 +1,21 @@
 {
-  "name": "automanager",
+  "name": "rv-automoviles",
   "version": "1.0.0",
-  "description": "Sistema de gestión digital para automotora - AutoManager",
-  "main": "index.js",
+  "description": "Sistema de gestión digital para automotora - RV Automoviles",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
   "scripts": {
     "install-all": "cd backend && npm install && cd ../frontend && npm install",
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
     "dev:backend": "cd backend && npm run dev",
     "dev:frontend": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build && cd ../backend && npm run build",
     "setup": "cd backend && npx prisma generate && npx prisma db push && npx prisma db seed"
   },
-  "keywords": ["automanager", "car-dealership", "management-system"],
+  "keywords": ["automanager", "car-dealership", "management-system", "rv-automoviles"],
   "author": "",
   "license": "ISC",
   "devDependencies": {

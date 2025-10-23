@@ -1,13 +1,12 @@
 {
   "version": 2,
-  "buildCommand": "cd frontend && npm install && npm run build && cd ../backend && npm install && npx prisma generate",
+  "buildCommand": "cd frontend && npm install && npm run build",
+  "outputDirectory": "frontend/dist",
+  "installCommand": "npm install --prefix frontend && npm install --prefix backend",
   "builds": [
     {
       "src": "backend/api/index.js",
-      "use": "@vercel/node",
-      "config": {
-        "maxLambdaSize": "50mb"
-      }
+      "use": "@vercel/node"
     }
   ],
   "routes": [
@@ -16,17 +15,15 @@
       "dest": "backend/api/index.js"
     },
     {
-      "src": "/assets/(.*)",
-      "dest": "frontend/dist/assets/$1"
+      "src": "/(.*)",
+      "dest": "frontend/dist/$1"
     },
     {
-      "src": "/.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot)",
-      "dest": "frontend/dist/$0"
+      "handle": "filesystem"
     },
     {
       "src": "/(.*)",
       "dest": "frontend/dist/index.html"
     }
-  ],
-  "outputDirectory": "frontend/dist"
+  ]
 }
