@@ -1,65 +1,127 @@
-# 🚗 RV Automoviles
+# 🚗 RV Automóviles - Sistema de Gestión# 🚗 RV Automoviles
 
-**Sistema de Gestión Digital para Automotoras**
 
-RV Automoviles es una aplicación web completa diseñada para digitalizar y automatizar la gestión de una automotora, eliminando el uso de papel y centralizando toda la información en un sistema moderno y eficiente.
 
-## � Deploy Rápido en Vercel
+Sistema completo de gestión para RV Automóviles con frontend React y backend Express + PostgreSQL.**Sistema de Gestión Digital para Automotoras**
 
-**¿Quieres poner la aplicación en producción AHORA?**
 
-👉 **[Guía Rápida de Deploy](QUICK_DEPLOY.md)** - ¡Lista en 10 minutos!
 
-**Documentación de Deploy:**
-- 📖 [Guía Completa Paso a Paso](VERCEL_DEPLOY_GUIDE.md)
+## 🚀 Deploy en Producción (Vercel)RV Automoviles es una aplicación web completa diseñada para digitalizar y automatizar la gestión de una automotora, eliminando el uso de papel y centralizando toda la información en un sistema moderno y eficiente.
+
+
+
+### Variables de Entorno Requeridas en Vercel:## � Deploy Rápido en Vercel
+
+
+
+1. **NODE_ENV** = `production`**¿Quieres poner la aplicación en producción AHORA?**
+
+2. **POSTGRES_PRISMA_URL** = Tu URL de Neon (con pgbouncer)
+
+3. **DATABASE_URL_UNPOOLED** = Tu URL de Neon (sin pgbouncer)👉 **[Guía Rápida de Deploy](QUICK_DEPLOY.md)** - ¡Lista en 10 minutos!
+
+4. **JWT_SECRET** = `rv_automoviles_secret_key_2025_super_seguro`
+
+5. **FRONTEND_URL** = `https://tu-dominio.vercel.app`**Documentación de Deploy:**
+
+6. **VITE_API_URL** = `/api`- 📖 [Guía Completa Paso a Paso](VERCEL_DEPLOY_GUIDE.md)
+
 - ✅ [Checklist de Deploy](DEPLOY_CHECKLIST.md)
-- 📋 [Resumen Ejecutivo](DEPLOY_READY.md)
-- 📝 [Información Post-Deploy](POST_DEPLOY_INFO.md)
 
----
+### Deploy:- 📋 [Resumen Ejecutivo](DEPLOY_READY.md)
 
-## �📋 Tabla de Contenidos
+```bash- 📝 [Información Post-Deploy](POST_DEPLOY_INFO.md)
 
-- [Características](#características)
+git add .
+
+git commit -m "Deploy to production"---
+
+git push origin main
+
+```## �📋 Tabla de Contenidos
+
+
+
+Vercel desplegará automáticamente.- [Características](#características)
+
 - [Tecnologías](#tecnologías)
-- [Requisitos Previos](#requisitos-previos)
+
+## 💻 Desarrollo Local- [Requisitos Previos](#requisitos-previos)
+
 - [Instalación](#instalación)
-- [Configuración](#configuración)
-- [Ejecución](#ejecución)
-- [Estructura del Proyecto](#estructura-del-proyecto)
-- [API Endpoints](#api-endpoints)
-- [Uso del Sistema](#uso-del-sistema)
-- [Capturas de Pantalla](#capturas-de-pantalla)
-- [Solución de Problemas](#solución-de-problemas)
+
+### Backend:- [Configuración](#configuración)
+
+```bash- [Ejecución](#ejecución)
+
+cd backend- [Estructura del Proyecto](#estructura-del-proyecto)
+
+npm install- [API Endpoints](#api-endpoints)
+
+npx prisma generate- [Uso del Sistema](#uso-del-sistema)
+
+npm run dev- [Capturas de Pantalla](#capturas-de-pantalla)
+
+```- [Solución de Problemas](#solución-de-problemas)
+
 - [Próximas Funcionalidades](#próximas-funcionalidades)
 
-## ✨ Características
+### Frontend:
 
-### Funcionalidades Principales
+```bash## ✨ Características
 
-- **Dashboard Interactivo**: Vista general con estadísticas en tiempo real
+cd frontend
+
+npm install### Funcionalidades Principales
+
+npm run dev
+
+```- **Dashboard Interactivo**: Vista general con estadísticas en tiempo real
+
   - Total de autos (disponibles, vendidos, reservados)
-  - Total de clientes registrados
+
+## 📁 Estructura del Proyecto  - Total de clientes registrados
+
   - Resumen de pagos (pagados, pendientes, vencidos)
-  - Próximos vencimientos de cuotas
-  - Historial de pagos recientes
 
-- **Gestión de Autos**
-  - Registro completo de vehículos (marca, modelo, año, matrícula, precio)
-  - Estados: Disponible, Vendido, Reservado
-  - Asignación de clientes
+```  - Próximos vencimientos de cuotas
+
+├── api/              # API serverless para Vercel  - Historial de pagos recientes
+
+├── backend/          # Servidor Express + Prisma
+
+├── frontend/         # App React con Vite- **Gestión de Autos**
+
+├── vercel.json       # Configuración de Vercel  - Registro completo de vehículos (marca, modelo, año, matrícula, precio)
+
+└── README.md  - Estados: Disponible, Vendido, Reservado
+
+```  - Asignación de clientes
+
   - Búsqueda y filtrado avanzado
-  - Edición y eliminación
 
-- **Gestión de Clientes**
-  - Registro de información completa (nombre, cédula, teléfono, dirección, email)
-  - Visualización de autos asociados
-  - Búsqueda rápida
-  - Edición y eliminación con validaciones
+## 🔒 Seguridad  - Edición y eliminación
 
-- **Gestión de Pagos y Cuotas**
+
+
+- Autenticación JWT- **Gestión de Clientes**
+
+- Rate limiting  - Registro de información completa (nombre, cédula, teléfono, dirección, email)
+
+- CORS configurado  - Visualización de autos asociados
+
+- Helmet para headers de seguridad  - Búsqueda rápida
+
+- Variables de entorno protegidas  - Edición y eliminación con validaciones
+
+
+
+---- **Gestión de Pagos y Cuotas**
+
   - Generación automática de planes de cuotas
-  - Control de cuotas pagadas y pendientes
+
+**Última actualización:** 2025-11-01  - Control de cuotas pagadas y pendientes
+
   - Alertas visuales para pagos vencidos
   - Registro de fechas de vencimiento y pago
   - Marcado rápido de cuotas como pagadas
