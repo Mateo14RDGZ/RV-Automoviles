@@ -1,67 +1,133 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// This is your Prisma schema file// This is your Prisma schema file,
 
-generator client {
-  provider = "prisma-client-js"
-  output   = "../../node_modules/.prisma/client"
+// learn more about it in the docs: https://pris.ly/d/prisma-schema// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+
+
+generator client {generator client {
+
+  provider = "prisma-client-js"  provider = "prisma-client-js"
+
+}  output   = "../../node_modules/.prisma/client"
+
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("POSTGRES_PRISMA_URL")
-  directUrl = env("POSTGRES_URL_NON_POOLING")
+
+  provider = "postgresql"datasource db {
+
+  url      = env("POSTGRES_PRISMA_URL")  provider = "postgresql"
+
+  directUrl = env("POSTGRES_URL_NON_POOLING")  url      = env("POSTGRES_PRISMA_URL")
+
+}  directUrl = env("POSTGRES_URL_NON_POOLING")
+
 }
 
 model Usuario {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  password  String
-  rol       String   @default("admin") // "admin" o "cliente"
-  clienteId Int?     @unique
-  cliente   Cliente? @relation(fields: [clienteId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+
+  id        Int      @id @default(autoincrement())model Usuario {
+
+  email     String   @unique  id        Int      @id @default(autoincrement())
+
+  password  String  email     String   @unique
+
+  rol       String   @default("admin") // "admin" o "cliente"  password  String
+
+  clienteId Int?     @unique  rol       String   @default("admin") // "admin" o "cliente"
+
+  cliente   Cliente? @relation(fields: [clienteId], references: [id])  clienteId Int?     @unique
+
+  createdAt DateTime @default(now())  cliente   Cliente? @relation(fields: [clienteId], references: [id])
+
+  updatedAt DateTime @updatedAt  createdAt DateTime @default(now())
+
+}  updatedAt DateTime @updatedAt
+
 }
 
 model Cliente {
-  id        Int      @id @default(autoincrement())
-  nombre    String
-  cedula    String   @unique
-  telefono  String
-  direccion String?
-  email     String   @unique
-  activo    Boolean  @default(true) // true: activo, false: archivado/completado
-  usuario   Usuario?
-  autos     Auto[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+
+  id        Int      @id @default(autoincrement())model Cliente {
+
+  nombre    String  id        Int      @id @default(autoincrement())
+
+  cedula    String   @unique  nombre    String
+
+  telefono  String  cedula    String   @unique
+
+  direccion String?  telefono  String
+
+  email     String   @unique  direccion String?
+
+  activo    Boolean  @default(true) // true: activo, false: archivado/completado  email     String   @unique
+
+  usuario   Usuario?  activo    Boolean  @default(true) // true: activo, false: archivado/completado
+
+  autos     Auto[]  usuario   Usuario?
+
+  createdAt DateTime @default(now())  autos     Auto[]
+
+  updatedAt DateTime @updatedAt  createdAt DateTime @default(now())
+
+}  updatedAt DateTime @updatedAt
+
 }
 
 model Auto {
-  id         Int      @id @default(autoincrement())
-  marca      String
-  modelo     String
-  anio       Int
-  matricula  String   @unique
-  precio     Float
-  estado     String   @default("disponible") // disponible, vendido, reservado
-  activo     Boolean  @default(true) // true: activo, false: archivado/completado
-  clienteId  Int?
-  cliente    Cliente? @relation(fields: [clienteId], references: [id])
-  pagos      Pago[]
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+
+  id         Int      @id @default(autoincrement())model Auto {
+
+  marca      String  id         Int      @id @default(autoincrement())
+
+  modelo     String  marca      String
+
+  anio       Int  modelo     String
+
+  matricula  String   @unique  anio       Int
+
+  precio     Float  matricula  String   @unique
+
+  estado     String   @default("disponible") // disponible, vendido, reservado  precio     Float
+
+  activo     Boolean  @default(true) // true: activo, false: archivado/completado  estado     String   @default("disponible") // disponible, vendido, reservado
+
+  clienteId  Int?  activo     Boolean  @default(true) // true: activo, false: archivado/completado
+
+  cliente    Cliente? @relation(fields: [clienteId], references: [id])  clienteId  Int?
+
+  pagos      Pago[]  cliente    Cliente? @relation(fields: [clienteId], references: [id])
+
+  createdAt  DateTime @default(now())  pagos      Pago[]
+
+  updatedAt  DateTime @updatedAt  createdAt  DateTime @default(now())
+
+}  updatedAt  DateTime @updatedAt
+
 }
 
 model Pago {
-  id                Int       @id @default(autoincrement())
-  autoId            Int
-  auto              Auto      @relation(fields: [autoId], references: [id])
-  numeroCuota       Int
-  monto             Float
-  fechaVencimiento  DateTime
-  fechaPago         DateTime?
-  estado            String    @default("pendiente") // pendiente, pagado, vencido
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+
+  id                Int       @id @default(autoincrement())model Pago {
+
+  autoId            Int  id                Int       @id @default(autoincrement())
+
+  auto              Auto      @relation(fields: [autoId], references: [id])  autoId            Int
+
+  numeroCuota       Int  auto              Auto      @relation(fields: [autoId], references: [id])
+
+  monto             Float  numeroCuota       Int
+
+  fechaVencimiento  DateTime  monto             Float
+
+  fechaPago         DateTime?  fechaVencimiento  DateTime
+
+  estado            String    @default("pendiente") // pendiente, pagado, vencido  fechaPago         DateTime?
+
+  createdAt         DateTime  @default(now())  estado            String    @default("pendiente") // pendiente, pagado, vencido
+
+  updatedAt         DateTime  @updatedAt  createdAt         DateTime  @default(now())
+
+}  updatedAt         DateTime  @updatedAt
+
 }

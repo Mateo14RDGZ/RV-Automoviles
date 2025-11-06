@@ -1,9 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { PrismaClient } = require('@prisma/client');
 const { authMiddleware } = require('../middleware/auth.middleware');
-
-const prisma = new PrismaClient();
+const prisma = require('../../api/lib/prisma');
 
 // Todas las rutas requieren autenticación
 router.use(authMiddleware);
