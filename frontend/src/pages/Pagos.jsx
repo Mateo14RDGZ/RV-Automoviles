@@ -176,7 +176,14 @@ const Pagos = () => {
       await pagosService.update(pagoSeleccionado, { estado: 'pagado' });
       setShowConfirmModal(false);
       setPagoSeleccionado(null);
-      handleFilter(filter);
+      
+      // Recargar todos los datos para actualizar los totales
+      await loadInitialData();
+      
+      // Aplicar el filtro actual nuevamente
+      if (filter !== 'pendientes') {
+        await handleFilter(filter);
+      }
     } catch (error) {
       alert('Error al actualizar el pago');
     }
