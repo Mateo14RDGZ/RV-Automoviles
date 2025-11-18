@@ -44,9 +44,12 @@ const Layout = () => {
       {/* Sidebar para desktop */}
       <aside className="hidden md:fixed md:inset-y-0 md:flex md:w-64 md:flex-col">
         <div className="flex flex-col flex-grow bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 overflow-y-auto">
-          <div className="flex items-center flex-shrink-0 px-6 py-5 bg-primary-600 dark:bg-primary-700">
-            <Car className="h-8 w-8 text-white" />
-            <span className="ml-3 text-xl font-bold text-white">RV Automoviles</span>
+          <div className="flex items-center justify-center flex-shrink-0 px-6 py-5 bg-primary-600 dark:bg-primary-700">
+            <img 
+              src="/assets/Gemini_Generated_Image_29p8qb29p8qb29p8.png" 
+              alt="RV Automoviles" 
+              className="h-16 w-auto object-contain"
+            />
           </div>
           
           <nav className="flex-1 px-4 py-6 space-y-2">
@@ -127,8 +130,11 @@ const Layout = () => {
           <div className="fixed inset-y-0 left-0 flex flex-col w-64 bg-white dark:bg-gray-800">
             <div className="flex items-center justify-between px-6 py-5 bg-primary-600 dark:bg-primary-700">
               <div className="flex items-center">
-                <Car className="h-8 w-8 text-white" />
-                <span className="ml-3 text-xl font-bold text-white">RV Automoviles</span>
+                <img 
+                  src="/assets/Gemini_Generated_Image_29p8qb29p8qb29p8.png" 
+                  alt="RV Automoviles" 
+                  className="h-12 w-auto object-contain"
+                />
               </div>
               <button
                 onClick={() => setSidebarOpen(false)}
