@@ -25,8 +25,10 @@ const Login = () => {
       if (loginMode === 'admin') {
         const result = await login(email, password);
         // Asegurar que el login fue exitoso antes de navegar
-        if (result && result.token) {
-          navigate('/dashboard');
+        if (result && result.token && result.user) {
+          // Navegar a la raíz para que RoleBasedRedirect haga su trabajo
+          // Esto redirigirá a /dashboard para admin o /pagos para cliente
+          navigate('/', { replace: true });
         } else {
           setError('Error al iniciar sesión: respuesta inválida del servidor');
           setLoading(false);
@@ -54,15 +56,16 @@ const Login = () => {
 
     if (!response.ok) {
       const data = await response.json();
-      throw { error: data.error };
+      throw new Error(data.error || 'Error al iniciar sesión como cliente');
     }
 
     const data = await response.json();
     localStorage.setItem('token', data.token);
     localStorage.setItem('user', JSON.stringify(data.user));
     
-    // Los clientes van directo a ver sus cuotas
-    window.location.href = '/pagos';
+    // Actualizar el contexto de autenticación
+    // Forzamos la recarga para que el AuthContext detecte el nuevo token
+    window.location.href = '/';
   };
 
   const resetForm = () => {
