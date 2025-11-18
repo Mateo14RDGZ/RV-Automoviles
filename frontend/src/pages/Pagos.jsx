@@ -35,27 +35,22 @@ const Pagos = () => {
   });
 
   useEffect(() => {
-    loadData();
+    loadInitialData();
   }, []);
 
-  const loadData = async () => {
+  const loadInitialData = async () => {
     try {
-      const [pagosData, autosData, clientesData] = await Promise.all([
-        pagosService.getAll({ estado: 'pendiente' }),
+      const [autosData, clientesData] = await Promise.all([
         autosService.getAll(),
         clientesService.getAll(),
       ]);
-      setPagos(pagosData);
       setAutos(autosData.filter(auto => auto.estado !== 'disponible'));
       setClientes(clientesData);
       
-      // Agrupar pagos por cliente
-      if (user?.rol === 'admin') {
-        organizarPagosPorCliente(pagosData, clientesData);
-      }
+      // Cargar pagos pendientes por defecto
+      handleFilter('pendientes');
     } catch (error) {
       console.error('Error al cargar datos:', error);
-    } finally {
       setLoading(false);
     }
   };
