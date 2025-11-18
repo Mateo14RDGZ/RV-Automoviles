@@ -46,7 +46,7 @@ const Layout = () => {
         <div className="flex flex-col flex-grow bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 overflow-y-auto">
           <div className="flex items-center justify-center flex-shrink-0 px-6 py-5 bg-primary-600 dark:bg-primary-700">
             <img 
-              src="/assets/Gemini_Generated_Image_29p8qb29p8qb29p8.png" 
+              src="/assets/logo-rv.png?v=2" 
               alt="RV Automoviles" 
               className="h-16 w-auto object-contain"
             />
@@ -131,7 +131,7 @@ const Layout = () => {
             <div className="flex items-center justify-between px-6 py-5 bg-primary-600 dark:bg-primary-700">
               <div className="flex items-center">
                 <img 
-                  src="/assets/Gemini_Generated_Image_29p8qb29p8qb29p8.png" 
+                  src="/assets/logo-rv.png?v=2" 
                   alt="RV Automoviles" 
                   className="h-12 w-auto object-contain"
                 />
