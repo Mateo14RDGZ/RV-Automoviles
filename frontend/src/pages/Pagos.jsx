@@ -40,17 +40,24 @@ const Pagos = () => {
 
   const loadInitialData = async () => {
     try {
-      const [autosData, clientesData] = await Promise.all([
+      setLoading(true);
+      const [pagosData, autosData, clientesData] = await Promise.all([
+        pagosService.getAll({ estado: 'pendiente' }),
         autosService.getAll(),
         clientesService.getAll(),
       ]);
+      
+      setPagos(pagosData);
       setAutos(autosData.filter(auto => auto.estado !== 'disponible'));
       setClientes(clientesData);
       
-      // Cargar pagos pendientes por defecto
-      handleFilter('pendientes');
+      // Agrupar pagos por cliente si es admin
+      if (user?.rol === 'admin') {
+        organizarPagosPorCliente(pagosData, clientesData);
+      }
     } catch (error) {
       console.error('Error al cargar datos:', error);
+    } finally {
       setLoading(false);
     }
   };
