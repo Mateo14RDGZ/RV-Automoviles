@@ -11,7 +11,7 @@ const Pagos = () => {
   const [clientesConPagos, setClientesConPagos] = useState([]);
   const [clientesExpandidos, setClientesExpandidos] = useState({});
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState('todos');
+  const [filter, setFilter] = useState('pendientes');
   const [showModal, setShowModal] = useState(false);
   const [showGenerateModal, setShowGenerateModal] = useState(false);
   const [pagoSeleccionado, setPagoSeleccionado] = useState(null);
@@ -41,7 +41,7 @@ const Pagos = () => {
   const loadData = async () => {
     try {
       const [pagosData, autosData, clientesData] = await Promise.all([
-        pagosService.getAll(),
+        pagosService.getAll({ estado: 'pendiente' }),
         autosService.getAll(),
         clientesService.getAll(),
       ]);
@@ -129,7 +129,6 @@ const Pagos = () => {
     } finally {
       setLoading(false);
     }
-  };
   };
 
   const toggleCliente = (clienteId) => {
@@ -290,15 +289,6 @@ const Pagos = () => {
       {/* Filtros */}
       <div className="card">
         <div className="flex flex-wrap gap-3">
-          <button
-            onClick={() => {
-              setFilter('todos');
-              loadData();
-            }}
-            className={`btn ${filter === 'todos' ? 'btn-primary' : 'btn-secondary'}`}
-          >
-            Todas
-          </button>
           <button
             onClick={() => handleFilter('pendientes')}
             className={`btn ${filter === 'pendientes' ? 'btn-primary' : 'btn-secondary'}`}
@@ -514,12 +504,12 @@ const Pagos = () => {
       ) : (
         /* Vista Cliente: Tabla simple */
         <div className="card overflow-hidden">
-          {!loading && pagos.length === 0 ? (
+          {pagos.length === 0 ? (
             <div className="text-center py-12">
               <CreditCard className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
               <p className="text-gray-500 dark:text-gray-400">No se encontraron pagos</p>
             </div>
-          ) : pagos.length > 0 && (
+          ) : (
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead className="bg-gray-50 dark:bg-gray-800">

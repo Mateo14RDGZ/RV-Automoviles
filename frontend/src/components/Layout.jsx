@@ -138,8 +138,7 @@ const Layout = () => {
               </div>
               <button
                 onClick={() => setSidebarOpen(false)}
-                className="p-2 mr-2"
-                className="text-white"
+                className="p-2 mr-2 text-white"
               >
                 <X className="h-6 w-6" />
               </button>
