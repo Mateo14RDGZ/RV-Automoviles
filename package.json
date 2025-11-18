@@ -5,8 +5,8 @@
   "private": true,
   "scripts": {
     "install-all": "cd backend && npm install && cd ../frontend && npm install",
-    "install:vercel": "cd api && npm install && cd ../frontend && npm ci || npm install",
-    "build:vercel": "cd frontend && npm install && npm run vercel-build",
+    "install:vercel": "cd api && npm install && cd ../frontend && npm install",
+    "build:vercel": "cd frontend && npm run vercel-build",
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
     "dev:backend": "cd backend && npm run dev",
     "dev:frontend": "cd frontend && npm run dev",
