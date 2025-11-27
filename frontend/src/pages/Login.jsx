@@ -197,7 +197,7 @@ const Login = () => {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         className="w-full pl-11 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-500 focus:border-transparent transition-all"
-                        placeholder="admin@automanager.com"
+                        placeholder="marcos@rvautomoviles.com"
                         required
                       />
                     </div>
@@ -260,25 +260,7 @@ const Login = () => {
                 )}
               </button>
 
-              {loginMode === 'admin' && (
-                <div className="mt-5 pt-5 border-t border-gray-200 dark:border-gray-700">
-                  <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
-                    <p className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Credenciales de Prueba
-                    </p>
-                    <div className="space-y-1.5 text-xs text-gray-600 dark:text-gray-400">
-                      <div className="flex items-center justify-between">
-                        <span>Admin:</span>
-                        <code className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 px-2 py-1 rounded border border-gray-200 dark:border-gray-600">admin@automanager.com</code>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span>Pass:</span>
-                        <code className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 px-2 py-1 rounded border border-gray-200 dark:border-gray-600">admin123</code>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
+
 
               {loginMode === 'cliente' && (
                 <div className="mt-5 pt-5 border-t border-gray-200 dark:border-gray-700">
