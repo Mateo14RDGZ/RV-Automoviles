@@ -393,56 +393,57 @@ const Pagos = () => {
               <div key={clienteData.cliente.id} className="card dark:bg-gray-800 dark:border-gray-700 overflow-hidden">
                 {/* Header del cliente */}
                 <div 
-                  className="bg-gradient-to-r from-gray-50 to-white dark:from-gray-700 dark:to-gray-800 p-6 cursor-pointer hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-600 dark:hover:to-gray-700 transition-all duration-200"
+                  className="bg-gradient-to-r from-gray-50 to-white dark:from-gray-700 dark:to-gray-800 p-4 md:p-6 cursor-pointer hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-600 dark:hover:to-gray-700 transition-all duration-200"
                   onClick={() => toggleCliente(clienteData.cliente.id)}
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 dark:from-red-600 dark:to-red-700 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg">
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    {/* Info del cliente */}
+                    <div className="flex items-center gap-3 md:gap-4">
+                      <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-red-500 to-red-600 dark:from-red-600 dark:to-red-700 rounded-full flex items-center justify-center text-white font-bold text-lg md:text-xl shadow-lg flex-shrink-0">
                         {clienteData.cliente.nombre.charAt(0).toUpperCase()}
                       </div>
-                      <div>
-                        <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                          {clienteData.cliente.nombre}
+                      <div className="min-w-0 flex-1">
+                        <h3 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                          <span className="truncate">{clienteData.cliente.nombre}</span>
                           {clientesExpandidos[clienteData.cliente.id] ? (
-                            <ChevronUp className="w-5 h-5 text-gray-400 dark:text-gray-500" />
+                            <ChevronUp className="w-5 h-5 text-gray-400 dark:text-gray-500 flex-shrink-0" />
                           ) : (
-                            <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-500" />
+                            <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-500 flex-shrink-0" />
                           )}
                         </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                        <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 truncate">
                           Cédula: {clienteData.cliente.cedula} • Tel: {clienteData.cliente.telefono}
                         </p>
                       </div>
                     </div>
                     
-                    {/* Resumen de pagos */}
-                    <div className="flex gap-6">
+                    {/* Resumen de pagos - Responsive */}
+                    <div className="flex flex-wrap md:flex-nowrap gap-3 md:gap-6 justify-start md:justify-end">
                       {clienteData.totales.vencidos > 0 && (
                         <div className="text-center">
-                          <div className="text-2xl font-bold text-red-600 dark:text-red-400">
+                          <div className="text-xl md:text-2xl font-bold text-red-600 dark:text-red-400">
                             {formatCurrency(clienteData.totales.vencidos)}
                           </div>
-                          <div className="text-xs text-red-600 dark:text-red-400 font-medium uppercase">
+                          <div className="text-xs text-red-600 dark:text-red-400 font-medium uppercase whitespace-nowrap">
                             Vencidos ({clienteData.pagos.vencidos.length})
                           </div>
                         </div>
                       )}
                       {clienteData.totales.pendientes > 0 && (
                         <div className="text-center">
-                          <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
+                          <div className="text-xl md:text-2xl font-bold text-yellow-600 dark:text-yellow-400">
                             {formatCurrency(clienteData.totales.pendientes)}
                           </div>
-                          <div className="text-xs text-yellow-600 dark:text-yellow-400 font-medium uppercase">
+                          <div className="text-xs text-yellow-600 dark:text-yellow-400 font-medium uppercase whitespace-nowrap">
                             Pendientes ({clienteData.pagos.pendientes.length})
                           </div>
                         </div>
                       )}
                       <div className="text-center">
-                        <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                        <div className="text-xl md:text-2xl font-bold text-green-600 dark:text-green-400">
                           {formatCurrency(clienteData.totales.pagados)}
                         </div>
-                        <div className="text-xs text-green-600 dark:text-green-400 font-medium uppercase">
+                        <div className="text-xs text-green-600 dark:text-green-400 font-medium uppercase whitespace-nowrap">
                           Pagados ({clienteData.pagos.pagados.length})
                         </div>
                       </div>
@@ -452,7 +453,7 @@ const Pagos = () => {
 
                 {/* Contenido expandible */}
                 {clientesExpandidos[clienteData.cliente.id] && (
-                  <div className="p-6 space-y-6 bg-gray-50 dark:bg-gray-900/50">
+                  <div className="p-4 md:p-6 space-y-4 md:space-y-6 bg-gray-50 dark:bg-gray-900/50">
                     {/* Pagos Vencidos */}
                     {clienteData.pagos.vencidos.length > 0 && (
                       <div>
@@ -462,23 +463,23 @@ const Pagos = () => {
                         </h4>
                         <div className="space-y-2">
                           {clienteData.pagos.vencidos.map(pago => (
-                            <div key={pago.id} className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900 rounded-lg p-4 hover:shadow-md transition-shadow">
-                              <div className="flex items-center justify-between">
-                                <div className="flex-1">
-                                  <div className="font-medium text-gray-900 dark:text-white">
+                            <div key={pago.id} className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900 rounded-lg p-3 md:p-4 hover:shadow-md transition-shadow">
+                              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                                <div className="flex-1 min-w-0">
+                                  <div className="font-medium text-gray-900 dark:text-white text-sm md:text-base">
                                     {pago.auto.marca} {pago.auto.modelo} - Cuota #{pago.numeroCuota}
                                   </div>
-                                  <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                  <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1">
                                     Matrícula: {pago.auto.matricula} • Vencimiento: {formatDate(pago.fechaVencimiento)}
                                   </div>
                                 </div>
-                                <div className="flex items-center gap-4">
+                                <div className="flex items-center justify-between md:justify-end gap-3 md:gap-4">
                                   <div className="text-right">
-                                    <div className="text-lg font-bold text-red-700 dark:text-red-400">{formatCurrency(pago.monto)}</div>
+                                    <div className="text-lg md:text-xl font-bold text-red-700 dark:text-red-400">{formatCurrency(pago.monto)}</div>
                                   </div>
                                   <button
                                     onClick={() => handleMarcarPagado(pago.id)}
-                                    className="btn btn-success btn-sm whitespace-nowrap"
+                                    className="btn btn-success btn-sm whitespace-nowrap text-xs md:text-sm"
                                   >
                                     Marcar Pagado
                                   </button>
@@ -499,23 +500,23 @@ const Pagos = () => {
                         </h4>
                         <div className="space-y-2">
                           {clienteData.pagos.pendientes.map(pago => (
-                            <div key={pago.id} className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-900 rounded-lg p-4 hover:shadow-md transition-shadow">
-                              <div className="flex items-center justify-between">
-                                <div className="flex-1">
-                                  <div className="font-medium text-gray-900 dark:text-white">
+                            <div key={pago.id} className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-900 rounded-lg p-3 md:p-4 hover:shadow-md transition-shadow">
+                              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                                <div className="flex-1 min-w-0">
+                                  <div className="font-medium text-gray-900 dark:text-white text-sm md:text-base">
                                     {pago.auto.marca} {pago.auto.modelo} - Cuota #{pago.numeroCuota}
                                   </div>
-                                  <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                  <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1">
                                     Matrícula: {pago.auto.matricula} • Vencimiento: {formatDate(pago.fechaVencimiento)}
                                   </div>
                                 </div>
-                                <div className="flex items-center gap-4">
+                                <div className="flex items-center justify-between md:justify-end gap-3 md:gap-4">
                                   <div className="text-right">
-                                    <div className="text-lg font-bold text-yellow-700 dark:text-yellow-400">{formatCurrency(pago.monto)}</div>
+                                    <div className="text-lg md:text-xl font-bold text-yellow-700 dark:text-yellow-400">{formatCurrency(pago.monto)}</div>
                                   </div>
                                   <button
                                     onClick={() => handleMarcarPagado(pago.id)}
-                                    className="btn btn-success btn-sm whitespace-nowrap"
+                                    className="btn btn-success btn-sm whitespace-nowrap text-xs md:text-sm"
                                   >
                                     Marcar Pagado
                                   </button>
@@ -536,18 +537,18 @@ const Pagos = () => {
                         </h4>
                         <div className="space-y-2">
                           {clienteData.pagos.pagados.map(pago => (
-                            <div key={pago.id} className="bg-white dark:bg-gray-800 border border-green-200 dark:border-green-900 rounded-lg p-4 hover:shadow-md transition-shadow">
-                              <div className="flex items-center justify-between">
-                                <div className="flex-1">
-                                  <div className="font-medium text-gray-900 dark:text-white">
+                            <div key={pago.id} className="bg-white dark:bg-gray-800 border border-green-200 dark:border-green-900 rounded-lg p-3 md:p-4 hover:shadow-md transition-shadow">
+                              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                                <div className="flex-1 min-w-0">
+                                  <div className="font-medium text-gray-900 dark:text-white text-sm md:text-base">
                                     {pago.auto.marca} {pago.auto.modelo} - Cuota #{pago.numeroCuota}
                                   </div>
-                                  <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                  <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1">
                                     Matrícula: {pago.auto.matricula} • Pagado: {formatDate(pago.fechaPago)}
                                   </div>
                                 </div>
                                 <div className="text-right">
-                                  <div className="text-lg font-bold text-green-600 dark:text-green-400">{formatCurrency(pago.monto)}</div>
+                                  <div className="text-lg md:text-xl font-bold text-green-600 dark:text-green-400">{formatCurrency(pago.monto)}</div>
                                   <div className="text-xs text-green-600 dark:text-green-400 font-medium">✓ PAGADO</div>
                                 </div>
                               </div>
