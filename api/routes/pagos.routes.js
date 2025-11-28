@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { authMiddleware } = require('../middleware/auth.middleware');
 const prisma = require('../lib/prisma');
+const { enviarConfirmacionPago } = require('../lib/email');
 
 // Todas las rutas requieren autenticación
 router.use(authMiddleware);
@@ -258,6 +259,17 @@ router.put('/:id', async (req, res) => {
         }
       }
     });
+
+    // Si el pago fue marcado como "pagado", enviar email de confirmación
+    if (estado === 'pagado' && pago.auto?.cliente?.email) {
+      try {
+        await enviarConfirmacionPago(pago.auto.cliente, pago, pago.auto);
+        console.log(`📧 Email de confirmación enviado a ${pago.auto.cliente.email}`);
+      } catch (emailError) {
+        console.error('❌ Error al enviar email (no afecta el proceso):', emailError);
+        // No falla la petición si el email falla
+      }
+    }
 
     // Si el pago fue marcado como "pagado", verificar si todas las cuotas del cliente están pagadas
     if (estado === 'pagado' && pago.auto.clienteId) {
