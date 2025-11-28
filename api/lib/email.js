@@ -1,17 +1,32 @@
 const nodemailer = require('nodemailer');
 
+// Validar que las credenciales estén disponibles
+const emailUser = process.env.EMAIL_USER;
+const emailPassword = process.env.EMAIL_PASSWORD;
+
+if (!emailUser || !emailPassword) {
+  console.error('⚠️ ADVERTENCIA: Variables de entorno EMAIL_USER o EMAIL_PASSWORD no configuradas');
+  console.error('EMAIL_USER:', emailUser ? 'Configurado' : 'NO CONFIGURADO');
+  console.error('EMAIL_PASSWORD:', emailPassword ? 'Configurado' : 'NO CONFIGURADO');
+}
+
 // Configurar transportador de Gmail
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: process.env.EMAIL_USER || 'mateorodriguez1026@gmail.com',
-    pass: process.env.EMAIL_PASSWORD // Contraseña de aplicación de Gmail
+    user: emailUser,
+    pass: emailPassword
   }
 });
 
 // Función para enviar email de confirmación de pago
 async function enviarConfirmacionPago(cliente, pago, auto) {
   try {
+    // Validar credenciales antes de enviar
+    if (!emailUser || !emailPassword) {
+      throw new Error('Credenciales de email no configuradas. Por favor configura EMAIL_USER y EMAIL_PASSWORD en Vercel.');
+    }
+
     const fechaPago = new Date(pago.fechaPago || new Date()).toLocaleDateString('es-EC', {
       day: '2-digit',
       month: 'long',
