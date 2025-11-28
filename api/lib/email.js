@@ -214,6 +214,31 @@ async function enviarConfirmacionPago(cliente, pago, auto) {
                 Agradecemos su puntualidad y compromiso con sus pagos. Este comprobante es válido como constancia de su transacción.
               </p>
 
+              <div class="info-box" style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border: 1px solid #3b82f6;">
+                <div style="text-align: center; margin-bottom: 15px;">
+                  <strong style="color: #1e40af; font-size: 16px;">💻 Control en Línea de tus Cuotas</strong>
+                </div>
+                <p class="message" style="margin: 10px 0; text-align: center;">
+                  Ahora puedes ver el estado de todas tus cuotas en cualquier momento desde nuestra plataforma web:
+                </p>
+                <div style="text-align: center; margin: 20px 0;">
+                  <a href="https://rv-gestion-automotora20.vercel.app" 
+                     style="display: inline-block; background: #3b82f6; color: white; padding: 12px 30px; 
+                            border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 15px;">
+                    🚗 Ingresar a Mi Portal
+                  </a>
+                </div>
+                <p class="message" style="margin: 15px 0; text-align: center; font-size: 14px; color: #1e40af;">
+                  <strong>Ingresa con tu número de cédula</strong> y podrás ver:
+                </p>
+                <ul style="color: #1e3a8a; text-align: left; display: inline-block; margin: 0 auto;">
+                  <li>Estado de todas tus cuotas (pendientes, vencidas, pagadas)</li>
+                  <li>Montos y fechas de vencimiento</li>
+                  <li>Historial completo de pagos</li>
+                  <li>Información de tu vehículo</li>
+                </ul>
+              </div>
+
               <p class="message">
                 Si tiene alguna consulta o necesita información adicional, no dude en contactarnos.
               </p>
@@ -222,6 +247,9 @@ async function enviarConfirmacionPago(cliente, pago, auto) {
             <div class="footer">
               <p class="footer-title">RV Automóviles</p>
               <p class="footer-text">Su concesionario de confianza</p>
+              <p class="footer-text" style="margin-top: 10px;">
+                🌐 <a href="https://rv-gestion-automotora20.vercel.app" style="color: #3b82f6; text-decoration: none;">rv-gestion-automotora20.vercel.app</a>
+              </p>
               <p class="footer-text" style="margin-top: 15px;">
                 Este es un correo automático. Por favor, no responda directamente a este mensaje.
               </p>
