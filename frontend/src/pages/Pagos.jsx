@@ -16,6 +16,8 @@ const Pagos = () => {
   const [showGenerateModal, setShowGenerateModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showEmailModal, setShowEmailModal] = useState(false);
+  const [emailEnviado, setEmailEnviado] = useState(false);
+  const [emailError, setEmailError] = useState(null);
   const [pagoSeleccionado, setPagoSeleccionado] = useState(null);
   const [pagoParaEmail, setPagoParaEmail] = useState(null);
   const [formData, setFormData] = useState({
@@ -210,12 +212,18 @@ const Pagos = () => {
   const enviarEmailConfirmacion = async () => {
     try {
       setLoading(true);
+      setEmailError(null);
       await pagosService.enviarEmail(pagoParaEmail.id);
-      setShowEmailModal(false);
-      setPagoParaEmail(null);
-      alert('✅ Email de confirmación enviado exitosamente');
+      setEmailEnviado(true);
+      
+      // Cerrar modal después de 2 segundos
+      setTimeout(() => {
+        setShowEmailModal(false);
+        setPagoParaEmail(null);
+        setEmailEnviado(false);
+      }, 2000);
     } catch (error) {
-      alert('❌ Error al enviar el email: ' + (error.response?.data?.error || error.message));
+      setEmailError(error.response?.data?.error || error.message);
     } finally {
       setLoading(false);
     }
@@ -1120,46 +1128,84 @@ const Pagos = () => {
           <div className="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4">
             <div className="p-6">
               <div className="flex items-center justify-center mb-4">
-                <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
-                  <CheckCircle className="w-10 h-10 text-green-600 dark:text-green-400" />
+                <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-500 ${
+                  emailEnviado 
+                    ? 'bg-green-500 dark:bg-green-600 scale-110' 
+                    : 'bg-green-100 dark:bg-green-900/30'
+                }`}>
+                  <CheckCircle className={`w-10 h-10 transition-all duration-500 ${
+                    emailEnviado 
+                      ? 'text-white scale-110' 
+                      : 'text-green-600 dark:text-green-400'
+                  }`} />
                 </div>
               </div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 text-center">
-                ¡Pago Confirmado!
+                {emailEnviado ? '¡Email Enviado!' : '¡Pago Confirmado!'}
               </h3>
               <p className="text-gray-600 dark:text-gray-300 mb-6 text-center">
-                La cuota ha sido marcada como pagada exitosamente.
+                {emailEnviado 
+                  ? 'El cliente recibirá la confirmación en su correo electrónico.' 
+                  : 'La cuota ha sido marcada como pagada exitosamente.'}
               </p>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 text-center">
-                ¿Deseas enviar un email de confirmación al cliente?
-              </p>
-              <div className="flex flex-col gap-3">
-                <button
-                  onClick={enviarEmailConfirmacion}
-                  disabled={loading}
-                  className="w-full bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white py-2.5 px-4 rounded-lg font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  {loading ? (
-                    <>
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                      Enviando...
-                    </>
-                  ) : (
-                    <>
-                      📧 Enviar Email de Confirmación
-                    </>
+              
+              {!emailEnviado && (
+                <>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 text-center">
+                    ¿Deseas enviar un email de confirmación al cliente?
+                  </p>
+                  
+                  {emailError && (
+                    <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                      <p className="text-sm text-red-600 dark:text-red-400">
+                        ❌ {emailError}
+                      </p>
+                    </div>
                   )}
-                </button>
-                <button
-                  onClick={() => {
-                    setShowEmailModal(false);
-                    setPagoParaEmail(null);
-                  }}
-                  className="w-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 py-2.5 px-4 rounded-lg font-semibold transition-all duration-200"
-                >
-                  Omitir
-                </button>
-              </div>
+                  
+                  <div className="flex flex-col gap-3">
+                    <button
+                      onClick={enviarEmailConfirmacion}
+                      disabled={loading || emailEnviado}
+                      className={`w-full py-2.5 px-4 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${
+                        emailEnviado
+                          ? 'bg-green-500 dark:bg-green-600 text-white cursor-default'
+                          : 'bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white disabled:opacity-50 disabled:cursor-not-allowed'
+                      }`}
+                    >
+                      {loading ? (
+                        <>
+                          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                          Enviando...
+                        </>
+                      ) : emailEnviado ? (
+                        <>
+                          <CheckCircle className="w-5 h-5 animate-bounce" />
+                          ¡Enviado!
+                        </>
+                      ) : (
+                        <>
+                          📧 Enviar Email de Confirmación
+                        </>
+                      )}
+                    </button>
+                    
+                    {!emailEnviado && (
+                      <button
+                        onClick={() => {
+                          setShowEmailModal(false);
+                          setPagoParaEmail(null);
+                          setEmailError(null);
+                        }}
+                        disabled={loading}
+                        className="w-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 py-2.5 px-4 rounded-lg font-semibold transition-all duration-200 disabled:opacity-50"
+                      >
+                        Omitir
+                      </button>
+                    )}
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
