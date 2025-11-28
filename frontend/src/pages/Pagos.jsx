@@ -159,9 +159,9 @@ const Pagos = () => {
       await pagosService.create(formData);
       setShowModal(false);
       resetForm();
-      loadData();
+      await loadInitialData();
     } catch (error) {
-      alert(error.response?.data?.error || 'Error al crear el pago');
+      console.error('Error al crear el pago:', error);
     }
   };
 
@@ -171,10 +171,13 @@ const Pagos = () => {
       await pagosService.generarCuotas(generateData);
       setShowGenerateModal(false);
       resetGenerateForm();
-      loadData();
-      alert('Cuotas generadas exitosamente');
+      await loadInitialData();
+      // Recargar con el filtro actual
+      if (filter !== 'pendientes') {
+        await handleFilter(filter);
+      }
     } catch (error) {
-      alert(error.response?.data?.error || 'Error al generar cuotas');
+      console.error('Error al generar cuotas:', error);
     }
   };
 
