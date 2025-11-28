@@ -219,7 +219,7 @@ async function enviarConfirmacionPago(cliente, pago, auto) {
                   <strong style="color: #1e40af; font-size: 16px;">💻 Control en Línea de tus Cuotas</strong>
                 </div>
                 <p class="message" style="margin: 10px 0; text-align: center;">
-                  Ahora puedes ver el estado de todas tus cuotas en cualquier momento desde nuestra plataforma web:
+                  Ahora puedes ver el estado de todas tus cuotas en cualquier momento desde nuestra plataforma web.
                 </p>
                 <div style="text-align: center; margin: 20px 0;">
                   <a href="https://rv-gestion-automotora20.vercel.app" 
@@ -229,14 +229,8 @@ async function enviarConfirmacionPago(cliente, pago, auto) {
                   </a>
                 </div>
                 <p class="message" style="margin: 15px 0; text-align: center; font-size: 14px; color: #1e40af;">
-                  <strong>Ingresa con tu número de cédula</strong> y podrás ver:
+                  <strong>Ingresa con tu número de cédula</strong>
                 </p>
-                <ul style="color: #1e3a8a; text-align: left; display: inline-block; margin: 0 auto;">
-                  <li>Estado de todas tus cuotas (pendientes, vencidas, pagadas)</li>
-                  <li>Montos y fechas de vencimiento</li>
-                  <li>Historial completo de pagos</li>
-                  <li>Información de tu vehículo</li>
-                </ul>
               </div>
 
               <p class="message">
