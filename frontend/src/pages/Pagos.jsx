@@ -248,16 +248,16 @@ const Pagos = () => {
       const mensaje = `✅ *Pago Confirmado - RV Automóviles*\n\n` +
         `Estimado/a *${cliente.nombre}*,\n\n` +
         `Le confirmamos que hemos recibido su pago correspondiente a:\n\n` +
-        `*Vehículo:* ${auto.marca} ${auto.modelo} ${auto.anio}\n` +
-        `*Matrícula:* ${auto.matricula}\n` +
-        `*Cuota:* #${pagoParaEmail.numeroCuota}\n` +
-        `*Monto Pagado:* $${parseFloat(pagoParaEmail.monto).toFixed(2)}\n` +
-        `*Fecha de Pago:* ${fechaPago}\n\n` +
-        `Agradecemos su puntualidad y compromiso.\n\n` +
-        `*Control en Línea:*\n` +
-        `Puede consultar el estado de todas sus cuotas ingresando a:\n` +
+        `🚗 *Vehículo:* ${auto.marca} ${auto.modelo} ${auto.anio}\n` +
+        `📋 *Matrícula:* ${auto.matricula}\n` +
+        `🔢 *Cuota:* #${pagoParaEmail.numeroCuota}\n` +
+        `💰 *Monto Pagado:* $${parseFloat(pagoParaEmail.monto).toFixed(2)}\n` +
+        `📅 *Fecha de Pago:* ${fechaPago}\n\n` +
+        `Agradecemos su puntualidad.\n\n` +
+        `💻 *Control en Línea*\n` +
+        `Puede ver el estado de todas sus cuotas en:\n` +
         `https://rv-gestion-automotora20.vercel.app\n` +
-        `(Ingrese con su número de cédula)\n\n` +
+        `Ingrese con su número de cédula.\n\n` +
         `_RV Automóviles - Su concesionario de confianza_`;
       
       // Limpiar el número de teléfono (quitar espacios, guiones, etc.)
