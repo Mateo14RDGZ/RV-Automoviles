@@ -5,6 +5,7 @@ import PrivateRoute from './components/PrivateRoute';
 import RoleBasedRedirect from './components/RoleBasedRedirect';
 import Layout from './components/Layout';
 import ThemeTransitionOverlay from './components/ThemeTransitionOverlay';
+import InstallPWABanner from './components/InstallPWABanner';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Autos from './pages/Autos';
@@ -34,6 +35,9 @@ function App() {
               </Route>
             </Route>
           </Routes>
+          
+          {/* Banner de instalación PWA */}
+          <InstallPWABanner />
         </Router>
       </AuthProvider>
     </ThemeProvider>
