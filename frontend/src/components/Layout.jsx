@@ -23,6 +23,11 @@ const Layout = () => {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  const handleThemeToggle = () => {
+    console.log('🎨 Cambiando tema de', theme, 'a', theme === 'light' ? 'dark' : 'light');
+    toggleTheme();
+  };
+
   const handleLogout = () => {
     logout();
     navigate('/login');
@@ -95,7 +100,7 @@ const Layout = () => {
             
             {/* Theme Toggle */}
             <button
-              onClick={toggleTheme}
+              onClick={handleThemeToggle}
               className="w-full flex items-center justify-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-all duration-300 transform hover:scale-105 active:scale-95"
               title={theme === 'light' ? 'Modo oscuro' : 'Modo claro'}
             >
@@ -188,7 +193,7 @@ const Layout = () => {
               
               {/* Theme Toggle Mobile */}
               <button
-                onClick={toggleTheme}
+                onClick={handleThemeToggle}
                 className="w-full flex items-center justify-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-all duration-300 transform hover:scale-105 active:scale-95"
                 title={theme === 'light' ? 'Modo oscuro' : 'Modo claro'}
               >
