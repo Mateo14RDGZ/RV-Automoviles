@@ -1,6 +1,6 @@
 // Service Worker para PWA - RV Automóviles
-const CACHE_NAME = 'rv-autos-v1';
-const CACHE_VERSION = '1.0.0';
+const CACHE_NAME = 'rv-autos-v6';
+const CACHE_VERSION = '6.0.0';
 
 // Archivos esenciales que se cachearán durante la instalación
 const STATIC_ASSETS = [

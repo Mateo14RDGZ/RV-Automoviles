@@ -1,6 +1,6 @@
 {
   "name": "RV Automóviles - Gestión Automotora",
-  "short_name": "RV Autos",
+  "short_name": "RV Automóviles",
   "description": "Sistema de gestión de cuotas y pagos automotor",
   "start_url": "/",
   "display": "standalone",
