@@ -43,7 +43,7 @@ router.post('/register', validateRegister, async (req, res) => {
     const { email, password } = req.body;
 
     // Verificar si el usuario ya existe
-    const existingUser = await prisma.usuario.findUnique({ where: { email } });
+    const existingUser = await prisma.usuario.findFirst({ where: { email } });
     if (existingUser) {
       return res.status(400).json({ error: 'El email ya está registrado' });
     }
@@ -79,9 +79,12 @@ router.post('/register', validateRegister, async (req, res) => {
 // Login de usuario (admin con email+contraseña, cliente con cédula)
 router.post('/login', validateLogin, async (req, res) => {
   try {
+    console.log('🔐 Intentando login con:', req.body.email);
+    
     // Validar errores
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('❌ Errores de validación:', errors.array());
       return res.status(400).json({ 
         error: 'Datos inválidos', 
         details: errors.array() 
@@ -105,17 +108,23 @@ router.post('/login', validateLogin, async (req, res) => {
     }
 
     // Buscar usuario por email
-    const user = await prisma.usuario.findUnique({ 
+    console.log('🔍 Buscando usuario:', email);
+    const user = await prisma.usuario.findFirst({ 
       where: { email },
       include: { cliente: true }
     });
+
+    console.log('👤 Usuario encontrado:', user ? `ID: ${user.id}, Rol: ${user.rol}` : 'No encontrado');
 
     if (!user) {
       return res.status(401).json({ error: 'Credenciales inválidas' });
     }
 
     // Verificar contraseña
+    console.log('🔑 Verificando contraseña...');
     const isValidPassword = await bcrypt.compare(password, user.password);
+    console.log('✅ Contraseña válida:', isValidPassword);
+    
     if (!isValidPassword) {
       return res.status(401).json({ error: 'Credenciales inválidas' });
     }
