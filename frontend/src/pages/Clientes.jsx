@@ -31,11 +31,25 @@ const Clientes = () => {
     }
   };
 
-  const handleSearch = async () => {
+  const handleSearch = async (term = searchTerm) => {
     try {
       setLoading(true);
-      const data = await clientesService.getAll({ buscar: searchTerm });
+      const data = await clientesService.getAll({ buscar: term });
       setClientes(data);
+      
+      // Si hay resultados, desplazar al primer resultado
+      if (data.length > 0) {
+        setTimeout(() => {
+          const firstCard = document.querySelector('.grid > div:first-child');
+          if (firstCard) {
+            firstCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            firstCard.classList.add('ring-2', 'ring-blue-500', 'dark:ring-blue-400');
+            setTimeout(() => {
+              firstCard.classList.remove('ring-2', 'ring-blue-500', 'dark:ring-blue-400');
+            }, 2000);
+          }
+        }, 100);
+      }
     } catch (error) {
       console.error('Error en búsqueda:', error);
     } finally {
@@ -66,7 +80,23 @@ const Clientes = () => {
       loadClientes();
     } catch (error) {
       console.error('❌ Error al guardar cliente:', error);
-      alert(error.response?.data?.error || error.message || 'Error al guardar el cliente');
+      const errorMsg = error.response?.data?.error || error.message || 'Error al guardar el cliente';
+      
+      // Si el error es que ya existe, ofrecer buscar al cliente
+      if (errorMsg.includes('cédula ya está registrada') || errorMsg.includes('email ya está registrado')) {
+        const buscar = window.confirm(
+          `${errorMsg}\n\n¿Deseas buscar este cliente existente?\n\nPuedes agregarle un nuevo auto desde la sección "Autos" seleccionando este cliente.`
+        );
+        if (buscar) {
+          setShowModal(false);
+          resetForm();
+          const termBusqueda = formData.cedula || formData.email;
+          setSearchTerm(termBusqueda);
+          await handleSearch(termBusqueda);
+        }
+      } else {
+        alert(errorMsg);
+      }
     }
   };
 
@@ -109,7 +139,9 @@ const Clientes = () => {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Gestión de Clientes</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">Administra la información de tus clientes</p>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">
+            Administra la información de tus clientes. Los clientes existentes pueden tener múltiples autos/planes.
+          </p>
         </div>
         <button
           onClick={() => {
@@ -121,6 +153,26 @@ const Clientes = () => {
           <Plus className="w-5 h-5" />
           Nuevo Cliente
         </button>
+      </div>
+
+      {/* Mensaje informativo */}
+      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+        <div className="flex items-start gap-3">
+          <div className="flex-shrink-0">
+            <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+            </svg>
+          </div>
+          <div className="flex-1">
+            <h3 className="text-sm font-medium text-blue-800 dark:text-blue-300">
+              ¿Cliente ya existe?
+            </h3>
+            <p className="text-sm text-blue-700 dark:text-blue-400 mt-1">
+              Si un cliente ya completó un plan de cuotas y necesitas crear uno nuevo, no es necesario crear un nuevo registro. 
+              Simplemente ve a <strong>Autos</strong> y crea un nuevo auto asociado al cliente existente.
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Búsqueda */}
@@ -235,6 +287,14 @@ const Clientes = () => {
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
                 {editingCliente ? 'Editar Cliente' : 'Nuevo Cliente'}
               </h2>
+
+              {!editingCliente && (
+                <div className="mb-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3">
+                  <p className="text-sm text-yellow-800 dark:text-yellow-300">
+                    <strong>Nota:</strong> Si el cliente ya existe, será redirigido a buscarlo. Los clientes pueden tener múltiples autos/planes de cuotas.
+                  </p>
+                </div>
+              )}
               
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>

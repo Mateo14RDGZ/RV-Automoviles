@@ -10,6 +10,7 @@ const Autos = () => {
   const [estadoFilter, setEstadoFilter] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingAuto, setEditingAuto] = useState(null);
+  const [clienteSearch, setClienteSearch] = useState('');
   const [formData, setFormData] = useState({
     marca: '',
     modelo: '',
@@ -360,18 +361,34 @@ const Autos = () => {
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Cliente
                     </label>
+                    <input
+                      type="text"
+                      placeholder="Buscar cliente por nombre o cédula..."
+                      value={clienteSearch}
+                      onChange={(e) => setClienteSearch(e.target.value)}
+                      className="input mb-2"
+                    />
                     <select
                       value={formData.clienteId}
                       onChange={(e) => setFormData({ ...formData, clienteId: e.target.value })}
                       className="input"
                     >
                       <option value="">Sin cliente asignado</option>
-                      {clientes.map((cliente) => (
-                        <option key={cliente.id} value={cliente.id}>
-                          {cliente.nombre} - {cliente.cedula}
-                        </option>
-                      ))}
+                      {clientes
+                        .filter(cliente => 
+                          !clienteSearch || 
+                          cliente.nombre.toLowerCase().includes(clienteSearch.toLowerCase()) ||
+                          cliente.cedula.includes(clienteSearch)
+                        )
+                        .map((cliente) => (
+                          <option key={cliente.id} value={cliente.id}>
+                            {cliente.nombre} - CI: {cliente.cedula}
+                          </option>
+                        ))}
                     </select>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      Los clientes pueden tener múltiples autos/planes de cuotas
+                    </p>
                   </div>
                 </div>
 
