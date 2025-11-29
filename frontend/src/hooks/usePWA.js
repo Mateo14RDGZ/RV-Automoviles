@@ -21,7 +21,7 @@ export const usePWA = () => {
     
     // Verificar si ya está instalada
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
-    const isIOSStandalone = (window.navigator as any).standalone === true;
+    const isIOSStandalone = window.navigator.standalone === true;
     
     if (isStandalone || isIOSStandalone) {
       setIsInstalled(true);
