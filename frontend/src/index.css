@@ -58,6 +58,23 @@
     @apply bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6 transition-all duration-300 ease-in-out hover:shadow-lg;
   }
 
+  /* Animación para iconos en cards */
+  .icon-bounce-hover:hover {
+    animation: iconBounce 0.6s ease-in-out;
+  }
+
+  @keyframes iconBounce {
+    0%, 100% {
+      transform: translateY(0) rotate(0deg);
+    }
+    25% {
+      transform: translateY(-5px) rotate(-5deg);
+    }
+    75% {
+      transform: translateY(-3px) rotate(5deg);
+    }
+  }
+
   .badge {
     @apply px-3 py-1 rounded-full text-sm font-medium;
   }
@@ -147,8 +164,40 @@
     }
   }
 
+  @keyframes fadeInUp {
+    from {
+      transform: translateY(30px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes scaleIn {
+    from {
+      transform: scale(0.9);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
   .animate-fadeIn {
     animation: fadeIn 0.3s ease-in-out;
+  }
+
+  .animate-fadeInUp {
+    animation: fadeInUp 0.6s ease-out;
+    animation-fill-mode: both;
+  }
+
+  .animate-scaleIn {
+    animation: scaleIn 0.5s ease-out;
+    animation-fill-mode: both;
   }
 
   .animate-slideUp {
@@ -207,12 +256,33 @@
 
   /* Efectos hover */
   .hover-lift {
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
   }
 
   .hover-lift:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 12px 30px -8px rgba(0, 0, 0, 0.15);
+  }
+
+  /* Efecto de brillo sutil al pasar el mouse */
+  .hover-glow {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hover-glow::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 0.5s;
+  }
+
+  .hover-glow:hover::before {
+    left: 100%;
   }
 
   /* Scrollbar personalizada */
