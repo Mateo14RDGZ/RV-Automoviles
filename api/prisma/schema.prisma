@@ -13,7 +13,7 @@ datasource db {
 
 model Usuario {
   id        Int      @id @default(autoincrement())
-  email     String   @unique
+  email     String
   password  String
   rol       String   @default("admin") // "admin" o "cliente"
   clienteId Int?     @unique

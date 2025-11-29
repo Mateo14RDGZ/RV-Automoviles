@@ -119,7 +119,7 @@ const Autos = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Gestión de Autos</h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">Administra el inventario de vehículos</p>
@@ -129,7 +129,7 @@ const Autos = () => {
             resetForm();
             setShowModal(true);
           }}
-          className="btn btn-primary flex items-center gap-2"
+          className="btn btn-primary flex items-center justify-center gap-2 w-full md:w-auto"
         >
           <Plus className="w-5 h-5" />
           Nuevo Auto
@@ -152,7 +152,7 @@ const Autos = () => {
               />
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-col md:flex-row gap-2">
             <select
               value={estadoFilter}
               onChange={(e) => setEstadoFilter(e.target.value)}
@@ -163,15 +163,15 @@ const Autos = () => {
               <option value="vendido">Vendido</option>
               <option value="reservado">Reservado</option>
             </select>
-            <button onClick={handleSearch} className="btn btn-primary">
+            <button onClick={handleSearch} className="btn btn-primary whitespace-nowrap">
               Buscar
             </button>
           </div>
         </div>
       </div>
 
-      {/* Tabla de autos */}
-      <div className="card overflow-hidden">
+      {/* Tabla de autos - Desktop */}
+      <div className="hidden md:block card overflow-hidden">
         {loading ? (
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
@@ -258,6 +258,77 @@ const Autos = () => {
               </tbody>
             </table>
           </div>
+        )}
+      </div>
+
+      {/* Cards para móvil */}
+      <div className="md:hidden space-y-4">
+        {loading ? (
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
+          </div>
+        ) : autos.length === 0 ? (
+          <div className="card text-center py-12">
+            <Car className="w-12 h-12 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
+            <p className="text-gray-500 dark:text-gray-400">No se encontraron autos</p>
+          </div>
+        ) : (
+          autos.map((auto) => (
+            <div key={auto.id} className="card">
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center">
+                    <Car className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 dark:text-white">
+                      {auto.marca} {auto.modelo}
+                    </h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">{auto.matricula}</p>
+                  </div>
+                </div>
+                <span className={getEstadoBadge(auto.estado)}>
+                  {auto.estado}
+                </span>
+              </div>
+
+              <div className="space-y-2 mb-4">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600 dark:text-gray-400">Año:</span>
+                  <span className="font-medium text-gray-900 dark:text-white">{auto.anio}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600 dark:text-gray-400">Precio:</span>
+                  <span className="font-medium text-gray-900 dark:text-white">
+                    ${auto.precio.toLocaleString()}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600 dark:text-gray-400">Cliente:</span>
+                  <span className="font-medium text-gray-900 dark:text-white">
+                    {auto.cliente ? auto.cliente.nombre : 'Sin asignar'}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <button
+                  onClick={() => handleEdit(auto)}
+                  className="flex-1 btn btn-secondary text-sm py-2 flex items-center justify-center gap-2"
+                >
+                  <Edit2 className="w-4 h-4" />
+                  Editar
+                </button>
+                <button
+                  onClick={() => handleDelete(auto.id)}
+                  className="flex-1 btn btn-danger text-sm py-2 flex items-center justify-center gap-2"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  Eliminar
+                </button>
+              </div>
+            </div>
+          ))
         )}
       </div>
 
