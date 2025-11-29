@@ -147,7 +147,6 @@ const Reportes = () => {
       console.error('Error al exportar PDF:', error);
       showToast('Error al exportar pagos a PDF', 'error');
     }
-  };}
   };
 
   const handleExportClientesPDF = async () => {
