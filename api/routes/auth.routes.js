@@ -196,62 +196,77 @@ router.post('/login-cliente', validateClienteLogin, async (req, res) => {
 
     const { cedula } = req.body;
 
-    // Buscar cliente por cédula base (sin sufijo) o con sufijo
-    // Primero intentar buscar con cédula exacta
-    let cliente = await prisma.cliente.findFirst({
-      where: { cedula },
+    // Buscar TODOS los clientes con esta cédula (base o con sufijo)
+    const clientesConCedula = await prisma.cliente.findMany({
+      where: {
+        OR: [
+          { cedula: cedula },  // Cédula exacta
+          { cedula: { startsWith: cedula + '-' } }  // Cédula con sufijo -2, -3, etc
+        ]
+      },
       include: { 
         usuario: true,
         autos: {
           include: {
-            pagos: {
-              where: { estado: 'pendiente' }
-            }
+            pagos: true  // Traer TODOS los pagos para verificar
           }
         }
+      },
+      orderBy: {
+        createdAt: 'desc' // Más reciente primero
       }
     });
 
-    // Si no encuentra, buscar clientes con cédula que comience con el número dado
-    // y tomar el más reciente (último plan de cuotas)
-    if (!cliente) {
-      const clientesConCedula = await prisma.cliente.findMany({
-        where: {
-          cedula: {
-            startsWith: cedula
-          }
-        },
-        include: { 
-          usuario: true,
-          autos: {
-            include: {
-              pagos: {
-                where: { estado: 'pendiente' }
-              }
-            }
-          }
-        },
-        orderBy: {
-          createdAt: 'desc' // Más reciente primero
-        }
-      });
+    console.log('👥 Clientes encontrados con cédula', cedula, ':', clientesConCedula.length);
 
-      // Tomar el cliente más reciente que tenga pagos pendientes
-      cliente = clientesConCedula.find(c => 
-        c.autos.some(auto => auto.pagos.length > 0)
-      ) || clientesConCedula[0];
+    if (clientesConCedula.length === 0) {
+      return res.status(404).json({ error: 'Cliente no encontrado' });
     }
 
-    console.log('👤 Cliente encontrado:', cliente ? `ID: ${cliente.id}, Cédula: ${cliente.cedula}` : 'No encontrado');
+    // Buscar el cliente más reciente que tenga pagos (pendientes o pagados)
+    let cliente = null;
+    for (const c of clientesConCedula) {
+      const tienePagos = c.autos.some(auto => auto.pagos.length > 0);
+      const tienePagosPendientes = c.autos.some(auto => 
+        auto.pagos.some(pago => pago.estado === 'pendiente')
+      );
+      
+      console.log(`  Cliente ID ${c.id} (${c.cedula}):`, {
+        autos: c.autos.length,
+        tienePagos,
+        tienePagosPendientes
+      });
+
+      if (tienePagosPendientes) {
+        cliente = c;
+        break; // Tomar el primero con pagos pendientes (el más reciente por el orderBy)
+      }
+    }
+
+    // Si no hay ninguno con pagos pendientes, tomar el más reciente con pagos
+    if (!cliente) {
+      cliente = clientesConCedula.find(c => 
+        c.autos.some(auto => auto.pagos.length > 0)
+      );
+    }
+
+    // Si aún no hay, tomar el más reciente aunque no tenga pagos
+    if (!cliente) {
+      cliente = clientesConCedula[0];
+    }
+
+    console.log('👤 Cliente seleccionado:', cliente ? `ID: ${cliente.id}, Cédula: ${cliente.cedula}` : 'No encontrado');
 
     if (!cliente) {
       return res.status(404).json({ error: 'Cliente no encontrado' });
     }
 
     // Verificar si tiene pagos pendientes
-    const tienePagosPendientes = cliente.autos.some(auto => auto.pagos.length > 0);
+    const tienePagosPendientes = cliente.autos.some(auto => 
+      auto.pagos.some(pago => pago.estado === 'pendiente')
+    );
     
-    console.log('📋 Tiene pagos pendientes:', tienePagosPendientes);
+    console.log('📋 Cliente tiene pagos pendientes:', tienePagosPendientes);
     
     if (!tienePagosPendientes) {
       return res.status(403).json({ 
