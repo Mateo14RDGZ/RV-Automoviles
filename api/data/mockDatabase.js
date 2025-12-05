@@ -21,6 +21,22 @@ class MockDatabase {
         
         if (options.where) {
           result = result.filter(cliente => {
+            // Manejo de OR
+            if (options.where.OR) {
+              return options.where.OR.some(condition => {
+                if (condition.cedula) {
+                  // Si es un objeto con startsWith
+                  if (typeof condition.cedula === 'object' && condition.cedula.startsWith) {
+                    return cliente.cedula.startsWith(condition.cedula.startsWith);
+                  }
+                  // Si es una cédula exacta
+                  return cliente.cedula === condition.cedula;
+                }
+                return false;
+              });
+            }
+            
+            // Filtros simples
             if (options.where.id) return cliente.id === options.where.id;
             if (options.where.cedula) return cliente.cedula === options.where.cedula;
             if (options.where.email) return cliente.email.includes(options.where.email);
@@ -28,11 +44,38 @@ class MockDatabase {
           });
         }
 
-        if (options.include?.usuario) {
-          result = result.map(cliente => ({
-            ...cliente,
-            usuario: this.usuarios.find(u => u.id === cliente.usuarioId)
-          }));
+        // Ordenar si se especifica
+        if (options.orderBy) {
+          if (options.orderBy.createdAt === 'desc') {
+            result.sort((a, b) => b.createdAt - a.createdAt);
+          } else if (options.orderBy.createdAt === 'asc') {
+            result.sort((a, b) => a.createdAt - b.createdAt);
+          }
+        }
+
+        // Incluir relaciones
+        if (options.include) {
+          result = result.map(cliente => {
+            const enriched = { ...cliente };
+            
+            if (options.include.usuario) {
+              enriched.usuario = this.usuarios.find(u => u.id === cliente.usuarioId);
+            }
+            
+            if (options.include.autos) {
+              enriched.autos = this.autos.filter(a => a.clienteId === cliente.id);
+              
+              // Si autos incluye pagos
+              if (options.include.autos.include?.pagos) {
+                enriched.autos = enriched.autos.map(auto => ({
+                  ...auto,
+                  pagos: this.pagos.filter(p => p.autoId === auto.id)
+                }));
+              }
+            }
+            
+            return enriched;
+          });
         }
 
         return result;
