@@ -75,7 +75,8 @@ app.get('/api/health', async (req, res) => {
 app.get('/api/diagnostic', (req, res) => {
   const envVars = {
     NODE_ENV: process.env.NODE_ENV ? '✅ Configurado' : '❌ No configurado',
-    JWT_SECRET: process.env.JWT_SECRET ? '✅ Configurado' : '❌ No configurado',
+    USE_MOCK_DB: process.env.USE_MOCK_DB ? '✅ ' + process.env.USE_MOCK_DB : '❌ No configurado',
+    JWT_SECRET: process.env.JWT_SECRET ? '✅ Configurado (longitud: ' + process.env.JWT_SECRET.length + ')' : '❌ No configurado',
     POSTGRES_PRISMA_URL: process.env.POSTGRES_PRISMA_URL ? '✅ Configurado' : '❌ No configurado',
     POSTGRES_URL_NON_POOLING: process.env.POSTGRES_URL_NON_POOLING ? '✅ Configurado' : '❌ No configurado',
     FRONTEND_URL: process.env.FRONTEND_URL || 'No configurado',
@@ -85,6 +86,7 @@ app.get('/api/diagnostic', (req, res) => {
   res.json({
     message: 'Diagnóstico de variables de entorno',
     variables: envVars,
+    modoDemo: process.env.USE_MOCK_DB === 'true' || !process.env.POSTGRES_PRISMA_URL,
     timestamp: new Date().toISOString()
   });
 });

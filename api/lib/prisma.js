@@ -62,13 +62,3 @@ if (USE_MOCK_DB) {
 }
 
 module.exports = prisma;
-    } catch (error) {
-      prisma._connectionState = 'disconnected';
-      console.error('❌ Error conectando Prisma:', error.message);
-      console.error('Error completo:', error);
-      throw error;
-    }
-  };
-}
-
-module.exports = prisma;
