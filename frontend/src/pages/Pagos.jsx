@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { pagosService, autosService, clientesService } from '../services';
 import { useAuth } from '../context/AuthContext';
-import { CreditCard, Plus, AlertCircle, CheckCircle, Calendar, DollarSign, User, ChevronDown, ChevronUp, Car } from 'lucide-react';
+import { CreditCard, Plus, AlertCircle, CheckCircle, Calendar, DollarSign, User, ChevronDown, ChevronUp, Car, RefreshCw } from 'lucide-react';
 
 const Pagos = () => {
   const { user } = useAuth();
@@ -12,6 +12,7 @@ const Pagos = () => {
   const [clientesExpandidos, setClientesExpandidos] = useState({});
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('pendientes');
+  const [lastUpdate, setLastUpdate] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [showGenerateModal, setShowGenerateModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -42,6 +43,22 @@ const Pagos = () => {
   useEffect(() => {
     loadInitialData();
   }, []);
+
+  // Auto-refresh para clientes: actualizar datos cada 30 segundos
+  useEffect(() => {
+    if (user?.rol !== 'admin') {
+      console.log('🔄 Auto-refresh activado para cliente (cada 30s)');
+      const interval = setInterval(() => {
+        console.log('🔄 Actualizando datos automáticamente...');
+        handleFilter(filter);
+      }, 30000); // 30 segundos
+
+      return () => {
+        console.log('🛑 Auto-refresh desactivado');
+        clearInterval(interval);
+      };
+    }
+  }, [user, filter]);
 
   const loadInitialData = async () => {
     try {
@@ -124,6 +141,9 @@ const Pagos = () => {
       });
       
       setPagos(data);
+      
+      // Registrar hora de última actualización
+      setLastUpdate(new Date());
       
       // Actualizar agrupación por cliente si es admin - usar los pagos FILTRADOS
       if (user?.rol === 'admin') {
@@ -424,7 +444,7 @@ const Pagos = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <div>
+        <div className="flex-1">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
             {user?.rol === 'admin' ? 'Gestión de Pagos' : 'Mis Cuotas'}
           </h1>
@@ -433,19 +453,38 @@ const Pagos = () => {
               ? 'Administra las cuotas y pagos' 
               : 'Consulta tus cuotas pagadas y pendientes'}
           </p>
+          {user?.rol !== 'admin' && lastUpdate && (
+            <p className="text-xs text-gray-500 dark:text-gray-500 mt-1 flex items-center gap-1">
+              <RefreshCw className="w-3 h-3" />
+              Última actualización: {lastUpdate.toLocaleTimeString('es-UY')} (se actualiza cada 30s)
+            </p>
+          )}
         </div>
-        {user?.rol === 'admin' && (
-          <button
-            onClick={() => {
-              resetGenerateForm();
-              setShowGenerateModal(true);
-            }}
-            className="btn btn-primary flex items-center gap-2"
-          >
-            <Plus className="w-5 h-5" />
-            Generar Cuotas
-          </button>
-        )}
+        <div className="flex gap-2">
+          {user?.rol !== 'admin' && (
+            <button
+              onClick={() => handleFilter(filter)}
+              disabled={loading}
+              className="btn btn-secondary flex items-center gap-2"
+              title="Actualizar datos"
+            >
+              <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
+              <span className="hidden sm:inline">Actualizar</span>
+            </button>
+          )}
+          {user?.rol === 'admin' && (
+            <button
+              onClick={() => {
+                resetGenerateForm();
+                setShowGenerateModal(true);
+              }}
+              className="btn btn-primary flex items-center gap-2"
+            >
+              <Plus className="w-5 h-5" />
+              Generar Cuotas
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Filtros */}
