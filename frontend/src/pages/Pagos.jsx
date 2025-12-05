@@ -1379,8 +1379,6 @@ const Pagos = () => {
           </div>
         </div>
       )}
-        </div>
-      )}
     </div>
   );
 };
