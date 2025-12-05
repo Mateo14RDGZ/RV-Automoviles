@@ -1,7 +1,15 @@
 {
+  "version": 2,
   "buildCommand": "npm run build:vercel",
   "outputDirectory": "frontend/dist",
   "installCommand": "npm run install:vercel",
+  "functions": {
+    "api/index.js": {
+      "maxDuration": 10,
+      "memory": 1024,
+      "includeFiles": "api/**"
+    }
+  },
   "env": {
     "USE_MOCK_DB": "false",
     "NODE_ENV": "production",
