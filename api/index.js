@@ -448,9 +448,15 @@ app.get('/api/pagos', authenticateToken, async (req, res) => {
     if (autoId) where.autoId = parseInt(autoId);
 
     if (vencidos === 'true') {
+      // Vencidas: estado pendiente Y fecha vencida
       where.estado = 'pendiente';
       where.fechaVencimiento = { lt: new Date() };
+    } else if (estado === 'pendiente') {
+      // Pendientes: estado pendiente PERO fecha NO vencida
+      where.estado = 'pendiente';
+      where.fechaVencimiento = { gte: new Date() };
     } else if (estado) {
+      // Pagadas u otros estados
       where.estado = estado;
     }
 
@@ -857,7 +863,8 @@ app.post('/api/setup', async (req, res) => {
           numeroCuota: 1,
           monto: 2500,
           fechaVencimiento: new Date(hoy.getFullYear(), hoy.getMonth() - 2, diaMes),
-          estado: 'pendiente'
+          fechaPago: new Date(hoy.getFullYear(), hoy.getMonth() - 2, diaMes + 3),
+          estado: 'pagado'
         },
         {
           autoId: auto1.id,
