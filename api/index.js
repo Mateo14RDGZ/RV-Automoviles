@@ -570,6 +570,38 @@ app.put('/api/pagos/:id/registrar-pago', authenticateToken, requireAdmin, async 
   }
 });
 
+// Actualizar pago (genérico)
+app.put('/api/pagos/:id', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updateData = req.body;
+    
+    console.log('📝 Actualizando pago:', { id, updateData });
+
+    // Si se está marcando como pagado y no tiene fechaPago, agregarla
+    if (updateData.estado === 'pagado' && !updateData.fechaPago) {
+      updateData.fechaPago = new Date();
+    }
+
+    // Convertir fechaPago a Date si viene como string
+    if (updateData.fechaPago && typeof updateData.fechaPago === 'string') {
+      updateData.fechaPago = new Date(updateData.fechaPago);
+    }
+
+    const pago = await prisma.pago.update({
+      where: { id: parseInt(id) },
+      data: updateData,
+      include: { auto: { include: { cliente: true } } }
+    });
+
+    console.log('✅ Pago actualizado:', pago);
+    res.json(pago);
+  } catch (error) {
+    console.error('❌ Error actualizando pago:', error);
+    res.status(500).json({ error: 'Error al actualizar pago', details: error.message });
+  }
+});
+
 app.delete('/api/pagos/:id', authenticateToken, requireAdmin, async (req, res) => {
   try {
     await prisma.pago.delete({
