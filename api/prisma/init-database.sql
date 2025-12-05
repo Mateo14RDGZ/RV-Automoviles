@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS "Auto" (
     "clienteId" INTEGER,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY ("clienteId") REFERENCES "Cliente"("id") ON DELETE SET NULL ON UPDATE CASCADE
+    FOREIGN KEY ("clienteId") REFERENCES "Cliente" ("id") ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 -- Tabla Pago
@@ -52,17 +52,20 @@ CREATE TABLE IF NOT EXISTS "Pago" (
     "estado" TEXT NOT NULL DEFAULT 'pendiente',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY ("autoId") REFERENCES "Auto"("id") ON DELETE RESTRICT ON UPDATE CASCADE
+    FOREIGN KEY ("autoId") REFERENCES "Auto" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 -- Foreign Key de Usuario a Cliente
-ALTER TABLE "Usuario" 
-ADD CONSTRAINT "Usuario_clienteId_fkey" 
-FOREIGN KEY ("clienteId") REFERENCES "Cliente"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Usuario"
+ADD CONSTRAINT "Usuario_clienteId_fkey" FOREIGN KEY ("clienteId") REFERENCES "Cliente" ("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- Índices
-CREATE INDEX IF NOT EXISTS "idx_auto_matricula" ON "Auto"("matricula");
-CREATE INDEX IF NOT EXISTS "idx_cliente_cedula" ON "Cliente"("cedula");
-CREATE INDEX IF NOT EXISTS "idx_usuario_email" ON "Usuario"("email");
-CREATE INDEX IF NOT EXISTS "idx_pago_estado" ON "Pago"("estado");
-CREATE INDEX IF NOT EXISTS "idx_pago_fechaVencimiento" ON "Pago"("fechaVencimiento");
+CREATE INDEX IF NOT EXISTS "idx_auto_matricula" ON "Auto" ("matricula");
+
+CREATE INDEX IF NOT EXISTS "idx_cliente_cedula" ON "Cliente" ("cedula");
+
+CREATE INDEX IF NOT EXISTS "idx_usuario_email" ON "Usuario" ("email");
+
+CREATE INDEX IF NOT EXISTS "idx_pago_estado" ON "Pago" ("estado");
+
+CREATE INDEX IF NOT EXISTS "idx_pago_fechaVencimiento" ON "Pago" ("fechaVencimiento");

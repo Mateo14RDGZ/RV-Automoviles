@@ -10,7 +10,6 @@
     }
   },
   "env": {
-    "USE_MOCK_DB": "false",
     "NODE_ENV": "production",
     "JWT_SECRET": "demo_jwt_secret_2024_cambiar_para_produccion"
   },

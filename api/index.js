@@ -568,6 +568,7 @@ app.get('/api/dashboard/stats', authenticateToken, requireAdmin, async (req, res
     const totalAutos = await prisma.auto.count();
     const autosDisponibles = await prisma.auto.count({ where: { estado: 'disponible' } });
     const autosVendidos = await prisma.auto.count({ where: { estado: 'vendido' } });
+    const autosReservados = await prisma.auto.count({ where: { estado: 'reservado' } });
 
     const pagosPendientes = await prisma.pago.count({ where: { estado: 'pendiente' } });
     const pagosVencidos = await prisma.pago.count({
@@ -576,26 +577,78 @@ app.get('/api/dashboard/stats', authenticateToken, requireAdmin, async (req, res
         fechaVencimiento: { lt: new Date() }
       }
     });
+    const pagosPagados = await prisma.pago.count({ where: { estado: 'pagado' } });
 
-    const totalAPagar = await prisma.pago.aggregate({
+    const totalPendiente = await prisma.pago.aggregate({
       where: { estado: 'pendiente' },
       _sum: { monto: true }
     });
 
-    const totalPagado = await prisma.pago.aggregate({
+    const totalRecaudado = await prisma.pago.aggregate({
       where: { estado: 'pagado' },
       _sum: { monto: true }
     });
 
+    // Próximos vencimientos (próximos 7 días)
+    const hoy = new Date();
+    const en7Dias = new Date();
+    en7Dias.setDate(hoy.getDate() + 7);
+
+    const proximosVencimientos = await prisma.pago.findMany({
+      where: {
+        estado: 'pendiente',
+        fechaVencimiento: {
+          gte: hoy,
+          lte: en7Dias
+        }
+      },
+      include: {
+        auto: {
+          include: {
+            cliente: true
+          }
+        }
+      },
+      orderBy: { fechaVencimiento: 'asc' },
+      take: 5
+    });
+
+    // Pagos recientes (últimos 5)
+    const pagosRecientes = await prisma.pago.findMany({
+      where: {
+        estado: 'pagado',
+        fechaPago: { not: null }
+      },
+      include: {
+        auto: {
+          include: {
+            cliente: true
+          }
+        }
+      },
+      orderBy: { fechaPago: 'desc' },
+      take: 5
+    });
+
     res.json({
-      clientes: totalClientes,
-      autos: { total: totalAutos, disponibles: autosDisponibles, vendidos: autosVendidos },
+      clientes: {
+        total: totalClientes
+      },
+      autos: {
+        total: totalAutos,
+        disponibles: autosDisponibles,
+        vendidos: autosVendidos,
+        reservados: autosReservados
+      },
       pagos: {
         pendientes: pagosPendientes,
         vencidos: pagosVencidos,
-        totalAPagar: totalAPagar._sum.monto || 0,
-        totalPagado: totalPagado._sum.monto || 0
-      }
+        pagados: pagosPagados,
+        totalPendiente: totalPendiente._sum.monto || 0,
+        totalRecaudado: totalRecaudado._sum.monto || 0
+      },
+      proximosVencimientos,
+      pagosRecientes
     });
   } catch (error) {
     console.error('Error obteniendo estadísticas:', error);
