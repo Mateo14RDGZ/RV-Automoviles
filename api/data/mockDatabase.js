@@ -230,23 +230,60 @@ class MockDatabase {
         
         if (options.where) {
           result = result.filter(pago => {
+            // Filtro simple por ID
             if (options.where.id) return pago.id === options.where.id;
+            
+            // Filtro por clienteId
             if (options.where.clienteId) return pago.clienteId === options.where.clienteId;
+            
+            // Filtro por autoId
             if (options.where.autoId) return pago.autoId === options.where.autoId;
-            if (options.where.estado) return pago.estado === options.where.estado;
+            
+            // Filtro por estado
+            if (options.where.estado && !options.where.fechaVencimiento) {
+              return pago.estado === options.where.estado;
+            }
+            
+            // Filtro por auto.clienteId (para clientes)
+            if (options.where.auto?.clienteId) {
+              const auto = this.autos.find(a => a.id === pago.autoId);
+              if (!auto || auto.clienteId !== options.where.auto.clienteId) {
+                return false;
+              }
+            }
+            
+            // Filtro de pagos vencidos (estado pendiente + fecha < hoy)
+            if (options.where.fechaVencimiento?.lt) {
+              const fechaVencimiento = new Date(pago.fechaVencimiento);
+              const fechaLimite = new Date(options.where.fechaVencimiento.lt);
+              
+              // Debe ser pendiente Y vencido
+              if (pago.estado !== 'pendiente') return false;
+              if (fechaVencimiento >= fechaLimite) return false;
+            }
+            
             return true;
           });
         }
 
+        // Incluir relaciones
         if (options.include) {
           result = result.map(pago => {
             const enriched = { ...pago };
+            
+            if (options.include.auto) {
+              enriched.auto = this.autos.find(a => a.id === pago.autoId);
+              
+              // Si auto incluye cliente
+              if (options.include.auto.include?.cliente && enriched.auto) {
+                enriched.auto.cliente = this.clientes.find(c => c.id === enriched.auto.clienteId);
+              }
+            }
+            
             if (options.include.cliente) {
               enriched.cliente = this.clientes.find(c => c.id === pago.clienteId);
             }
-            if (options.include.auto) {
-              enriched.auto = this.autos.find(a => a.id === pago.autoId);
-            }
+            
             return enriched;
           });
         }
