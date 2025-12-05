@@ -110,14 +110,14 @@ const Login = () => {
       <div className="max-w-md w-full animate-zoomIn">
         {/* Logo y título minimalista */}
         <div className="text-center mb-8 animate-fadeInUp" style={{animationDelay: '0.1s'}}>
-          <h1 className="text-6xl font-black mb-2 tracking-tight">
-            <span className="text-red-600 dark:text-red-500">RV</span>
-          </h1>
-          <h2 className="text-2xl font-semibold text-gray-600 dark:text-gray-300 mb-3">
-            Automoviles
-          </h2>
-          <p className="text-gray-500 dark:text-gray-400 text-sm">
+          <div className="text-6xl mb-3">
+            🚗
+          </div>
+          <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">
             Gestión Automotora
+          </h1>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">
+            Sistema de Gestión Demo
           </p>
         </div>
 

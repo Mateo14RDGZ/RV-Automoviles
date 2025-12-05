@@ -19,6 +19,43 @@ const usuarios = [
     rol: 'admin',
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-01-01')
+  },
+  // Usuarios para clientes (pueden ver sus cuotas)
+  {
+    id: 3,
+    email: 'juan.perez@email.com',
+    password: '$2a$10$ln.v2lFJmyIbBy/9s5X88eZ2wRuRwEVTiesB5Zmw.86kqJnPLCCa.', // admin123 (mismo hash para demo)
+    rol: 'cliente',
+    clienteId: 1,
+    createdAt: new Date('2024-01-15'),
+    updatedAt: new Date('2024-01-15')
+  },
+  {
+    id: 4,
+    email: 'maria.gonzalez@email.com',
+    password: '$2a$10$ln.v2lFJmyIbBy/9s5X88eZ2wRuRwEVTiesB5Zmw.86kqJnPLCCa.', // admin123
+    rol: 'cliente',
+    clienteId: 2,
+    createdAt: new Date('2024-02-01'),
+    updatedAt: new Date('2024-02-01')
+  },
+  {
+    id: 5,
+    email: 'carlos.rodriguez@email.com',
+    password: '$2a$10$ln.v2lFJmyIbBy/9s5X88eZ2wRuRwEVTiesB5Zmw.86kqJnPLCCa.', // admin123
+    rol: 'cliente',
+    clienteId: 3,
+    createdAt: new Date('2024-02-15'),
+    updatedAt: new Date('2024-02-15')
+  },
+  {
+    id: 6,
+    email: 'ana.martinez@email.com',
+    password: '$2a$10$ln.v2lFJmyIbBy/9s5X88eZ2wRuRwEVTiesB5Zmw.86kqJnPLCCa.', // admin123
+    rol: 'cliente',
+    clienteId: 4,
+    createdAt: new Date('2024-03-01'),
+    updatedAt: new Date('2024-03-01')
   }
 ];
 
@@ -31,7 +68,7 @@ const clientes = [
     email: 'juan.perez@email.com',
     telefono: '099123456',
     direccion: 'Av. Principal 123',
-    usuarioId: 2,
+    usuarioId: 3,
     createdAt: new Date('2024-01-15'),
     updatedAt: new Date('2024-01-15')
   },
@@ -42,7 +79,7 @@ const clientes = [
     email: 'maria.gonzalez@email.com',
     telefono: '099876543',
     direccion: 'Calle Secundaria 456',
-    usuarioId: 3,
+    usuarioId: 4,
     createdAt: new Date('2024-02-01'),
     updatedAt: new Date('2024-02-01')
   },
@@ -53,7 +90,7 @@ const clientes = [
     email: 'carlos.rodriguez@email.com',
     telefono: '099334455',
     direccion: 'Bulevar Este 789',
-    usuarioId: 4,
+    usuarioId: 5,
     createdAt: new Date('2024-02-15'),
     updatedAt: new Date('2024-02-15')
   },
@@ -64,7 +101,7 @@ const clientes = [
     email: 'ana.martinez@email.com',
     telefono: '099667788',
     direccion: 'Av. Central 321',
-    usuarioId: 5,
+    usuarioId: 6,
     createdAt: new Date('2024-03-01'),
     updatedAt: new Date('2024-03-01')
   }
