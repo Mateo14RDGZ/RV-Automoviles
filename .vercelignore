@@ -8,6 +8,12 @@ node_modules
 .vscode
 .idea
 
+# Evitar que Vercel detecte estos como funciones serverless
+api/routes
+api/routes/**
+api/middleware
+api/middleware/**
+
 # Archivos de prueba y desarrollo
 *.test.js
 *.spec.js
