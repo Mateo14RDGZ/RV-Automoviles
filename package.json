@@ -4,9 +4,9 @@
   "description": "Sistema de gestión digital para automotora - RV Automoviles",
   "private": true,
   "scripts": {
-    "install-all": "cd api && npm install && cd ../frontend && npm install",
-    "install:vercel": "cd api && npm install && cd ../frontend && npm install",
-    "build:vercel": "cd frontend && npm run vercel-build",
+    "install-all": "cd api && npm install && npm run prisma:generate && cd ../frontend && npm install",
+    "install:vercel": "cd api && npm install && npm run prisma:generate && cd ../frontend && npm install",
+    "build:vercel": "cd api && npm run prisma:migrate:deploy && cd ../frontend && npm run vercel-build",
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
     "dev:backend": "cd api && node index.js",
     "dev:frontend": "cd frontend && npm run dev",
