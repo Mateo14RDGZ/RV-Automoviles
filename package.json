@@ -4,14 +4,17 @@
   "description": "Sistema de gestión digital para automotora - RV Automoviles",
   "private": true,
   "scripts": {
-    "install-all": "cd backend && npm install && cd ../frontend && npm install",
+    "install-all": "cd api && npm install && cd ../frontend && npm install",
     "install:vercel": "cd api && npm install && cd ../frontend && npm install",
     "build:vercel": "cd frontend && npm run vercel-build",
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
-    "dev:backend": "cd backend && npm run dev",
+    "dev:backend": "cd api && node index.js",
     "dev:frontend": "cd frontend && npm run dev",
     "build": "cd frontend && npm install && npm run build",
-    "setup": "cd backend && npx prisma generate && npx prisma db push && npx prisma db seed"
+    "setup": "node setup-database.js",
+    "db:setup": "cd api && npx prisma generate --schema=./prisma/schema.prisma && npx prisma db push --schema=./prisma/schema.prisma",
+    "db:seed": "cd api && node prisma/seed.js",
+    "db:check": "node setup-database.js"
   },
   "keywords": ["automanager", "car-dealership", "management-system", "rv-automoviles"],
   "author": "",
