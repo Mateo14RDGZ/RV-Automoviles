@@ -233,6 +233,46 @@ app.get('/api/auth/verify', authenticateToken, async (req, res) => {
   }
 });
 
+// ==================== ENDPOINT DE DIAGNÓSTICO ====================
+
+app.get('/api/health', async (req, res) => {
+  try {
+    // Verificar conexión a la base de datos
+    await prisma.$queryRaw`SELECT 1`;
+    
+    // Contar registros
+    const [autosCount, clientesCount, pagosCount] = await Promise.all([
+      prisma.auto.count(),
+      prisma.cliente.count(),
+      prisma.pago.count()
+    ]);
+    
+    res.json({
+      status: 'OK',
+      database: {
+        connected: true,
+        url: process.env.DATABASE_URL ? 'Configurada' : 'NO CONFIGURADA',
+        counts: {
+          autos: autosCount,
+          clientes: clientesCount,
+          pagos: pagosCount
+        }
+      },
+      environment: process.env.NODE_ENV || 'development',
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('❌ Error en health check:', error);
+    res.status(500).json({
+      status: 'ERROR',
+      database: {
+        connected: false,
+        error: error.message
+      }
+    });
+  }
+});
+
 // ==================== RUTAS DE AUTOS ====================
 
 app.get('/api/autos', authenticateToken, async (req, res) => {
@@ -285,6 +325,7 @@ app.post('/api/autos', authenticateToken, requireAdmin, async (req, res) => {
     const { marca, modelo, anio, matricula, precio, estado, clienteId } = req.body;
 
     console.log('🚗 Creando auto:', { marca, modelo, anio, matricula, precio, estado, clienteId });
+    console.log('📊 DATABASE_URL configurada:', process.env.DATABASE_URL ? 'SÍ' : 'NO');
 
     const auto = await prisma.auto.create({
       data: {
@@ -299,7 +340,15 @@ app.post('/api/autos', authenticateToken, requireAdmin, async (req, res) => {
       include: { cliente: true }
     });
 
-    console.log('✅ Auto creado exitosamente:', auto);
+    console.log('✅ Auto creado exitosamente en DB:', { id: auto.id, marca: auto.marca, modelo: auto.modelo });
+    
+    // Verificar que el auto realmente se guardó
+    const autoVerificado = await prisma.auto.findUnique({
+      where: { id: auto.id }
+    });
+    
+    console.log('🔍 Verificación de auto en DB:', autoVerificado ? 'EXISTE' : 'NO EXISTE');
+    
     res.status(201).json(auto);
   } catch (error) {
     console.error('❌ Error creando auto:', error);
@@ -395,6 +444,9 @@ app.post('/api/clientes', authenticateToken, requireAdmin, async (req, res) => {
   try {
     const { nombre, cedula, telefono, direccion, email } = req.body;
 
+    console.log('👤 Creando cliente:', { nombre, cedula, telefono, email });
+    console.log('📊 DATABASE_URL configurada:', process.env.DATABASE_URL ? 'SÍ' : 'NO');
+
     const hashedPassword = await bcrypt.hash(cedula, 10);
 
     const cliente = await prisma.cliente.create({
@@ -417,10 +469,19 @@ app.post('/api/clientes', authenticateToken, requireAdmin, async (req, res) => {
       }
     });
 
+    console.log('✅ Cliente creado exitosamente en DB:', { id: cliente.id, nombre: cliente.nombre });
+    
+    // Verificar que el cliente realmente se guardó
+    const clienteVerificado = await prisma.cliente.findUnique({
+      where: { id: cliente.id }
+    });
+    
+    console.log('🔍 Verificación de cliente en DB:', clienteVerificado ? 'EXISTE' : 'NO EXISTE');
+
     res.status(201).json(cliente);
   } catch (error) {
-    console.error('Error creando cliente:', error);
-    res.status(500).json({ error: 'Error al crear cliente' });
+    console.error('❌ Error creando cliente:', error);
+    res.status(500).json({ error: 'Error al crear cliente', details: error.message });
   }
 });
 

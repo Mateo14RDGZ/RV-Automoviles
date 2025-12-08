@@ -7,8 +7,11 @@ const prismaClientSingleton = () => {
     throw new Error('DATABASE_URL no está configurada');
   }
 
+  console.log('🔗 Conectando a base de datos:', process.env.DATABASE_URL.substring(0, 30) + '...');
+
   return new PrismaClient({
-    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+    log: ['query', 'error', 'warn', 'info'],
+    errorFormat: 'pretty',
   });
 };
 
@@ -18,5 +21,14 @@ const prisma = globalForPrisma.prisma ?? prismaClientSingleton();
 if (process.env.NODE_ENV !== 'production') {
   globalForPrisma.prisma = prisma;
 }
+
+// Verificar conexión al iniciar
+prisma.$connect()
+  .then(() => {
+    console.log('✅ Prisma conectado exitosamente a la base de datos');
+  })
+  .catch((error) => {
+    console.error('❌ Error al conectar Prisma:', error);
+  });
 
 module.exports = prisma;
