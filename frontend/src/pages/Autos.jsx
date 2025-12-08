@@ -43,6 +43,26 @@ const Autos = () => {
     }
   };
 
+  // Filtrar clientes sin planes de cuotas (sin autos que tengan pagos)
+  const getClientesSinPlanesActivos = () => {
+    return clientes.filter(cliente => {
+      // Si no tiene autos, puede ser seleccionado
+      if (!cliente.autos || cliente.autos.length === 0) {
+        return true;
+      }
+      
+      // Verificar si algún auto del cliente tiene pagos
+      const tieneAutosConPagos = cliente.autos.some(auto => {
+        // Buscar el auto en el array de autos para verificar si tiene pagos
+        const autoCompleto = autos.find(a => a.id === auto.id);
+        return autoCompleto && autoCompleto.pagos && autoCompleto.pagos.length > 0;
+      });
+      
+      // Retornar solo clientes sin autos con pagos
+      return !tieneAutosConPagos;
+    });
+  };
+
   const handleSearch = async () => {
     try {
       setLoading(true);
@@ -69,7 +89,7 @@ const Autos = () => {
         matricula: formData.matricula,
         precio: parseFloat(formData.precio),
         estado: formData.estado,
-        clienteId: formData.clienteId || null
+        clienteId: formData.clienteId ? parseInt(formData.clienteId) : null
       };
       
       console.log('🚗 Guardando auto:', { dataToSend, editingAuto });
@@ -462,12 +482,15 @@ const Autos = () => {
                       className="input"
                     >
                       <option value="">Sin cliente asignado</option>
-                      {clientes.map((cliente) => (
+                      {getClientesSinPlanesActivos().map((cliente) => (
                         <option key={cliente.id} value={cliente.id}>
                           {cliente.nombre} - {cliente.cedula}
                         </option>
                       ))}
                     </select>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      Solo se muestran clientes sin planes de cuotas activos
+                    </p>
                   </div>
                 </div>
 
