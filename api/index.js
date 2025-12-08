@@ -331,12 +331,26 @@ app.post('/api/autos', authenticateToken, requireAdmin, async (req, res) => {
     console.log('🚗 Creando auto:', { marca, modelo, anio, matricula, precio, estado, clienteId });
     console.log('📊 DATABASE_URL configurada:', process.env.DATABASE_URL ? 'SÍ' : 'NO');
 
+    // Si no hay matrícula o está vacía, usar "0km"
+    const matriculaFinal = !matricula || matricula.trim() === '' ? '0km' : matricula.trim();
+
+    // Validar que la matrícula no esté duplicada (excepto "0km")
+    if (matriculaFinal !== '0km') {
+      const autoExistente = await prisma.auto.findFirst({
+        where: { matricula: matriculaFinal }
+      });
+      
+      if (autoExistente) {
+        return res.status(400).json({ error: 'Ya existe un auto con esta matrícula' });
+      }
+    }
+
     const auto = await prisma.auto.create({
       data: {
         marca,
         modelo,
         anio: parseInt(anio),
-        matricula,
+        matricula: matriculaFinal,
         precio: parseFloat(precio),
         estado: estado || 'disponible',
         clienteId: clienteId ? parseInt(clienteId) : null
@@ -364,13 +378,30 @@ app.put('/api/autos/:id', authenticateToken, requireAdmin, async (req, res) => {
   try {
     const { marca, modelo, anio, matricula, precio, estado, clienteId } = req.body;
 
+    // Si no hay matrícula o está vacía, usar "0km"
+    const matriculaFinal = !matricula || matricula.trim() === '' ? '0km' : matricula.trim();
+
+    // Validar que la matrícula no esté duplicada (excepto "0km")
+    if (matriculaFinal !== '0km') {
+      const autoExistente = await prisma.auto.findFirst({
+        where: { 
+          matricula: matriculaFinal,
+          NOT: { id: parseInt(req.params.id) }
+        }
+      });
+      
+      if (autoExistente) {
+        return res.status(400).json({ error: 'Ya existe un auto con esta matrícula' });
+      }
+    }
+
     const auto = await prisma.auto.update({
       where: { id: parseInt(req.params.id) },
       data: {
         marca,
         modelo,
         anio: parseInt(anio),
-        matricula,
+        matricula: matriculaFinal,
         precio: parseFloat(precio),
         estado,
         clienteId: clienteId ? parseInt(clienteId) : null

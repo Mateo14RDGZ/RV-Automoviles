@@ -269,7 +269,13 @@ const Autos = () => {
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-300">{auto.matricula}</td>
+                    <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-300">
+                      {auto.matricula === '0km' ? (
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">
+                          0km
+                        </span>
+                      ) : auto.matricula}
+                    </td>
                     <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-300">{auto.anio}</td>
                     <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
                       ${auto.precio.toLocaleString()}
@@ -329,7 +335,13 @@ const Autos = () => {
                     <h3 className="font-semibold text-gray-900 dark:text-white">
                       {auto.marca} {auto.modelo}
                     </h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{auto.matricula}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {auto.matricula === '0km' ? (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">
+                          0km
+                        </span>
+                      ) : auto.matricula}
+                    </p>
                   </div>
                 </div>
                 <span className={getEstadoBadge(auto.estado)}>
@@ -431,15 +443,18 @@ const Autos = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Matrícula *
+                      Matrícula
                     </label>
                     <input
                       type="text"
-                      required
                       value={formData.matricula}
                       onChange={(e) => setFormData({ ...formData, matricula: e.target.value })}
+                      placeholder="Dejar vacío para autos 0km"
                       className="input"
                     />
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      Si no tiene matrícula, se mostrará como "0km"
+                    </p>
                   </div>
 
                   <div>

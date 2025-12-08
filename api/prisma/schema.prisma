@@ -40,7 +40,7 @@ model Auto {
   marca      String
   modelo     String
   anio       Int
-  matricula  String   @unique
+  matricula  String   // Removido @unique para permitir múltiples autos 0km
   precio     Float
   estado     String   @default("disponible") // disponible, vendido, reservado
   activo     Boolean  @default(true) // true: activo, false: archivado/completado
