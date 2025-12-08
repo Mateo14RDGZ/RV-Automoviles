@@ -185,6 +185,18 @@ const Login = () => {
               {loginMode === 'admin' ? (
                 /* Formulario para admin */
                 <>
+                  {/* Credenciales de prueba para admin */}
+                  <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                    <h4 className="text-sm font-semibold text-blue-800 dark:text-blue-300 mb-2 flex items-center gap-2">
+                      <Sparkles className="w-4 h-4" />
+                      Credenciales de Prueba
+                    </h4>
+                    <div className="space-y-1 text-xs text-blue-700 dark:text-blue-400">
+                      <p><span className="font-medium">Email:</span> admin@admin.com</p>
+                      <p><span className="font-medium">Contraseña:</span> admin123</p>
+                    </div>
+                  </div>
+
                   <div className="space-y-2">
                     <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                       Correo Electrónico
@@ -223,33 +235,48 @@ const Login = () => {
                 </>
               ) : (
                 /* Formulario para cliente */
-                <div className="space-y-2">
-                  <label htmlFor="cedula" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Número de Cédula
-                  </label>
-                  <div className="relative">
-                    <IdCard className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
-                    <input
-                      id="cedula"
-                      type="text"
-                      value={cedula}
-                      onChange={(e) => {
-                        const value = e.target.value.replace(/\D/g, '');
-                        if (value.length <= 8) {
-                          setCedula(value);
-                        }
-                      }}
-                      className="w-full pl-11 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-500 focus:border-transparent transition-all"
-                      placeholder="Ej: 12345678"
-                      maxLength="8"
-                      pattern="[0-9]{8}"
-                      required
-                    />
+                <>
+                  {/* Cédulas de prueba para clientes */}
+                  <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-lg">
+                    <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-300 mb-2 flex items-center gap-2">
+                      <Sparkles className="w-4 h-4" />
+                      Cédulas de Prueba
+                    </h4>
+                    <div className="space-y-1 text-xs text-gray-700 dark:text-gray-400">
+                      <p><span className="font-medium">Juan Pérez:</span> 12345678</p>
+                      <p><span className="font-medium">María González:</span> 87654321</p>
+                      <p><span className="font-medium">Carlos Rodríguez:</span> 11223344</p>
+                    </div>
                   </div>
-                  <p className="text-gray-500 dark:text-gray-400 text-xs mt-2">
-                    Ingresa tu número de cédula (8 dígitos) para ver tus pagos pendientes
-                  </p>
-                </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="cedula" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Número de Cédula
+                    </label>
+                    <div className="relative">
+                      <IdCard className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
+                      <input
+                        id="cedula"
+                        type="text"
+                        value={cedula}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\D/g, '');
+                          if (value.length <= 8) {
+                            setCedula(value);
+                          }
+                        }}
+                        className="w-full pl-11 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-500 focus:border-transparent transition-all"
+                        placeholder="Ej: 12345678"
+                        maxLength="8"
+                        pattern="[0-9]{8}"
+                        required
+                      />
+                    </div>
+                    <p className="text-gray-500 dark:text-gray-400 text-xs mt-2">
+                      Ingresa tu número de cédula (8 dígitos) para ver tus pagos pendientes
+                    </p>
+                  </div>
+                </>
               )}
 
               <button
