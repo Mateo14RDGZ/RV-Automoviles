@@ -187,7 +187,20 @@ const Pagos = () => {
   const handleGenerateCuotas = async (e) => {
     e.preventDefault();
     try {
-      await pagosService.generarCuotas(generateData);
+      // Mapear los datos del formulario a lo que espera el backend
+      const dataParaBackend = {
+        autoId: generateData.autoId,
+        numeroCuotas: parseInt(generateData.numeroCuotas),
+        montoPorCuota: parseFloat(generateData.montoCuota),
+        fechaPrimeraCuota: generateData.fechaInicio
+      };
+      
+      console.log('🚀 Generando plan de cuotas:', dataParaBackend);
+      
+      await pagosService.generarCuotas(dataParaBackend);
+      
+      console.log('✅ Plan de cuotas generado exitosamente');
+      
       setShowGenerateModal(false);
       resetGenerateForm();
       await loadInitialData();
@@ -196,7 +209,8 @@ const Pagos = () => {
         await handleFilter(filter);
       }
     } catch (error) {
-      console.error('Error al generar cuotas:', error);
+      console.error('❌ Error al generar cuotas:', error);
+      alert('Error al generar el plan de cuotas: ' + (error.message || 'Error desconocido'));
     }
   };
 
