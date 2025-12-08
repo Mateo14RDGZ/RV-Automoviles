@@ -284,6 +284,8 @@ app.post('/api/autos', authenticateToken, requireAdmin, async (req, res) => {
   try {
     const { marca, modelo, anio, matricula, precio, estado, clienteId } = req.body;
 
+    console.log('🚗 Creando auto:', { marca, modelo, anio, matricula, precio, estado, clienteId });
+
     const auto = await prisma.auto.create({
       data: {
         marca,
@@ -297,10 +299,11 @@ app.post('/api/autos', authenticateToken, requireAdmin, async (req, res) => {
       include: { cliente: true }
     });
 
+    console.log('✅ Auto creado exitosamente:', auto);
     res.status(201).json(auto);
   } catch (error) {
-    console.error('Error creando auto:', error);
-    res.status(500).json({ error: 'Error al crear auto' });
+    console.error('❌ Error creando auto:', error);
+    res.status(500).json({ error: 'Error al crear auto', details: error.message });
   }
 });
 

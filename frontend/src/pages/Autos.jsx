@@ -61,18 +61,34 @@ const Autos = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Preparar datos para enviar al backend
+      const dataToSend = {
+        marca: formData.marca,
+        modelo: formData.modelo,
+        anio: parseInt(formData.anio),
+        matricula: formData.matricula,
+        precio: parseFloat(formData.precio),
+        estado: formData.estado,
+        clienteId: formData.clienteId || null
+      };
+      
+      console.log('🚗 Guardando auto:', { dataToSend, editingAuto });
+      
       if (editingAuto) {
-        await autosService.update(editingAuto.id, formData);
+        const response = await autosService.update(editingAuto.id, dataToSend);
+        console.log('✅ Auto actualizado:', response);
         showToast('Auto actualizado exitosamente', 'success');
       } else {
-        await autosService.create(formData);
+        const response = await autosService.create(dataToSend);
+        console.log('✅ Auto creado:', response);
         showToast('Auto creado exitosamente', 'success');
       }
       setShowModal(false);
       resetForm();
-      loadData();
+      await loadData();
     } catch (error) {
-      showToast(error.response?.data?.error || 'Error al guardar el auto', 'error');
+      console.error('❌ Error al guardar auto:', error);
+      showToast(error.message || error.response?.data?.error || 'Error al guardar el auto', 'error');
     }
   };
 
