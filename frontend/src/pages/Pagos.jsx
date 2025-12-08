@@ -76,8 +76,15 @@ const Pagos = () => {
           clientesService.getAll(),
         ]);
         
-        setAutos(autosData.filter(auto => auto.estado !== 'disponible'));
+        // Guardar TODOS los autos (no filtrar aquí)
+        // El filtrado se hace en getAutosSinPlanDeCuotas()
+        setAutos(autosData);
         setClientes(clientesData);
+        
+        console.log('📊 Autos cargados:', autosData.length);
+        console.log('👥 Clientes cargados:', clientesData.length);
+        console.log('🚗 Autos con cliente:', autosData.filter(a => a.clienteId).length);
+        console.log('📋 Autos sin pagos:', autosData.filter(a => !a.pagos || a.pagos.length === 0).length);
         
         // Aplicar el filtro inicial (puede ser 'vencidos' si viene desde Reportes)
         await handleFilter(initialFilter);
@@ -94,7 +101,7 @@ const Pagos = () => {
 
   // Filtrar autos que NO tienen planes de cuotas (sin pagos asociados)
   const getAutosSinPlanDeCuotas = () => {
-    return autos.filter(auto => {
+    const autosFiltrados = autos.filter(auto => {
       // Debe tener un cliente asignado
       if (!auto.clienteId) {
         return false;
@@ -104,6 +111,9 @@ const Pagos = () => {
       const tienePagos = auto.pagos && auto.pagos.length > 0;
       return !tienePagos;
     });
+    
+    console.log('🔍 Autos sin plan de cuotas:', autosFiltrados.length, autosFiltrados.map(a => `${a.marca} ${a.modelo}`));
+    return autosFiltrados;
   };
 
   const organizarPagosPorCliente = (pagosData, clientesData, filtroActivo) => {
