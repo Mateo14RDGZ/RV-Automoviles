@@ -1,20 +1,22 @@
 // Service Worker para PWA - RV Automóviles
-const CACHE_NAME = 'rv-autos-v7';
-const CACHE_VERSION = '7.0.0';
+const CACHE_NAME = 'rv-autos-v8';
+const CACHE_VERSION = '8.0.0';
 
 // Archivos esenciales que se cachearán durante la instalación
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/icon-192.svg',
-  '/icon-512.svg',
-  '/icon-72.svg',
-  '/icon-96.svg',
-  '/icon-128.svg',
-  '/icon-144.svg',
-  '/icon-152.svg',
-  '/icon-384.svg'
+  '/favicon.png',
+  '/apple-touch-icon.png',
+  '/icon-72.png',
+  '/icon-96.png',
+  '/icon-128.png',
+  '/icon-144.png',
+  '/icon-152.png',
+  '/icon-192.png',
+  '/icon-384.png',
+  '/icon-512.png'
 ];
 
 // Instalación del Service Worker
