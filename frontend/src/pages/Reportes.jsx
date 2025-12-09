@@ -99,34 +99,50 @@ const Reportes = () => {
       
       // Encabezado
       doc.setFontSize(18);
-      doc.setTextColor(220, 38, 38); // Rojo
-      doc.text('RV Automoviles', 14, 20);
-      doc.setFontSize(14);
-      doc.setTextColor(0, 0, 0);
-      doc.text('Reporte de Inventario de Autos', 14, 30);
+      doc.setTextColor(59, 130, 246); // Azul
+      doc.text('Reporte de Inventario de Autos', 105, 20, { align: 'center' });
       doc.setFontSize(10);
       doc.setTextColor(100, 100, 100);
-      doc.text(`Fecha: ${new Date().toLocaleDateString('es-ES')}`, 14, 37);
+      doc.text(`Fecha de generación: ${new Date().toLocaleDateString('es-ES')}`, 105, 28, { align: 'center' });
+      doc.text(`Total de autos: ${autos.length}`, 105, 34, { align: 'center' });
       
       // Tabla de autos
       const tableData = autos.map(auto => [
         String(auto.marca || ''),
         String(auto.modelo || ''),
-        String(auto.año || ''),
+        String(auto.matricula || 'N/A'),
+        String(auto.anio || ''),
         String(auto.color || ''),
-        `$${(auto.precio || 0).toLocaleString()}`,
+        `$${(auto.precio || 0).toLocaleString('es-ES')}`,
         String(auto.cliente?.nombre || 'Sin cliente'),
         auto.estado === 'vendido' ? 'Vendido' : auto.estado === 'financiado' ? 'Financiado' : 'Disponible'
       ]);
       
       autoTable(doc, {
-        startY: 45,
-        head: [['Marca', 'Modelo', 'Año', 'Color', 'Precio', 'Cliente', 'Estado']],
+        startY: 40,
+        head: [['Marca', 'Modelo', 'Matrícula', 'Año', 'Color', 'Precio', 'Cliente', 'Estado']],
         body: tableData,
-        theme: 'grid',
-        headStyles: { fillColor: [96, 165, 250], textColor: 255 }, // Azul claro
-        styles: { fontSize: 9, cellPadding: 3 },
-        alternateRowStyles: { fillColor: [249, 250, 251] }
+        theme: 'striped',
+        headStyles: { 
+          fillColor: [59, 130, 246], 
+          textColor: 255,
+          fontSize: 9,
+          fontStyle: 'bold',
+          halign: 'center'
+        },
+        bodyStyles: { fontSize: 8, cellPadding: 2.5 },
+        alternateRowStyles: { fillColor: [248, 250, 252] },
+        columnStyles: {
+          0: { cellWidth: 25 },
+          1: { cellWidth: 25 },
+          2: { cellWidth: 22 },
+          3: { cellWidth: 15, halign: 'center' },
+          4: { cellWidth: 20 },
+          5: { cellWidth: 25, halign: 'right' },
+          6: { cellWidth: 28 },
+          7: { cellWidth: 22, halign: 'center' }
+        },
+        margin: { left: 14, right: 14 }
       });
       
       // Pie de página
@@ -136,14 +152,14 @@ const Reportes = () => {
         doc.setFontSize(8);
         doc.setTextColor(150, 150, 150);
         doc.text(
-          `Página ${i} de ${pageCount} - RV Automoviles`,
+          `Página ${i} de ${pageCount}`,
           doc.internal.pageSize.getWidth() / 2,
           doc.internal.pageSize.getHeight() - 10,
           { align: 'center' }
         );
       }
       
-      doc.save(`pagos_${new Date().toISOString().split('T')[0]}.pdf`);
+      doc.save(`autos_${new Date().toISOString().split('T')[0]}.pdf`);
       showToast('PDF de pagos exportado exitosamente', 'success');
     } catch (error) {
       console.error('Error al exportar PDF:', error);
@@ -158,15 +174,12 @@ const Reportes = () => {
       
       // Encabezado
       doc.setFontSize(18);
-      doc.setTextColor(220, 38, 38);
-      doc.text('RV Automoviles', 14, 20);
-      doc.setFontSize(14);
-      doc.setTextColor(0, 0, 0);
-      doc.text('Reporte de Base de Clientes', 14, 30);
+      doc.setTextColor(147, 51, 234); // Púrpura
+      doc.text('Reporte de Base de Clientes', 105, 20, { align: 'center' });
       doc.setFontSize(10);
       doc.setTextColor(100, 100, 100);
-      doc.text(`Fecha: ${new Date().toLocaleDateString('es-ES')}`, 14, 37);
-      doc.text(`Total de Clientes: ${clientes.length}`, 14, 43);
+      doc.text(`Fecha de generación: ${new Date().toLocaleDateString('es-ES')}`, 105, 28, { align: 'center' });
+      doc.text(`Total de clientes: ${clientes.length}`, 105, 34, { align: 'center' });
       
       // Tabla de clientes
       const tableData = clientes.map(cliente => [
@@ -178,16 +191,27 @@ const Reportes = () => {
       ]);
       
       autoTable(doc, {
-        startY: 50,
+        startY: 40,
         head: [['Nombre', 'Cédula', 'Teléfono', 'Email', 'Dirección']],
         body: tableData,
-        theme: 'grid',
-        headStyles: { fillColor: [96, 165, 250], textColor: 255 },
-        styles: { fontSize: 8, cellPadding: 2 },
-        alternateRowStyles: { fillColor: [249, 250, 251] },
+        theme: 'striped',
+        headStyles: { 
+          fillColor: [147, 51, 234], 
+          textColor: 255,
+          fontSize: 9,
+          fontStyle: 'bold',
+          halign: 'center'
+        },
+        bodyStyles: { fontSize: 8, cellPadding: 2.5 },
+        alternateRowStyles: { fillColor: [250, 245, 255] },
         columnStyles: {
-          4: { cellWidth: 50 } // Dirección más ancha
-        }
+          0: { cellWidth: 40 },
+          1: { cellWidth: 25 },
+          2: { cellWidth: 25 },
+          3: { cellWidth: 38 },
+          4: { cellWidth: 54 }
+        },
+        margin: { left: 14, right: 14 }
       });
       
       // Pie de página
@@ -197,7 +221,7 @@ const Reportes = () => {
         doc.setFontSize(8);
         doc.setTextColor(150, 150, 150);
         doc.text(
-          `Página ${i} de ${pageCount} - RV Automoviles`,
+          `Página ${i} de ${pageCount}`,
           doc.internal.pageSize.getWidth() / 2,
           doc.internal.pageSize.getHeight() - 10,
           { align: 'center' }
@@ -218,17 +242,13 @@ const Reportes = () => {
       const doc = new jsPDF();
       
       // Encabezado principal
-      doc.setFontSize(20);
-      doc.setTextColor(220, 38, 38); // Rojo
-      doc.text('RV Automoviles', 105, 20, { align: 'center' });
-      
-      doc.setFontSize(16);
-      doc.setTextColor(0, 0, 0);
-      doc.text('Historial de Pagos por Cliente', 105, 30, { align: 'center' });
+      doc.setFontSize(18);
+      doc.setTextColor(34, 197, 94); // Verde
+      doc.text('Historial de Pagos por Cliente', 105, 20, { align: 'center' });
       
       doc.setFontSize(10);
       doc.setTextColor(100, 100, 100);
-      doc.text(`Fecha de generación: ${new Date().toLocaleDateString('es-ES')}`, 105, 37, { align: 'center' });
+      doc.text(`Fecha de generación: ${new Date().toLocaleDateString('es-ES')}`, 105, 28, { align: 'center' });
 
       // Agrupar pagos por cliente
       const pagosPorCliente = pagos.reduce((acc, pago) => {
@@ -245,7 +265,7 @@ const Reportes = () => {
         return acc;
       }, {});
 
-      let yPosition = 45;
+      let yPosition = 38;
 
       // Iterar por cada cliente
       Object.entries(pagosPorCliente).forEach(([clienteId, data], index) => {
@@ -473,8 +493,7 @@ const Reportes = () => {
         doc.setPage(i);
         doc.setFontSize(8);
         doc.setTextColor(150, 150, 150);
-        doc.text(`Página ${i} de ${pageCount}`, 105, 290, { align: 'center' });
-        doc.text('RV Automoviles - Sistema de Gestión', 105, 285, { align: 'center' });
+        doc.text(`Página ${i} de ${pageCount}`, 105, 287, { align: 'center' });
       }
 
       doc.save(`historial_pagos_por_cliente_${new Date().toISOString().split('T')[0]}.pdf`);
@@ -489,21 +508,18 @@ const Reportes = () => {
       const doc = new jsPDF();
       
       // Encabezado
-      doc.setFontSize(20);
-      doc.setTextColor(220, 38, 38);
-      doc.text('RV Automoviles', 14, 20);
-      doc.setFontSize(16);
-      doc.setTextColor(0, 0, 0);
-      doc.text('Reporte General del Sistema', 14, 32);
+      doc.setFontSize(18);
+      doc.setTextColor(59, 130, 246); // Azul
+      doc.text('Reporte General del Sistema', 105, 20, { align: 'center' });
       doc.setFontSize(10);
       doc.setTextColor(100, 100, 100);
-      doc.text(`Fecha: ${new Date().toLocaleDateString('es-ES')}`, 14, 40);
-      doc.text(`Rango: ${new Date(dateRange.start).toLocaleDateString('es-ES')} - ${new Date(dateRange.end).toLocaleDateString('es-ES')}`, 14, 46);
+      doc.text(`Fecha: ${new Date().toLocaleDateString('es-ES')}`, 105, 28, { align: 'center' });
+      doc.text(`Rango: ${new Date(dateRange.start).toLocaleDateString('es-ES')} - ${new Date(dateRange.end).toLocaleDateString('es-ES')}`, 105, 34, { align: 'center' });
       
       // Sección de Autos
       doc.setFontSize(14);
       doc.setTextColor(59, 130, 246); // Azul
-      doc.text('Inventario de Autos', 14, 58);
+      doc.text('Inventario de Autos', 14, 45);
       doc.setFontSize(10);
       doc.setTextColor(0, 0, 0);
       
@@ -515,7 +531,7 @@ const Reportes = () => {
       ];
       
       autoTable(doc, {
-        startY: 62,
+        startY: 50,
         body: autosData,
         theme: 'plain',
         styles: { fontSize: 10, cellPadding: 2 },
@@ -592,7 +608,7 @@ const Reportes = () => {
       doc.setFontSize(8);
       doc.setTextColor(150, 150, 150);
       doc.text(
-        'RV Automoviles - Sistema de Gestión Automotora',
+        `Página 1 de 1`,
         doc.internal.pageSize.getWidth() / 2,
         doc.internal.pageSize.getHeight() - 10,
         { align: 'center' }
