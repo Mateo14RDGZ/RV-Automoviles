@@ -78,6 +78,19 @@ const Autos = () => {
     }
   };
 
+  // Filtrar autos localmente en tiempo real
+  const filteredAutos = autos.filter(auto => {
+    const searchLower = searchTerm.toLowerCase();
+    const matchesSearch = !searchTerm || 
+      auto.marca.toLowerCase().includes(searchLower) ||
+      auto.modelo.toLowerCase().includes(searchLower) ||
+      auto.matricula.toLowerCase().includes(searchLower);
+    
+    const matchesEstado = !estadoFilter || auto.estado === estadoFilter;
+    
+    return matchesSearch && matchesEstado;
+  });
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -192,12 +205,11 @@ const Autos = () => {
                 placeholder="Buscar por marca, modelo o matrícula..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                 className="input pl-10"
               />
             </div>
           </div>
-          <div className="flex flex-col md:flex-row gap-2">
+          <div>
             <select
               value={estadoFilter}
               onChange={(e) => setEstadoFilter(e.target.value)}
@@ -208,9 +220,6 @@ const Autos = () => {
               <option value="vendido">Vendido</option>
               <option value="reservado">Reservado</option>
             </select>
-            <button onClick={handleSearch} className="btn btn-primary whitespace-nowrap">
-              Buscar
-            </button>
           </div>
         </div>
       </div>
@@ -221,10 +230,10 @@ const Autos = () => {
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
           </div>
-        ) : autos.length === 0 ? (
+        ) : filteredAutos.length === 0 ? (
           <div className="text-center py-12">
             <Car className="w-12 h-12 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
-            <p className="text-gray-500 dark:text-gray-400">No se encontraron autos</p>
+            <p className="text-gray-500 dark:text-gray-400">{searchTerm || estadoFilter ? 'No se encontraron autos con ese criterio' : 'No hay autos registrados'}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -255,7 +264,7 @@ const Autos = () => {
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                {autos.map((auto) => (
+                {filteredAutos.map((auto) => (
                   <tr key={auto.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                     <td className="px-6 py-4">
                       <div className="flex items-center">
@@ -318,13 +327,13 @@ const Autos = () => {
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
           </div>
-        ) : autos.length === 0 ? (
+        ) : filteredAutos.length === 0 ? (
           <div className="card text-center py-12">
             <Car className="w-12 h-12 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
-            <p className="text-gray-500 dark:text-gray-400">No se encontraron autos</p>
+            <p className="text-gray-500 dark:text-gray-400">{searchTerm || estadoFilter ? 'No se encontraron autos con ese criterio' : 'No hay autos registrados'}</p>
           </div>
         ) : (
-          autos.map((auto, index) => (
+          filteredAutos.map((auto, index) => (
             <div key={auto.id} className="card hover-lift animate-fadeInUp" style={{animationDelay: `${0.1 * (index % 6)}s`}}>
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
