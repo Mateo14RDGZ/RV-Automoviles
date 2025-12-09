@@ -47,6 +47,18 @@ const Clientes = () => {
     }
   };
 
+  // Filtrado local en tiempo real
+  const filteredClientes = clientes.filter(cliente => {
+    if (!searchTerm) return true;
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      cliente.nombre.toLowerCase().includes(searchLower) ||
+      cliente.cedula.toLowerCase().includes(searchLower) ||
+      cliente.telefono.toLowerCase().includes(searchLower) ||
+      (cliente.email && cliente.email.toLowerCase().includes(searchLower))
+    );
+  });
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -137,21 +149,15 @@ const Clientes = () => {
 
       {/* Búsqueda */}
       <div className="card animate-fadeInUp" style={{animationDelay: '0.2s'}}>
-        <div className="flex gap-4">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5" />
-            <input
-              type="text"
-              placeholder="Buscar por nombre, cédula, teléfono o email..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-              className="input pl-10"
-            />
-          </div>
-          <button onClick={handleSearch} className="btn btn-primary">
-            Buscar
-          </button>
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5" />
+          <input
+            type="text"
+            placeholder="Buscar por nombre, cédula, teléfono o email..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="input pl-10"
+          />
         </div>
       </div>
 
@@ -160,14 +166,14 @@ const Clientes = () => {
         <div className="text-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
         </div>
-      ) : clientes.length === 0 ? (
+      ) : filteredClientes.length === 0 ? (
         <div className="card text-center py-12">
           <Users className="w-12 h-12 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
-          <p className="text-gray-500 dark:text-gray-400">No se encontraron clientes</p>
+          <p className="text-gray-500 dark:text-gray-400">{searchTerm ? 'No se encontraron clientes con ese criterio' : 'No hay clientes registrados'}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {clientes.map((cliente, index) => (
+          {filteredClientes.map((cliente, index) => (
             <div key={cliente.id} className="card hover:shadow-xl hover-lift transition-all duration-300 animate-fadeInUp" style={{animationDelay: `${0.1 * (index % 6)}s`}}>
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
