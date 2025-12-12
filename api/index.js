@@ -143,7 +143,7 @@ app.post('/api/auth/login', [
   }
 });
 
-// Login cliente
+// Login cliente - solo requiere cédula
 app.post('/api/auth/login-cliente', [
   body('cedula').trim().isLength({ min: 8, max: 13 }).isNumeric().withMessage('La cédula debe tener entre 8 y 13 dígitos numéricos')
 ], async (req, res) => {
@@ -157,31 +157,39 @@ app.post('/api/auth/login-cliente', [
     const { cedula } = req.body;
     console.log('Intentando login de cliente con cédula:', cedula);
 
+    // Buscar cliente por cédula con sus autos
     const cliente = await prisma.cliente.findFirst({
       where: { cedula },
-      include: { usuario: true }
+      include: { 
+        autos: {
+          where: {
+            estado: 'financiado'
+          }
+        }
+      }
     });
 
     console.log('Cliente encontrado:', cliente ? `${cliente.nombre} (ID: ${cliente.id})` : 'No encontrado');
-    console.log('Usuario asociado:', cliente?.usuario ? `Email: ${cliente.usuario.email}, Rol: ${cliente.usuario.rol}` : 'No encontrado');
-
-    if (!cliente || !cliente.usuario) {
-      return res.status(401).json({ error: 'Cliente no encontrado o sin acceso' });
-    }
-
-    const validPassword = await bcrypt.compare(cedula, cliente.usuario.password);
-    console.log('Contraseña válida:', validPassword);
     
-    if (!validPassword) {
-      return res.status(401).json({ error: 'Cédula incorrecta' });
+    if (!cliente) {
+      return res.status(401).json({ error: 'Cliente no encontrado' });
     }
 
+    // Verificar que tenga al menos un auto financiado (plan de cuotas)
+    if (!cliente.autos || cliente.autos.length === 0) {
+      return res.status(401).json({ error: 'Cliente sin plan de cuotas activo' });
+    }
+
+    console.log(`Cliente ${cliente.nombre} tiene ${cliente.autos.length} auto(s) financiado(s)`);
+
+    // Generar token JWT
     const token = jwt.sign(
       {
-        id: cliente.usuario.id,
-        email: cliente.usuario.email,
-        rol: cliente.usuario.rol,
-        clienteId: cliente.id
+        id: cliente.id,
+        clienteId: cliente.id,
+        nombre: cliente.nombre,
+        cedula: cliente.cedula,
+        rol: 'cliente'
       },
       process.env.JWT_SECRET,
       { expiresIn: '24h' }
@@ -190,11 +198,12 @@ app.post('/api/auth/login-cliente', [
     res.json({
       token,
       user: {
-        id: cliente.usuario.id,
-        email: cliente.usuario.email,
-        rol: cliente.usuario.rol,
-        clienteId: cliente.id,
-        nombre: cliente.nombre
+        id: cliente.id,
+        nombre: cliente.nombre,
+        cedula: cliente.cedula,
+        email: cliente.email,
+        rol: 'cliente',
+        clienteId: cliente.id
       }
     });
   } catch (error) {
