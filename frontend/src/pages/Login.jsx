@@ -12,7 +12,7 @@ const Login = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [focusedInput, setFocusedInput] = useState('');
-  const { login } = useAuth();
+  const { login, loginCliente } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
@@ -24,10 +24,7 @@ const Login = () => {
     try {
       if (loginMode === 'admin') {
         const result = await login(email, password);
-        // Asegurar que el login fue exitoso antes de navegar
         if (result && result.token && result.user) {
-          // Navegar a la raíz para que RoleBasedRedirect haga su trabajo
-          // Esto redirigirá a /dashboard para admin o /pagos para cliente
           navigate('/', { replace: true });
         } else {
           setError('Error al iniciar sesión: respuesta inválida del servidor');
@@ -35,37 +32,19 @@ const Login = () => {
         }
       } else {
         // Login de cliente con cédula
-        await loginCliente(cedula);
-        // loginCliente hace su propia navegación, no necesitamos navigate aquí
+        const result = await loginCliente(cedula);
+        if (result && result.token && result.user) {
+          navigate('/', { replace: true });
+        } else {
+          setError('Error al iniciar sesión: respuesta inválida del servidor');
+          setLoading(false);
+        }
       }
     } catch (err) {
-      // Manejar diferentes formatos de error
       const errorMessage = err?.message || err?.response?.data?.error || err?.error || err?.data?.error || 'Error al iniciar sesión';
       setError(errorMessage);
       setLoading(false);
     }
-  };
-
-  const loginCliente = async (cedula) => {
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-    const response = await fetch(`${API_URL}/auth/login-cliente`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ cedula })
-    });
-
-    if (!response.ok) {
-      const data = await response.json();
-      throw new Error(data.error || 'Error al iniciar sesión como cliente');
-    }
-
-    const data = await response.json();
-    localStorage.setItem('token', data.token);
-    localStorage.setItem('user', JSON.stringify(data.user));
-    
-    // Actualizar el contexto de autenticación
-    // Forzamos la recarga para que el AuthContext detecte el nuevo token
-    window.location.href = '/';
   };
 
   const resetForm = () => {

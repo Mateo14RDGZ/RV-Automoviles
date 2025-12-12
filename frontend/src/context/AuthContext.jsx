@@ -69,6 +69,31 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const loginCliente = async (cedula) => {
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+      const response = await fetch(`${API_URL}/auth/login-cliente`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cedula })
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Error al iniciar sesión como cliente');
+      }
+
+      const data = await response.json();
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      setUser(data.user);
+      return data;
+    } catch (error) {
+      const errorMessage = error?.message || error?.data?.error || error?.error || 'Error al iniciar sesión';
+      throw new Error(errorMessage);
+    }
+  };
+
   const logout = () => {
     authService.logout();
     setUser(null);
@@ -78,6 +103,7 @@ export const AuthProvider = ({ children }) => {
     user,
     loading,
     login,
+    loginCliente,
     logout,
     isAuthenticated: !!user,
   };
