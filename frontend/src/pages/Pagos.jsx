@@ -40,6 +40,28 @@ const Pagos = () => {
     intervaloMeses: 1,
     esFinanciamientoEnProgreso: false,
     cuotasPagadas: 0,
+    // Estados para permutas
+    tienePermuta: false,
+    tipoPermuta: '', // 'auto', 'moto', 'otros'
+    permutaAbierta: false,
+    permutaAuto: {
+      marca: '',
+      modelo: '',
+      anio: '',
+      matricula: '',
+      precio: '',
+      agregarCatalogo: false
+    },
+    permutaMoto: {
+      marca: '',
+      modelo: '',
+      anio: '',
+      precio: ''
+    },
+    permutaOtros: {
+      descripcion: '',
+      precio: ''
+    },
   });
 
   useEffect(() => {
@@ -412,6 +434,28 @@ const Pagos = () => {
       intervaloMeses: 1,
       esFinanciamientoEnProgreso: false,
       cuotasPagadas: 0,
+      // Estados para permutas
+      tienePermuta: false,
+      tipoPermuta: '',
+      permutaAbierta: false,
+      permutaAuto: {
+        marca: '',
+        modelo: '',
+        anio: '',
+        matricula: '',
+        precio: '',
+        agregarCatalogo: false
+      },
+      permutaMoto: {
+        marca: '',
+        modelo: '',
+        anio: '',
+        precio: ''
+      },
+      permutaOtros: {
+        descripcion: '',
+        precio: ''
+      },
     });
   };
 
@@ -1133,6 +1177,329 @@ const Pagos = () => {
                           </div>
                         )}
                       </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Sección de Permutas */}
+                <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-300 dark:border-gray-600">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300">
+                      Permutas
+                    </h3>
+                    <button
+                      type="button"
+                      onClick={() => setGenerateData({ 
+                        ...generateData, 
+                        permutaAbierta: !generateData.permutaAbierta 
+                      })}
+                      className="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
+                    >
+                      {generateData.permutaAbierta ? (
+                        <ChevronUp className="w-5 h-5" />
+                      ) : (
+                        <ChevronDown className="w-5 h-5" />
+                      )}
+                    </button>
+                  </div>
+
+                  {generateData.permutaAbierta && (
+                    <div className="space-y-4 animate-fade-in">
+                      {/* Checkbox para indicar si hay permuta */}
+                      <label className="flex items-center gap-3 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={generateData.tienePermuta}
+                          onChange={(e) => {
+                            setGenerateData({ 
+                              ...generateData, 
+                              tienePermuta: e.target.checked,
+                              tipoPermuta: e.target.checked ? generateData.tipoPermuta : ''
+                            });
+                          }}
+                          className="w-4 h-4 text-blue-400 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-400"
+                        />
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          El cliente ofrece una permuta
+                        </span>
+                      </label>
+
+                      {/* Selector de tipo de permuta */}
+                      {generateData.tienePermuta && (
+                        <div className="space-y-4 pl-7">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                              Tipo de Permuta
+                            </label>
+                            <select
+                              value={generateData.tipoPermuta}
+                              onChange={(e) => setGenerateData({ 
+                                ...generateData, 
+                                tipoPermuta: e.target.value 
+                              })}
+                              className="input w-full"
+                            >
+                              <option value="">Seleccione el tipo...</option>
+                              <option value="auto">Auto</option>
+                              <option value="moto">Moto</option>
+                              <option value="otros">Otros</option>
+                            </select>
+                          </div>
+
+                          {/* Formulario para Auto */}
+                          {generateData.tipoPermuta === 'auto' && (
+                            <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-300 dark:border-gray-600 space-y-3">
+                              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                                Datos del Vehículo
+                              </h4>
+                              
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div>
+                                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Marca
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={generateData.permutaAuto.marca}
+                                    onChange={(e) => setGenerateData({
+                                      ...generateData,
+                                      permutaAuto: { ...generateData.permutaAuto, marca: e.target.value }
+                                    })}
+                                    className="input text-sm"
+                                    placeholder="Ej: Toyota"
+                                  />
+                                </div>
+                                
+                                <div>
+                                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Modelo
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={generateData.permutaAuto.modelo}
+                                    onChange={(e) => setGenerateData({
+                                      ...generateData,
+                                      permutaAuto: { ...generateData.permutaAuto, modelo: e.target.value }
+                                    })}
+                                    className="input text-sm"
+                                    placeholder="Ej: Corolla"
+                                  />
+                                </div>
+                                
+                                <div>
+                                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Año
+                                  </label>
+                                  <input
+                                    type="number"
+                                    min="1900"
+                                    max={new Date().getFullYear()}
+                                    value={generateData.permutaAuto.anio}
+                                    onChange={(e) => setGenerateData({
+                                      ...generateData,
+                                      permutaAuto: { ...generateData.permutaAuto, anio: e.target.value }
+                                    })}
+                                    className="input text-sm"
+                                    placeholder="2020"
+                                  />
+                                </div>
+                                
+                                <div>
+                                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Matrícula
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={generateData.permutaAuto.matricula}
+                                    onChange={(e) => setGenerateData({
+                                      ...generateData,
+                                      permutaAuto: { ...generateData.permutaAuto, matricula: e.target.value }
+                                    })}
+                                    className="input text-sm"
+                                    placeholder="ABC1234"
+                                  />
+                                </div>
+                                
+                                <div className="md:col-span-2">
+                                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Valor Estimado
+                                  </label>
+                                  <div className="relative">
+                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 text-sm">$</span>
+                                    <input
+                                      type="number"
+                                      min="0"
+                                      step="0.01"
+                                      value={generateData.permutaAuto.precio}
+                                      onChange={(e) => setGenerateData({
+                                        ...generateData,
+                                        permutaAuto: { ...generateData.permutaAuto, precio: e.target.value }
+                                      })}
+                                      className="input pl-8 text-sm"
+                                      placeholder="0.00"
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Opción para agregar al catálogo */}
+                              <div className="pt-3 border-t border-gray-200 dark:border-gray-700">
+                                <label className="flex items-center gap-2 cursor-pointer">
+                                  <input
+                                    type="checkbox"
+                                    checked={generateData.permutaAuto.agregarCatalogo}
+                                    onChange={(e) => setGenerateData({
+                                      ...generateData,
+                                      permutaAuto: { ...generateData.permutaAuto, agregarCatalogo: e.target.checked }
+                                    })}
+                                    className="w-4 h-4 text-blue-400 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-400"
+                                  />
+                                  <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                                    Agregar vehículo al catálogo
+                                  </span>
+                                </label>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 ml-6">
+                                  El vehículo se agregará como disponible en el inventario
+                                </p>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Formulario para Moto */}
+                          {generateData.tipoPermuta === 'moto' && (
+                            <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-300 dark:border-gray-600 space-y-3">
+                              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                                Datos de la Motocicleta
+                              </h4>
+                              
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div>
+                                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Marca
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={generateData.permutaMoto.marca}
+                                    onChange={(e) => setGenerateData({
+                                      ...generateData,
+                                      permutaMoto: { ...generateData.permutaMoto, marca: e.target.value }
+                                    })}
+                                    className="input text-sm"
+                                    placeholder="Ej: Honda"
+                                  />
+                                </div>
+                                
+                                <div>
+                                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Modelo
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={generateData.permutaMoto.modelo}
+                                    onChange={(e) => setGenerateData({
+                                      ...generateData,
+                                      permutaMoto: { ...generateData.permutaMoto, modelo: e.target.value }
+                                    })}
+                                    className="input text-sm"
+                                    placeholder="Ej: CB500X"
+                                  />
+                                </div>
+                                
+                                <div>
+                                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Año
+                                  </label>
+                                  <input
+                                    type="number"
+                                    min="1900"
+                                    max={new Date().getFullYear()}
+                                    value={generateData.permutaMoto.anio}
+                                    onChange={(e) => setGenerateData({
+                                      ...generateData,
+                                      permutaMoto: { ...generateData.permutaMoto, anio: e.target.value }
+                                    })}
+                                    className="input text-sm"
+                                    placeholder="2020"
+                                  />
+                                </div>
+                                
+                                <div>
+                                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Valor Estimado
+                                  </label>
+                                  <div className="relative">
+                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 text-sm">$</span>
+                                    <input
+                                      type="number"
+                                      min="0"
+                                      step="0.01"
+                                      value={generateData.permutaMoto.precio}
+                                      onChange={(e) => setGenerateData({
+                                        ...generateData,
+                                        permutaMoto: { ...generateData.permutaMoto, precio: e.target.value }
+                                      })}
+                                      className="input pl-8 text-sm"
+                                      placeholder="0.00"
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+
+                              <p className="text-xs text-gray-500 dark:text-gray-400 italic">
+                                Las motocicletas no se agregan al catálogo automáticamente
+                              </p>
+                            </div>
+                          )}
+
+                          {/* Formulario para Otros */}
+                          {generateData.tipoPermuta === 'otros' && (
+                            <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-300 dark:border-gray-600 space-y-3">
+                              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                                Descripción de la Permuta
+                              </h4>
+                              
+                              <div className="space-y-3">
+                                <div>
+                                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Descripción
+                                  </label>
+                                  <textarea
+                                    value={generateData.permutaOtros.descripcion}
+                                    onChange={(e) => setGenerateData({
+                                      ...generateData,
+                                      permutaOtros: { ...generateData.permutaOtros, descripcion: e.target.value }
+                                    })}
+                                    className="input text-sm resize-none"
+                                    rows="3"
+                                    placeholder="Describa el bien que se ofrece como permuta..."
+                                  />
+                                </div>
+                                
+                                <div>
+                                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Valor Estimado
+                                  </label>
+                                  <div className="relative">
+                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 text-sm">$</span>
+                                    <input
+                                      type="number"
+                                      min="0"
+                                      step="0.01"
+                                      value={generateData.permutaOtros.precio}
+                                      onChange={(e) => setGenerateData({
+                                        ...generateData,
+                                        permutaOtros: { ...generateData.permutaOtros, precio: e.target.value }
+                                      })}
+                                      className="input pl-8 text-sm"
+                                      placeholder="0.00"
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
