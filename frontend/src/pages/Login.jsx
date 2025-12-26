@@ -171,8 +171,19 @@ const Login = () => {
                       Credenciales de Prueba
                     </h4>
                     <div className="space-y-1 text-xs text-blue-700 dark:text-blue-400">
-                      <p><span className="font-medium">Email:</span> admin@demo.com</p>
-                      <p><span className="font-medium">Contraseña:</span> admin123</p>
+                      <div className="pb-2 border-b border-blue-200 dark:border-blue-700">
+                        <p className="font-semibold mb-1">👑 Administrador</p>
+                        <p><span className="font-medium">Email:</span> admin@demo.com</p>
+                        <p><span className="font-medium">Contraseña:</span> admin123</p>
+                      </div>
+                      <div className="pt-2">
+                        <p className="font-semibold mb-1">👤 Empleado</p>
+                        <p><span className="font-medium">Email:</span> empleado@demo.com</p>
+                        <p><span className="font-medium">Contraseña:</span> admin123</p>
+                        <p className="text-[10px] text-blue-600 dark:text-blue-400 mt-1 italic">
+                          Sin acceso a Dashboard ni Reportes
+                        </p>
+                      </div>
                     </div>
                   </div>
 
