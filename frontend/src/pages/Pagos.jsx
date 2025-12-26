@@ -1,3 +1,10 @@
+  // Buscador de clientes por nombre
+  const [clienteSearch, setClienteSearch] = useState('');
+
+  // Filtrar clientes por nombre (solo staff)
+  const clientesConPagosFiltrados = isStaff && clienteSearch.trim()
+    ? clientesConPagos.filter(c => c.cliente.nombre.toLowerCase().includes(clienteSearch.trim().toLowerCase()))
+    : clientesConPagos;
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { pagosService, autosService, clientesService } from '../services';
@@ -684,6 +691,19 @@ const Pagos = () => {
         </div>
       </div>
 
+      {/* Buscador de clientes por nombre (solo staff) */}
+      {isStaff && (
+        <div className="card mb-2">
+          <input
+            type="text"
+            placeholder="Buscar cliente por nombre..."
+            value={clienteSearch}
+            onChange={e => setClienteSearch(e.target.value)}
+            className="input w-full"
+          />
+        </div>
+      )}
+
       {/* Vista de pagos */}
       {loading ? (
         <div className="card">
@@ -694,7 +714,7 @@ const Pagos = () => {
       ) : isStaff ? (
         /* Vista Admin: Clientes agrupados */
         <div className="space-y-4">
-          {clientesConPagos.length === 0 ? (
+          {clientesConPagosFiltrados.length === 0 ? (
             <div className="card dark:bg-gray-800 dark:border-gray-700">
               <div className="text-center py-12">
                 <User className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
@@ -702,7 +722,7 @@ const Pagos = () => {
               </div>
             </div>
           ) : (
-            clientesConPagos.map((clienteData, index) => (
+            clientesConPagosFiltrados.map((clienteData, index) => (
               <div key={clienteData.cliente.id} className="card dark:bg-gray-800 dark:border-gray-700 animate-fadeInUp" style={{animationDelay: `${0.1 * (index % 5)}s`}}>
                 {/* Header del cliente */}
                 <div 
