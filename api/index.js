@@ -1328,15 +1328,6 @@ app.get('/api/dashboard/stats-empleado', authenticateToken, requireStaff, async 
 });
 
 // ==================== RUTAS DE UTILIDAD ====================
-      pagosRecientes
-    });
-  } catch (error) {
-    console.error('Error obteniendo estadísticas:', error);
-    res.status(500).json({ error: 'Error al obtener estadísticas' });
-  }
-});
-
-// ==================== RUTAS DE UTILIDAD ====================
 
 // Setup automático de base de datos
 app.post('/api/setup', async (req, res) => {
