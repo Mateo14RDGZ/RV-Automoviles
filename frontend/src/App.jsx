@@ -10,6 +10,7 @@ import ThemeTransitionOverlay from './components/ThemeTransitionOverlay';
 import InstallPWABanner from './components/InstallPWABanner';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import EmpleadoDashboard from './pages/EmpleadoDashboard';
 import Autos from './pages/Autos';
 import Clientes from './pages/Clientes';
 import Pagos from './pages/Pagos';
@@ -35,6 +36,9 @@ function App() {
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/reportes" element={<Reportes />} />
                   </Route>
+                  
+                  {/* Dashboard para empleados */}
+                  <Route path="/empleado-dashboard" element={<EmpleadoDashboard />} />
                   
                   {/* Rutas para staff (admin y empleado) */}
                   <Route path="/autos" element={<Autos />} />

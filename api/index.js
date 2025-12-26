@@ -1176,6 +1176,166 @@ app.get('/api/dashboard/stats', authenticateToken, requireAdmin, async (req, res
   }
 });
 
+// Dashboard para empleados (SIN información monetaria)
+app.get('/api/dashboard/stats-empleado', authenticateToken, requireStaff, async (req, res) => {
+  try {
+    const totalClientes = await prisma.cliente.count({ where: { activo: true } });
+    const totalAutos = await prisma.auto.count();
+    const autosDisponibles = await prisma.auto.count({ where: { estado: 'disponible' } });
+    const autosVendidos = await prisma.auto.count({ where: { estado: 'vendido' } });
+    const autosFinanciados = await prisma.auto.count({ where: { estado: 'financiado' } });
+
+    const pagosPendientes = await prisma.pago.count({ where: { estado: 'pendiente' } });
+    const pagosVencidos = await prisma.pago.count({
+      where: {
+        estado: 'pendiente',
+        fechaVencimiento: { lt: new Date() }
+      }
+    });
+    const pagosPagados = await prisma.pago.count({ where: { estado: 'pagado' } });
+
+    // Próximos vencimientos (próximos 7 días) - SIN montos
+    const hoy = new Date();
+    const en7Dias = new Date();
+    en7Dias.setDate(hoy.getDate() + 7);
+
+    const proximosVencimientos = await prisma.pago.findMany({
+      where: {
+        estado: 'pendiente',
+        fechaVencimiento: {
+          gte: hoy,
+          lte: en7Dias
+        }
+      },
+      select: {
+        id: true,
+        numeroCuota: true,
+        fechaVencimiento: true,
+        estado: true,
+        auto: {
+          select: {
+            id: true,
+            marca: true,
+            modelo: true,
+            anio: true,
+            matricula: true,
+            cliente: {
+              select: {
+                id: true,
+                nombre: true,
+                telefono: true
+              }
+            }
+          }
+        }
+      },
+      orderBy: { fechaVencimiento: 'asc' },
+      take: 10
+    });
+
+    // Pagos vencidos - SIN montos
+    const pagosVencidosDetalle = await prisma.pago.findMany({
+      where: {
+        estado: 'pendiente',
+        fechaVencimiento: { lt: hoy }
+      },
+      select: {
+        id: true,
+        numeroCuota: true,
+        fechaVencimiento: true,
+        estado: true,
+        auto: {
+          select: {
+            id: true,
+            marca: true,
+            modelo: true,
+            anio: true,
+            matricula: true,
+            cliente: {
+              select: {
+                id: true,
+                nombre: true,
+                telefono: true
+              }
+            }
+          }
+        }
+      },
+      orderBy: { fechaVencimiento: 'asc' },
+      take: 10
+    });
+
+    // Clientes con financiamiento activo
+    const clientesConFinanciamiento = await prisma.cliente.findMany({
+      where: {
+        activo: true,
+        autos: {
+          some: {
+            estado: 'financiado'
+          }
+        }
+      },
+      select: {
+        id: true,
+        nombre: true,
+        telefono: true,
+        autos: {
+          where: {
+            estado: 'financiado'
+          },
+          select: {
+            id: true,
+            marca: true,
+            modelo: true,
+            anio: true,
+            matricula: true
+          }
+        }
+      },
+      take: 10
+    });
+
+    // Total de permutas (sin valores)
+    const totalPermutas = await prisma.permuta.count();
+
+    res.json({
+      clientes: {
+        total: totalClientes,
+        conFinanciamiento: clientesConFinanciamiento.length
+      },
+      autos: {
+        total: totalAutos,
+        disponibles: autosDisponibles,
+        financiados: autosFinanciados,
+        vendidos: autosVendidos
+      },
+      pagos: {
+        pendientes: pagosPendientes,
+        vencidos: pagosVencidos,
+        pagados: pagosPagados
+      },
+      permutas: {
+        total: totalPermutas
+      },
+      proximosVencimientos,
+      pagosVencidos: pagosVencidosDetalle,
+      clientesConFinanciamiento
+    });
+  } catch (error) {
+    console.error('Error obteniendo estadísticas para empleado:', error);
+    res.status(500).json({ error: 'Error al obtener estadísticas' });
+  }
+});
+
+// ==================== RUTAS DE UTILIDAD ====================
+      pagosRecientes
+    });
+  } catch (error) {
+    console.error('Error obteniendo estadísticas:', error);
+    res.status(500).json({ error: 'Error al obtener estadísticas' });
+  }
+});
+
 // ==================== RUTAS DE UTILIDAD ====================
 
 // Setup automático de base de datos

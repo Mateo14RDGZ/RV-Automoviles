@@ -48,6 +48,7 @@ const Layout = () => {
     
     if (user?.rol === 'empleado') {
       return [
+        { to: '/empleado-dashboard', icon: LayoutDashboard, label: 'Escritorio' },
         { to: '/autos', icon: Car, label: 'Autos' },
         { to: '/clientes', icon: Users, label: 'Clientes' },
         { to: '/pagos', icon: CreditCard, label: 'Pagos' },

@@ -10,7 +10,7 @@ const RoleBasedRedirect = () => {
   }
   
   if (user?.rol === 'empleado') {
-    return <Navigate to="/autos" replace />;
+    return <Navigate to="/empleado-dashboard" replace />;
   }
   
   // Los clientes van a su dashboard personal
