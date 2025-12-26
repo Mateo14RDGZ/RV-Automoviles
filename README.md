@@ -29,15 +29,24 @@ NODE_ENV=production
 
 ---
 
-## ⚡ Quick Start - Deploy en Vercel
+## ⚡ Quick Start - Deploy en Vercel con Neon
 
 **¿Listo para poner tu app en producción?**
 
-### 📘 Opción 1: Guía Completa (Paso a Paso - 30 min)
+### 📘 Guía Completa de Deploy (Paso a Paso)
 
+👉 **[DEPLOY_VERCEL_NEON.md](DEPLOY_VERCEL_NEON.md)** - Guía completa para deploy en Vercel con base de datos Neon PostgreSQL
 
+Esta guía incluye:
+- ✅ Configuración de base de datos en Neon
+- ✅ Variables de entorno explicadas
+- ✅ Deployment en Vercel
+- ✅ Inicialización de base de datos
+- ✅ Solución de problemas
 
-👉 **[VERCEL_DEPLOY_GUIDE.md](VERCEL_DEPLOY_GUIDE.md)**
+### 📝 Guías Adicionales
+
+👉 **[VERCEL_DEPLOY_GUIDE.md](VERCEL_DEPLOY_GUIDE.md)** (si existe)
 
 
 

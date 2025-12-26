@@ -10,8 +10,7 @@
     }
   },
   "env": {
-    "NODE_ENV": "production",
-    "JWT_SECRET": "demo_jwt_secret_2024_cambiar_para_produccion"
+    "NODE_ENV": "production"
   },
   "headers": [
     {

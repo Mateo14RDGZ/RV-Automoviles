@@ -2,12 +2,21 @@
 const { PrismaClient } = require('@prisma/client');
 
 const prismaClientSingleton = () => {
-  if (!process.env.DATABASE_URL) {
-    console.error('❌ ERROR: DATABASE_URL no está configurada');
-    throw new Error('DATABASE_URL no está configurada');
+  // Usar POSTGRES_PRISMA_URL (Vercel/Neon) o DATABASE_URL como fallback
+  const databaseUrl = process.env.POSTGRES_PRISMA_URL || process.env.DATABASE_URL;
+  
+  if (!databaseUrl) {
+    console.error('❌ ERROR: No hay URL de base de datos configurada');
+    console.error('   Configura POSTGRES_PRISMA_URL o DATABASE_URL');
+    throw new Error('URL de base de datos no configurada');
   }
 
-  console.log('🔗 Conectando a base de datos:', process.env.DATABASE_URL.substring(0, 30) + '...');
+  // Si usamos POSTGRES_PRISMA_URL, establecer DATABASE_URL para Prisma
+  if (process.env.POSTGRES_PRISMA_URL && !process.env.DATABASE_URL) {
+    process.env.DATABASE_URL = process.env.POSTGRES_PRISMA_URL;
+  }
+
+  console.log('🔗 Conectando a base de datos:', databaseUrl.substring(0, 30) + '...');
 
   return new PrismaClient({
     log: ['query', 'error', 'warn', 'info'],
