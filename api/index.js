@@ -785,12 +785,13 @@ app.post('/api/pagos/generar-cuotas', authenticateToken, requireStaff, async (re
 
     console.log('✅ Cuotas creadas exitosamente:', createdPagos.length);
 
+    // Marcar auto como financiado (plan de cuotas en progreso)
     await prisma.auto.update({
       where: { id: parseInt(autoId) },
-      data: { estado: 'vendido' }
+      data: { estado: 'financiado' }
     });
 
-    console.log('✅ Auto marcado como vendido');
+    console.log('✅ Auto marcado como financiado (plan en progreso)');
 
     const response = {
       pagos: createdPagos,
@@ -819,6 +820,53 @@ app.put('/api/pagos/:id/registrar-pago', authenticateToken, requireStaff, async 
       },
       include: { auto: { include: { cliente: true } } }
     });
+
+    // Verificar si todas las cuotas del auto están pagadas
+    const todosPagos = await prisma.pago.findMany({
+      where: { autoId: pago.autoId }
+    });
+
+    const todosCompletados = todosPagos.every(p => p.estado === 'pagado');
+
+    if (todosCompletados) {
+      console.log('🎉 Todas las cuotas pagadas! Finalizando venta:', pago.autoId);
+      
+      // Obtener el auto con su cliente
+      const auto = await prisma.auto.findUnique({
+        where: { id: pago.autoId },
+        include: { cliente: true }
+      });
+
+      if (auto) {
+        // 1. Marcar auto como vendido (NO eliminarlo)
+        await prisma.auto.update({
+          where: { id: pago.autoId },
+          data: { estado: 'vendido', activo: false }
+        });
+        console.log('✅ Auto marcado como vendido');
+
+        // 2. Eliminar cliente y su usuario asociado
+        if (auto.clienteId) {
+          // Eliminar usuario del cliente si existe
+          const usuario = await prisma.usuario.findFirst({
+            where: { clienteId: auto.clienteId }
+          });
+          
+          if (usuario) {
+            await prisma.usuario.delete({
+              where: { id: usuario.id }
+            });
+            console.log('✅ Usuario del cliente eliminado');
+          }
+
+          // Eliminar cliente
+          await prisma.cliente.delete({
+            where: { id: auto.clienteId }
+          });
+          console.log('✅ Cliente eliminado automáticamente');
+        }
+      }
+    }
 
     res.json(pago);
   } catch (error) {
@@ -862,14 +910,43 @@ app.put('/api/pagos/:id', authenticateToken, async (req, res) => {
       const todosCompletados = todosPagos.every(p => p.estado === 'pagado');
 
       if (todosCompletados) {
-        console.log('🎉 Todas las cuotas pagadas! Eliminando auto del catálogo:', pago.autoId);
+        console.log('🎉 Todas las cuotas pagadas! Finalizando venta:', pago.autoId);
         
-        // Eliminar el auto del catálogo
-        await prisma.auto.delete({
-          where: { id: pago.autoId }
+        // Obtener el auto con su cliente antes de cualquier cambio
+        const auto = await prisma.auto.findUnique({
+          where: { id: pago.autoId },
+          include: { cliente: true }
         });
 
-        console.log('✅ Auto eliminado del catálogo exitosamente');
+        if (auto) {
+          // 1. Marcar auto como vendido (NO eliminarlo)
+          await prisma.auto.update({
+            where: { id: pago.autoId },
+            data: { estado: 'vendido', activo: false }
+          });
+          console.log('✅ Auto marcado como vendido');
+
+          // 2. Eliminar cliente y su usuario asociado
+          if (auto.clienteId) {
+            // Eliminar usuario del cliente si existe
+            const usuario = await prisma.usuario.findFirst({
+              where: { clienteId: auto.clienteId }
+            });
+            
+            if (usuario) {
+              await prisma.usuario.delete({
+                where: { id: usuario.id }
+              });
+              console.log('✅ Usuario del cliente eliminado');
+            }
+
+            // Eliminar cliente
+            await prisma.cliente.delete({
+              where: { id: auto.clienteId }
+            });
+            console.log('✅ Cliente eliminado automáticamente');
+          }
+        }
       }
     }
 
