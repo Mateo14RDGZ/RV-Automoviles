@@ -199,8 +199,8 @@ const Pagos = () => {
       // Registrar hora de última actualización
       setLastUpdate(new Date());
       
-      // Actualizar agrupación por cliente si es admin - usar los pagos FILTRADOS
-      if (user?.rol === 'admin') {
+      // Actualizar agrupación por cliente si es staff - usar los pagos FILTRADOS
+      if (isStaff) {
         // Usar clientes del estado si ya están cargados
         const clientesParaOrganizar = clientes.length > 0 ? clientes : await clientesService.getAll();
         organizarPagosPorCliente(data, clientesParaOrganizar, filterType);
