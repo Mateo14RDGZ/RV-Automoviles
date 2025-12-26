@@ -1,3 +1,28 @@
+  // Modal para asignar cliente
+  const [showAsignarCliente, setShowAsignarCliente] = useState(false);
+  const [autoAsignarCliente, setAutoAsignarCliente] = useState(null);
+  const [clienteAsignar, setClienteAsignar] = useState('');
+
+  const abrirAsignarCliente = (auto) => {
+    setAutoAsignarCliente(auto);
+    setClienteAsignar('');
+    setShowAsignarCliente(true);
+  };
+
+  const handleAsignarCliente = async (e) => {
+    e.preventDefault();
+    if (!clienteAsignar) return;
+    try {
+      await autosService.update(autoAsignarCliente.id, { clienteId: parseInt(clienteAsignar) });
+      showToast('Cliente asignado exitosamente', 'success');
+      setShowAsignarCliente(false);
+      setAutoAsignarCliente(null);
+      setClienteAsignar('');
+      await loadData();
+    } catch (error) {
+      showToast(error.message || error.response?.data?.error || 'Error al asignar cliente', 'error');
+    }
+  };
 import { useEffect, useState } from 'react';
 import { autosService, clientesService } from '../services';
 import { Car, Plus, Search, Edit2, Trash2, Eye } from 'lucide-react';
@@ -306,19 +331,14 @@ const Autos = () => {
                         >
                           <Edit2 className="w-4 h-4" />
                         </button>
-                        {/* Botón para asignar cliente solo si no tiene */}
+                        {/* Botón discreto solo ícono para asignar cliente */}
                         {!auto.cliente && (
                           <button
-                            onClick={() => {
-                              setEditingAuto(auto);
-                              setShowModal(true);
-                            }}
-                            className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300"
+                            onClick={() => abrirAsignarCliente(auto)}
+                            title="Asignar cliente"
+                            className="p-1 rounded hover:bg-green-100 dark:hover:bg-green-900/30 text-green-600 dark:text-green-400"
                           >
-                            <span className="inline-flex items-center gap-1">
-                              <Plus className="w-4 h-4" />
-                              Asignar cliente
-                            </span>
+                            <Plus className="w-4 h-4" />
                           </button>
                         )}
                         <button
@@ -328,6 +348,36 @@ const Autos = () => {
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
+                          {/* Modal para asignar cliente */}
+                          {showAsignarCliente && (
+                            <div className="fixed inset-0 bg-black dark:bg-black bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center p-4 z-50">
+                              <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto border border-gray-300 dark:border-gray-700 p-6">
+                                <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Asignar cliente</h2>
+                                <form onSubmit={handleAsignarCliente} className="space-y-4">
+                                  <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Cliente</label>
+                                    <select
+                                      value={clienteAsignar}
+                                      onChange={e => setClienteAsignar(e.target.value)}
+                                      className="input"
+                                      required
+                                    >
+                                      <option value="">Selecciona un cliente</option>
+                                      {getClientesSinPlanesActivos().map(cliente => (
+                                        <option key={cliente.id} value={cliente.id}>
+                                          {cliente.nombre} - {cliente.cedula}
+                                        </option>
+                                      ))}
+                                    </select>
+                                  </div>
+                                  <div className="flex gap-3 pt-2">
+                                    <button type="submit" className="btn btn-primary flex-1">Asignar</button>
+                                    <button type="button" className="btn btn-secondary flex-1" onClick={() => setShowAsignarCliente(false)}>Cancelar</button>
+                                  </div>
+                                </form>
+                              </div>
+                            </div>
+                          )}
                     </td>
                   </tr>
                 ))}
