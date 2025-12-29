@@ -128,10 +128,9 @@ export const dashboardService = {
 };
 
 export const comprobantesService = {
-  subir: async (pagoId, numeroCuenta, archivoBase64, tipoArchivo) => {
+  subir: async (pagoId, archivoBase64, tipoArchivo) => {
     const response = await api.post('/comprobantes', {
       pagoId,
-      numeroCuenta,
       archivoBase64,
       tipoArchivo
     });

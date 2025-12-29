@@ -975,16 +975,44 @@ app.delete('/api/pagos/:id', authenticateToken, requireStaff, async (req, res) =
 // Subir comprobante de pago (cliente)
 app.post('/api/comprobantes', authenticateToken, async (req, res) => {
   try {
-    const { pagoId, numeroCuenta, archivoBase64, tipoArchivo } = req.body;
+    const { pagoId, archivoBase64, tipoArchivo } = req.body;
 
-    if (!pagoId || !numeroCuenta || !archivoBase64) {
+    if (!pagoId || !archivoBase64) {
       return res.status(400).json({ error: 'Faltan datos requeridos' });
     }
 
-    // Validar tipo de archivo
-    const tiposPermitidos = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
-    if (tipoArchivo && !tiposPermitidos.includes(tipoArchivo)) {
-      return res.status(400).json({ error: 'Tipo de archivo no permitido. Solo se permiten PDF, JPG y PNG' });
+    // Validar tipo de archivo - aceptar múltiples variantes de PDF
+    const tiposPermitidos = [
+      'image/jpeg', 
+      'image/jpg', 
+      'image/png', 
+      'application/pdf',
+      'application/x-pdf',
+      'application/acrobat',
+      'applications/vnd.pdf',
+      'text/pdf',
+      'text/x-pdf'
+    ];
+    
+    // Si no hay tipoArchivo, intentar detectarlo del base64
+    let tipoArchivoFinal = tipoArchivo;
+    if (!tipoArchivoFinal && archivoBase64.startsWith('data:')) {
+      const match = archivoBase64.match(/data:([^;]+)/);
+      if (match) {
+        tipoArchivoFinal = match[1];
+      }
+    }
+    
+    if (tipoArchivoFinal && !tiposPermitidos.includes(tipoArchivoFinal)) {
+      // Validar por extensión si el tipo MIME no es reconocido
+      const esValido = archivoBase64.includes('pdf') || 
+                       archivoBase64.includes('jpeg') || 
+                       archivoBase64.includes('jpg') || 
+                       archivoBase64.includes('png');
+      
+      if (!esValido) {
+        return res.status(400).json({ error: 'Tipo de archivo no permitido. Solo se permiten PDF, JPG y PNG' });
+      }
     }
 
     // Verificar que el pago existe y pertenece al cliente
@@ -1009,11 +1037,11 @@ app.post('/api/comprobantes', authenticateToken, async (req, res) => {
       }
     }
 
-    // Crear el comprobante
+    // Crear el comprobante (número de cuenta será configurado por el administrador en el futuro)
     const comprobante = await prisma.comprobantePago.create({
       data: {
         pagoId: parseInt(pagoId),
-        numeroCuenta: numeroCuenta.trim(),
+        numeroCuenta: '', // Se configurará en el futuro con el número de cuenta de la automotora
         archivoUrl: archivoBase64, // Almacenamos base64 directamente
         estado: 'pendiente',
         visto: false

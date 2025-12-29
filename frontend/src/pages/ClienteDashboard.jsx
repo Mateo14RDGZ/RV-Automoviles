@@ -13,7 +13,6 @@ const ClienteDashboard = () => {
   const [proximoPago, setProximoPago] = useState(null);
   const [showComprobanteModal, setShowComprobanteModal] = useState(false);
   const [pagoSeleccionado, setPagoSeleccionado] = useState(null);
-  const [numeroCuenta, setNumeroCuenta] = useState('');
   const [archivoSeleccionado, setArchivoSeleccionado] = useState(null);
   const [subiendo, setSubiendo] = useState(false);
 
@@ -85,7 +84,6 @@ const ClienteDashboard = () => {
 
   const abrirModalComprobante = (pago) => {
     setPagoSeleccionado(pago);
-    setNumeroCuenta('');
     setArchivoSeleccionado(null);
     setShowComprobanteModal(true);
   };
@@ -93,16 +91,33 @@ const ClienteDashboard = () => {
   const cerrarModalComprobante = () => {
     setShowComprobanteModal(false);
     setPagoSeleccionado(null);
-    setNumeroCuenta('');
     setArchivoSeleccionado(null);
   };
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Validar tipo de archivo
-      const tiposPermitidos = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
-      if (!tiposPermitidos.includes(file.type)) {
+      // Validar tipo de archivo por extensión y MIME type
+      const extension = file.name.toLowerCase().split('.').pop();
+      const extensionesPermitidas = ['pdf', 'jpg', 'jpeg', 'png'];
+      const tiposMimePermitidos = [
+        'image/jpeg', 
+        'image/jpg', 
+        'image/png', 
+        'application/pdf',
+        'application/x-pdf',
+        'application/acrobat',
+        'applications/vnd.pdf',
+        'text/pdf',
+        'text/x-pdf'
+      ];
+      
+      // Validar por extensión o tipo MIME
+      const esValido = extensionesPermitidas.includes(extension) || 
+                       tiposMimePermitidos.includes(file.type) ||
+                       file.type === ''; // Algunos navegadores no detectan el tipo MIME
+      
+      if (!esValido) {
         showToast('Solo se permiten archivos PDF, JPG y PNG', 'error');
         return;
       }
@@ -128,8 +143,8 @@ const ClienteDashboard = () => {
 
   const handleSubirComprobante = async (e) => {
     e.preventDefault();
-    if (!numeroCuenta.trim() || !archivoSeleccionado) {
-      showToast('Por favor completa todos los campos', 'error');
+    if (!archivoSeleccionado) {
+      showToast('Por favor selecciona un archivo', 'error');
       return;
     }
 
@@ -137,11 +152,23 @@ const ClienteDashboard = () => {
       setSubiendo(true);
       const archivoBase64 = await convertirArchivoABase64(archivoSeleccionado);
       
+      // Determinar tipo MIME correcto si no está disponible
+      let tipoArchivo = archivoSeleccionado.type;
+      if (!tipoArchivo) {
+        const extension = archivoSeleccionado.name.toLowerCase().split('.').pop();
+        const tiposMime = {
+          'pdf': 'application/pdf',
+          'jpg': 'image/jpeg',
+          'jpeg': 'image/jpeg',
+          'png': 'image/png'
+        };
+        tipoArchivo = tiposMime[extension] || 'application/pdf';
+      }
+      
       await comprobantesService.subir(
         pagoSeleccionado.id,
-        numeroCuenta,
         archivoBase64,
-        archivoSeleccionado.type
+        tipoArchivo
       );
 
       showToast('Comprobante enviado exitosamente. Será revisado por el administrador.', 'success');
@@ -523,20 +550,6 @@ const ClienteDashboard = () => {
               </div>
 
               <form onSubmit={handleSubirComprobante} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Número de Cuenta de Transferencia *
-                  </label>
-                  <input
-                    type="text"
-                    value={numeroCuenta}
-                    onChange={(e) => setNumeroCuenta(e.target.value)}
-                    placeholder="Ingrese el número de cuenta"
-                    className="input"
-                    required
-                  />
-                </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Comprobante de Transferencia *
