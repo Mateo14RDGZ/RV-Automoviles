@@ -25,6 +25,8 @@ const Dashboard = () => {
   const [loadingNotificaciones, setLoadingNotificaciones] = useState(true);
   const [comprobanteSeleccionado, setComprobanteSeleccionado] = useState(null);
   const [mostrarComprobante, setMostrarComprobante] = useState(false);
+  const [mostrarModalWhatsApp, setMostrarModalWhatsApp] = useState(false);
+  const [pagoAprobado, setPagoAprobado] = useState(null);
 
   useEffect(() => {
     loadStats();
@@ -67,14 +69,74 @@ const Dashboard = () => {
 
   const aprobarComprobante = async (id, notas = '') => {
     try {
-      await comprobantesService.actualizarEstado(id, 'aprobado', notas);
+      const resultado = await comprobantesService.actualizarEstado(id, 'aprobado', notas);
       showToast('Comprobante aprobado exitosamente', 'success');
       setMostrarComprobante(false);
+      
+      // Guardar información del pago para el modal de WhatsApp
+      if (comprobanteSeleccionado && comprobanteSeleccionado.pago) {
+        setPagoAprobado({
+          ...comprobanteSeleccionado.pago,
+          estado: 'pagado',
+          fechaPago: new Date().toISOString()
+        });
+        setMostrarModalWhatsApp(true);
+      }
+      
       setComprobanteSeleccionado(null);
       await loadNotificaciones();
       await loadStats(); // Recargar stats para actualizar pagos
     } catch (error) {
       showToast(error.message || 'Error al aprobar comprobante', 'error');
+    }
+  };
+
+  const enviarWhatsAppConfirmacion = () => {
+    try {
+      if (!pagoAprobado) return;
+      
+      const cliente = pagoAprobado.auto.cliente;
+      const auto = pagoAprobado.auto;
+      const fechaPago = new Date(pagoAprobado.fechaPago || new Date()).toLocaleDateString('es-UY', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric'
+      });
+      
+      const mensaje = `✅ *Pago Confirmado - Gestión Automotora*\n\n` +
+        `Estimado/a *${cliente.nombre}*,\n\n` +
+        `Le confirmamos que hemos recibido su pago correspondiente a:\n\n` +
+        `🚗 *Vehículo:* ${auto.marca} ${auto.modelo} ${auto.anio}\n` +
+        `📋 *Matrícula:* ${auto.matricula}\n` +
+        `🔢 *Cuota:* #${pagoAprobado.numeroCuota}\n` +
+        `💰 *Monto Pagado:* $${parseFloat(pagoAprobado.monto).toFixed(2)}\n` +
+        `📅 *Fecha de Pago:* ${fechaPago}\n\n` +
+        `Agradecemos su puntualidad.\n\n` +
+        `💻 *Control en Línea*\n` +
+        `Puede ver el estado de todas sus cuotas en nuestro portal web.\n` +
+        `Ingrese con su número de cédula.\n\n` +
+        `_Gestión Automotora - Sistema Demo_`;
+      
+      // Limpiar el número de teléfono (quitar espacios, guiones, etc.)
+      let telefono = cliente.telefono.replace(/[^0-9]/g, '');
+      
+      // Si el número empieza con 0, quitarlo (ej: 0998765432 → 998765432)
+      if (telefono.startsWith('0')) {
+        telefono = telefono.substring(1);
+      }
+      
+      // Abrir WhatsApp con el mensaje pre-llenado
+      const url = `https://wa.me/598${telefono}?text=${encodeURIComponent(mensaje)}`;
+      window.open(url, '_blank');
+      
+      // Cerrar modal
+      setTimeout(() => {
+        setMostrarModalWhatsApp(false);
+        setPagoAprobado(null);
+      }, 500);
+    } catch (error) {
+      console.error('Error al abrir WhatsApp:', error);
+      showToast('Error al abrir WhatsApp', 'error');
     }
   };
 
@@ -485,6 +547,46 @@ const Dashboard = () => {
                 >
                   <X className="w-4 h-4" />
                   Rechazar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de WhatsApp después de aprobar comprobante */}
+      {mostrarModalWhatsApp && pagoAprobado && (
+        <div className="fixed inset-0 bg-black dark:bg-black bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full border border-gray-300 dark:border-gray-700">
+            <div className="p-6">
+              <div className="flex items-center justify-center mb-4">
+                <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                  <CheckCircle className="w-10 h-10 text-green-600 dark:text-green-400" />
+                </div>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 text-center">
+                ✅ ¡Pago Confirmado!
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300 mb-6 text-center">
+                La cuota #{pagoAprobado.numeroCuota} de {pagoAprobado.auto?.cliente?.nombre || 'cliente'} ha sido marcada como pagada.
+              </p>
+              
+              <div className="space-y-3">
+                <button
+                  onClick={enviarWhatsAppConfirmacion}
+                  className="w-full bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white py-3 px-4 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-105"
+                >
+                  <span className="text-xl">💬</span> Enviar WhatsApp
+                </button>
+                
+                <button
+                  onClick={() => {
+                    setMostrarModalWhatsApp(false);
+                    setPagoAprobado(null);
+                  }}
+                  className="w-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 rounded-lg font-semibold transition-all duration-200"
+                >
+                  Cerrar
                 </button>
               </div>
             </div>

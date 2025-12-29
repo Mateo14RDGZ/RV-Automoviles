@@ -66,7 +66,8 @@ const ClienteDashboard = () => {
         pagados,
         pendientes,
         vencidos,
-        pagables // todas las cuotas que se pueden pagar (pendientes + vencidas)
+        pagables, // todas las cuotas que se pueden pagar (pendientes + vencidas)
+        todasLasCuotas: pagos // todas las cuotas para mostrar en "Mis Cuotas"
       });
 
       setProximoPago(proximosPagos[0] || null);
@@ -399,58 +400,8 @@ const ClienteDashboard = () => {
         </div>
       )}
 
-      {/* Sección de Cuotas Pagadas */}
-      {stats.pagados.length > 0 && (
-        <div className="card dark:bg-gray-800 dark:border-gray-700 animate-fadeInUp" style={{animationDelay: '0.9s'}}>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-              <CheckCircle className="w-6 h-6 text-green-600 dark:text-green-400" />
-              Últimas Cuotas Pagadas
-            </h2>
-            <span className="text-sm text-gray-500 dark:text-gray-400">
-              {stats.cuotasPagadas} pagada{stats.cuotasPagadas !== 1 ? 's' : ''}
-            </span>
-          </div>
-          <div className="space-y-3">
-            {stats.pagados.slice(0, 5).map((pago) => (
-              <div
-                key={pago.id}
-                className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 hover:shadow-md transition-shadow"
-              >
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="font-semibold text-gray-900 dark:text-white">
-                        Cuota #{pago.numeroCuota}
-                      </span>
-                      <span className="text-xs px-2 py-1 rounded-full bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400">
-                        ✓ Pagado
-                      </span>
-                    </div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400">
-                      <p>{pago.auto.marca} {pago.auto.modelo} - {pago.auto.matricula}</p>
-                      <p className="mt-1">Pagado: {formatDate(pago.fechaPago)}</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-xl font-bold text-green-600 dark:text-green-400">
-                      {formatCurrency(pago.monto)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
-            {stats.cuotasPagadas > 5 && (
-              <p className="text-sm text-center text-gray-500 dark:text-gray-400 pt-2">
-                Mostrando 5 de {stats.cuotasPagadas} cuotas pagadas
-              </p>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Sección de Cuotas Pagables (pendientes y vencidas) */}
-      {stats.pagables && stats.pagables.length > 0 && (
+      {/* Sección de Mis Cuotas - Todas las cuotas */}
+      {stats.todasLasCuotas && stats.todasLasCuotas.length > 0 && (
         <div className="card dark:bg-gray-800 dark:border-gray-700 animate-fadeInUp" style={{animationDelay: '1s'}}>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
@@ -458,34 +409,61 @@ const ClienteDashboard = () => {
               Mis Cuotas
             </h2>
             <span className="text-sm text-gray-500 dark:text-gray-400">
-              {stats.pagables.length} cuota{stats.pagables.length !== 1 ? 's' : ''} para pagar
+              {stats.totalCuotas} cuota{stats.totalCuotas !== 1 ? 's' : ''} total{stats.totalCuotas !== 1 ? 'es' : ''}
             </span>
           </div>
           <div className="space-y-3">
-            {stats.pagables
-              .sort((a, b) => new Date(a.fechaVencimiento) - new Date(b.fechaVencimiento))
+            {stats.todasLasCuotas
+              .sort((a, b) => {
+                // Ordenar: primero pendientes/vencidas, luego pagadas
+                if (a.estado !== b.estado) {
+                  return a.estado === 'pagado' ? 1 : -1;
+                }
+                // Si ambos tienen el mismo estado, ordenar por fecha de vencimiento
+                return new Date(a.fechaVencimiento) - new Date(b.fechaVencimiento);
+              })
               .map((pago) => {
                 const diasRestantes = getDiasHastaVencimiento(pago.fechaVencimiento);
                 const esVencido = diasRestantes < 0;
                 const esUrgente = !esVencido && diasRestantes <= 7;
+                const estaPagado = pago.estado === 'pagado';
                 return (
                   <div
                     key={pago.id}
                     className={`border rounded-lg p-4 hover:shadow-md transition-shadow ${
-                      esVencido
+                      estaPagado
+                        ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
+                        : esVencido
                         ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
                         : esUrgente
                         ? 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800'
                         : 'bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700'
                     }`}
                   >
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                    <div className="flex flex-col md:flex-row md:items-center gap-3">
+                      {/* Botón de pagar a la izquierda - solo si NO está pagado */}
+                      {!estaPagado && (
+                        <div className="flex-shrink-0">
+                          <button
+                            onClick={() => abrirModalComprobante(pago)}
+                            className="btn btn-primary btn-sm flex items-center gap-2 whitespace-nowrap"
+                          >
+                            <Upload className="w-4 h-4" />
+                            Pagar
+                          </button>
+                        </div>
+                      )}
+                      {/* Información de la cuota */}
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
                           <span className="font-semibold text-gray-900 dark:text-white">
                             Cuota #{pago.numeroCuota}
                           </span>
-                          {esVencido ? (
+                          {estaPagado ? (
+                            <span className="text-xs px-2 py-1 rounded-full bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400">
+                              ✓ Pagado
+                            </span>
+                          ) : esVencido ? (
                             <span className="text-xs px-2 py-1 rounded-full bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-400 flex items-center gap-1">
                               <AlertCircle className="w-3 h-3" /> Vencida
                             </span>
@@ -497,26 +475,30 @@ const ClienteDashboard = () => {
                         </div>
                         <div className="text-sm text-gray-600 dark:text-gray-400">
                           <p>{pago.auto.marca} {pago.auto.modelo} - {pago.auto.matricula}</p>
-                          <p className="mt-1">Vencimiento: {formatDate(pago.fechaVencimiento)}</p>
-                          <p className="mt-1 font-medium text-gray-700 dark:text-gray-300">
-                            {diasRestantes === 0 ? '¡Vence hoy!' : 
-                              diasRestantes === 1 ? '¡Vence mañana!' :
-                              diasRestantes < 0 ? `Vencido hace ${Math.abs(diasRestantes)} días` :
-                              `Faltan ${diasRestantes} días`}
-                          </p>
+                          {estaPagado ? (
+                            <p className="mt-1">Pagado: {formatDate(pago.fechaPago)}</p>
+                          ) : (
+                            <>
+                              <p className="mt-1">Vencimiento: {formatDate(pago.fechaVencimiento)}</p>
+                              <p className="mt-1 font-medium text-gray-700 dark:text-gray-300">
+                                {diasRestantes === 0 ? '¡Vence hoy!' : 
+                                  diasRestantes === 1 ? '¡Vence mañana!' :
+                                  diasRestantes < 0 ? `Vencido hace ${Math.abs(diasRestantes)} días` :
+                                  `Faltan ${diasRestantes} días`}
+                              </p>
+                            </>
+                          )}
                         </div>
                       </div>
-                      <div className="text-right">
-                        <p className="text-xl font-bold text-gray-900 dark:text-white">
+                      {/* Monto a la derecha */}
+                      <div className="text-right flex-shrink-0">
+                        <p className={`text-xl font-bold ${
+                          estaPagado 
+                            ? 'text-green-600 dark:text-green-400' 
+                            : 'text-gray-900 dark:text-white'
+                        }`}>
                           {formatCurrency(pago.monto)}
                         </p>
-                        <button
-                          onClick={() => abrirModalComprobante(pago)}
-                          className="mt-2 btn btn-primary btn-sm flex items-center gap-2"
-                        >
-                          <Upload className="w-4 h-4" />
-                          Pagar con Transferencia
-                        </button>
                       </div>
                     </div>
                   </div>
