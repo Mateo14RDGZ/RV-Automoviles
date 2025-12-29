@@ -972,8 +972,9 @@ app.delete('/api/pagos/:id', authenticateToken, requireStaff, async (req, res) =
 
 // ==================== RUTAS DE COMPROBANTES DE PAGO ====================
 
-// Subir comprobante de pago (cliente)
-app.post('/api/comprobantes', authenticateToken, async (req, res) => {
+const { isCliente } = require('./lib/auth');
+// Subir comprobante de pago (solo cliente)
+app.post('/api/comprobantes', authenticateToken, isCliente, async (req, res) => {
   try {
     const { pagoId, archivoBase64, tipoArchivo } = req.body;
 
