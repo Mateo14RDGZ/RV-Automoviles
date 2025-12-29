@@ -972,9 +972,8 @@ app.delete('/api/pagos/:id', authenticateToken, requireStaff, async (req, res) =
 
 // ==================== RUTAS DE COMPROBANTES DE PAGO ====================
 
-const { isCliente } = require('./lib/auth');
-// Subir comprobante de pago (solo cliente)
-app.post('/api/comprobantes', authenticateToken, isCliente, async (req, res) => {
+// Subir comprobante de pago (cliente puede subir, admin/empleado también pueden)
+app.post('/api/comprobantes', authenticateToken, async (req, res) => {
   try {
     const { pagoId, archivoBase64, tipoArchivo } = req.body;
 
@@ -1033,8 +1032,23 @@ app.post('/api/comprobantes', authenticateToken, isCliente, async (req, res) => 
         include: { cliente: true }
       });
 
-      if (!usuario || !usuario.cliente || usuario.cliente.id !== pago.auto.clienteId) {
-        return res.status(403).json({ error: 'No tienes permiso para subir comprobante de este pago' });
+      if (!usuario) {
+        return res.status(403).json({ error: 'Usuario no encontrado' });
+      }
+
+      // Si el usuario tiene clienteId, verificar que coincide
+      if (usuario.clienteId) {
+        if (usuario.clienteId !== pago.auto.clienteId) {
+          return res.status(403).json({ error: 'No tienes permiso para subir comprobante de este pago' });
+        }
+      } else if (usuario.cliente) {
+        // Si tiene cliente relacionado, verificar
+        if (usuario.cliente.id !== pago.auto.clienteId) {
+          return res.status(403).json({ error: 'No tienes permiso para subir comprobante de este pago' });
+        }
+      } else {
+        // Si no tiene cliente asociado, no puede subir comprobantes
+        return res.status(403).json({ error: 'No tienes un cliente asociado' });
       }
     }
 

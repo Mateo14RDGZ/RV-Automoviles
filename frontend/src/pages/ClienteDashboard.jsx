@@ -449,13 +449,13 @@ const ClienteDashboard = () => {
         </div>
       )}
 
-      {/* Sección de Cuotas Pagables (pendientes y vencidas) */}
+      {/* Sección de Mis Cuotas (todas las cuotas pendientes y vencidas) */}
       {stats.pagables && stats.pagables.length > 0 && (
         <div className="card dark:bg-gray-800 dark:border-gray-700 animate-fadeInUp" style={{animationDelay: '1s'}}>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
               <Clock className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
-              Cuotas Pendientes y Vencidas
+              Mis Cuotas
             </h2>
             <span className="text-sm text-gray-500 dark:text-gray-400">
               {stats.pagables.length} cuota{stats.pagables.length !== 1 ? 's' : ''} para pagar
