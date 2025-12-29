@@ -449,7 +449,7 @@ const ClienteDashboard = () => {
         </div>
       )}
 
-      {/* Sección de Mis Cuotas (todas las cuotas pendientes y vencidas) */}
+      {/* Sección de Cuotas Pagables (pendientes y vencidas) */}
       {stats.pagables && stats.pagables.length > 0 && (
         <div className="card dark:bg-gray-800 dark:border-gray-700 animate-fadeInUp" style={{animationDelay: '1s'}}>
           <div className="flex items-center justify-between mb-4">
@@ -515,7 +515,7 @@ const ClienteDashboard = () => {
                           className="mt-2 btn btn-primary btn-sm flex items-center gap-2"
                         >
                           <Upload className="w-4 h-4" />
-                          Pagar
+                          Pagar con Transferencia
                         </button>
                       </div>
                     </div>
