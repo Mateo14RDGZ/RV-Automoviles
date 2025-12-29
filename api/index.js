@@ -1027,29 +1027,45 @@ app.post('/api/comprobantes', authenticateToken, async (req, res) => {
 
     // Si el usuario es cliente, verificar que el pago le pertenece
     if (req.user.rol === 'cliente') {
+      // Verificar que el pago tiene un cliente asociado
+      if (!pago.auto.clienteId) {
+        console.log('❌ Pago sin cliente asociado:', pago.id);
+        return res.status(403).json({ error: 'Este pago no tiene un cliente asociado' });
+      }
+
+      // Obtener el usuario con su cliente
       const usuario = await prisma.usuario.findUnique({
         where: { id: req.user.id },
         include: { cliente: true }
       });
 
       if (!usuario) {
+        console.log('❌ Usuario no encontrado:', req.user.id);
         return res.status(403).json({ error: 'Usuario no encontrado' });
       }
 
-      // Si el usuario tiene clienteId, verificar que coincide
-      if (usuario.clienteId) {
-        if (usuario.clienteId !== pago.auto.clienteId) {
-          return res.status(403).json({ error: 'No tienes permiso para subir comprobante de este pago' });
-        }
-      } else if (usuario.cliente) {
-        // Si tiene cliente relacionado, verificar
-        if (usuario.cliente.id !== pago.auto.clienteId) {
-          return res.status(403).json({ error: 'No tienes permiso para subir comprobante de este pago' });
-        }
-      } else {
-        // Si no tiene cliente asociado, no puede subir comprobantes
-        return res.status(403).json({ error: 'No tienes un cliente asociado' });
+      // Verificar que el cliente del usuario coincide con el cliente del auto
+      const clienteIdUsuario = usuario.clienteId || (usuario.cliente ? usuario.cliente.id : null);
+      
+      console.log('🔍 Verificación de permisos:', {
+        usuarioId: req.user.id,
+        clienteIdUsuario,
+        clienteIdPago: pago.auto.clienteId,
+        usuarioTieneCliente: !!usuario.cliente,
+        usuarioClienteId: usuario.clienteId
+      });
+      
+      if (!clienteIdUsuario) {
+        console.log('❌ Usuario sin cliente asociado');
+        return res.status(403).json({ error: 'No tienes un cliente asociado a tu cuenta. Contacta al administrador.' });
       }
+
+      if (clienteIdUsuario !== pago.auto.clienteId) {
+        console.log('❌ Cliente no coincide:', { clienteIdUsuario, clienteIdPago: pago.auto.clienteId });
+        return res.status(403).json({ error: 'No tienes permiso para subir comprobante de este pago' });
+      }
+
+      console.log('✅ Permisos verificados correctamente');
     }
 
     // Crear el comprobante (número de cuenta será configurado por el administrador en el futuro)

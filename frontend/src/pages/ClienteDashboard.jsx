@@ -515,7 +515,7 @@ const ClienteDashboard = () => {
                           className="mt-2 btn btn-primary btn-sm flex items-center gap-2"
                         >
                           <Upload className="w-4 h-4" />
-                          Pagar con Transferencia
+                          Pagar
                         </button>
                       </div>
                     </div>
