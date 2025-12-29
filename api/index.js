@@ -970,6 +970,228 @@ app.delete('/api/pagos/:id', authenticateToken, requireStaff, async (req, res) =
   }
 });
 
+// ==================== RUTAS DE COMPROBANTES DE PAGO ====================
+
+// Subir comprobante de pago (cliente)
+app.post('/api/comprobantes', authenticateToken, async (req, res) => {
+  try {
+    const { pagoId, numeroCuenta, archivoBase64, tipoArchivo } = req.body;
+
+    if (!pagoId || !numeroCuenta || !archivoBase64) {
+      return res.status(400).json({ error: 'Faltan datos requeridos' });
+    }
+
+    // Validar tipo de archivo
+    const tiposPermitidos = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
+    if (tipoArchivo && !tiposPermitidos.includes(tipoArchivo)) {
+      return res.status(400).json({ error: 'Tipo de archivo no permitido. Solo se permiten PDF, JPG y PNG' });
+    }
+
+    // Verificar que el pago existe y pertenece al cliente
+    const pago = await prisma.pago.findUnique({
+      where: { id: parseInt(pagoId) },
+      include: { auto: { include: { cliente: true } } }
+    });
+
+    if (!pago) {
+      return res.status(404).json({ error: 'Pago no encontrado' });
+    }
+
+    // Si el usuario es cliente, verificar que el pago le pertenece
+    if (req.user.rol === 'cliente') {
+      const usuario = await prisma.usuario.findUnique({
+        where: { id: req.user.id },
+        include: { cliente: true }
+      });
+
+      if (!usuario || !usuario.cliente || usuario.cliente.id !== pago.auto.clienteId) {
+        return res.status(403).json({ error: 'No tienes permiso para subir comprobante de este pago' });
+      }
+    }
+
+    // Crear el comprobante
+    const comprobante = await prisma.comprobantePago.create({
+      data: {
+        pagoId: parseInt(pagoId),
+        numeroCuenta: numeroCuenta.trim(),
+        archivoUrl: archivoBase64, // Almacenamos base64 directamente
+        estado: 'pendiente',
+        visto: false
+      },
+      include: {
+        pago: {
+          include: {
+            auto: {
+              include: {
+                cliente: true
+              }
+            }
+          }
+        }
+      }
+    });
+
+    res.status(201).json(comprobante);
+  } catch (error) {
+    console.error('Error al subir comprobante:', error);
+    res.status(500).json({ error: 'Error al subir comprobante', details: error.message });
+  }
+});
+
+// Obtener notificaciones de comprobantes (admin y empleado)
+app.get('/api/comprobantes/notificaciones', authenticateToken, requireStaff, async (req, res) => {
+  try {
+    const { estado, visto } = req.query;
+
+    const where = {};
+    if (estado) {
+      where.estado = estado;
+    }
+    if (visto !== undefined) {
+      where.visto = visto === 'true';
+    }
+
+    const comprobantes = await prisma.comprobantePago.findMany({
+      where,
+      include: {
+        pago: {
+          include: {
+            auto: {
+              include: {
+                cliente: true
+              }
+            }
+          }
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+
+    res.json(comprobantes);
+  } catch (error) {
+    console.error('Error al obtener notificaciones:', error);
+    res.status(500).json({ error: 'Error al obtener notificaciones', details: error.message });
+  }
+});
+
+// Marcar comprobante como visto
+app.put('/api/comprobantes/:id/visto', authenticateToken, requireStaff, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { visto } = req.body;
+
+    const comprobante = await prisma.comprobantePago.update({
+      where: { id: parseInt(id) },
+      data: { visto: visto !== undefined ? visto : true },
+      include: {
+        pago: {
+          include: {
+            auto: {
+              include: {
+                cliente: true
+              }
+            }
+          }
+        }
+      }
+    });
+
+    res.json(comprobante);
+  } catch (error) {
+    console.error('Error al actualizar comprobante:', error);
+    res.status(500).json({ error: 'Error al actualizar comprobante', details: error.message });
+  }
+});
+
+// Actualizar estado del comprobante (aprobar/rechazar)
+app.put('/api/comprobantes/:id/estado', authenticateToken, requireStaff, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { estado, notas } = req.body;
+
+    if (!estado || !['pendiente', 'aprobado', 'rechazado'].includes(estado)) {
+      return res.status(400).json({ error: 'Estado inválido' });
+    }
+
+    const comprobante = await prisma.comprobantePago.findUnique({
+      where: { id: parseInt(id) },
+      include: { pago: true }
+    });
+
+    if (!comprobante) {
+      return res.status(404).json({ error: 'Comprobante no encontrado' });
+    }
+
+    // Si se aprueba, actualizar el pago como pagado
+    if (estado === 'aprobado' && comprobante.pago.estado === 'pendiente') {
+      await prisma.pago.update({
+        where: { id: comprobante.pagoId },
+        data: {
+          estado: 'pagado',
+          fechaPago: new Date()
+        }
+      });
+    }
+
+    const comprobanteActualizado = await prisma.comprobantePago.update({
+      where: { id: parseInt(id) },
+      data: {
+        estado,
+        visto: true,
+        notas: notas || null
+      },
+      include: {
+        pago: {
+          include: {
+            auto: {
+              include: {
+                cliente: true
+              }
+            }
+          }
+        }
+      }
+    });
+
+    res.json(comprobanteActualizado);
+  } catch (error) {
+    console.error('Error al actualizar estado del comprobante:', error);
+    res.status(500).json({ error: 'Error al actualizar estado del comprobante', details: error.message });
+  }
+});
+
+// Obtener comprobantes de un pago específico
+app.get('/api/comprobantes/pago/:pagoId', authenticateToken, async (req, res) => {
+  try {
+    const { pagoId } = req.params;
+
+    const comprobantes = await prisma.comprobantePago.findMany({
+      where: { pagoId: parseInt(pagoId) },
+      include: {
+        pago: {
+          include: {
+            auto: {
+              include: {
+                cliente: true
+              }
+            }
+          }
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+
+    res.json(comprobantes);
+  } catch (error) {
+    console.error('Error al obtener comprobantes:', error);
+    res.status(500).json({ error: 'Error al obtener comprobantes', details: error.message });
+  }
+});
+
 // ==================== RUTAS DE PERMUTAS ====================
 
 // Obtener todas las permutas

@@ -28,7 +28,16 @@ const Autos = () => {
     e.preventDefault();
     if (!clienteAsignar) return;
     try {
-      await autosService.update(autoAsignarCliente.id, { clienteId: parseInt(clienteAsignar) });
+      // Enviar todos los campos del auto, actualizando solo el clienteId
+      await autosService.update(autoAsignarCliente.id, {
+        marca: autoAsignarCliente.marca,
+        modelo: autoAsignarCliente.modelo,
+        anio: autoAsignarCliente.anio,
+        matricula: autoAsignarCliente.matricula,
+        precio: autoAsignarCliente.precio,
+        estado: autoAsignarCliente.estado,
+        clienteId: parseInt(clienteAsignar)
+      });
       showToast('Cliente asignado exitosamente', 'success');
       setShowAsignarCliente(false);
       setAutoAsignarCliente(null);
@@ -347,7 +356,15 @@ const Autos = () => {
                                 className="absolute right-0 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-lg p-4 z-50 min-w-[220px]"
                                 style={{top: '2.5rem'}}
                                 tabIndex={0}
-                                onBlur={() => setShowAsignarCliente(false)}
+                                onBlur={(e) => {
+                                  // No cerrar si el foco se mueve a un elemento dentro del modal
+                                  const currentTarget = e.currentTarget;
+                                  setTimeout(() => {
+                                    if (!currentTarget.contains(document.activeElement)) {
+                                      setShowAsignarCliente(false);
+                                    }
+                                  }, 200);
+                                }}
                               >
                                 <h2 className="text-base font-bold mb-2 text-gray-900 dark:text-white">Asignar cliente</h2>
                                 <form onSubmit={handleAsignarCliente} className="space-y-2">
@@ -456,6 +473,15 @@ const Autos = () => {
                   <Edit2 className="w-4 h-4" />
                   Editar
                 </button>
+                {!auto.cliente && (
+                  <button
+                    onClick={() => abrirAsignarCliente(auto)}
+                    className="flex-1 btn btn-primary text-sm py-2 flex items-center justify-center gap-2"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Asignar Cliente
+                  </button>
+                )}
                 <button
                   onClick={() => handleDelete(auto.id)}
                   className="flex-1 btn btn-danger text-sm py-2 flex items-center justify-center gap-2"
@@ -604,6 +630,58 @@ const Autos = () => {
                     onClick={() => {
                       setShowModal(false);
                       resetForm();
+                    }}
+                    className="btn btn-secondary flex-1"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal para asignar cliente (mobile y desktop) */}
+      {showAsignarCliente && autoAsignarCliente && (
+        <div className="fixed inset-0 bg-black dark:bg-black bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full border border-gray-300 dark:border-gray-700">
+            <div className="p-6">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+                Asignar Cliente
+              </h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                Auto: {autoAsignarCliente.marca} {autoAsignarCliente.modelo}
+              </p>
+              <form onSubmit={handleAsignarCliente} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Cliente
+                  </label>
+                  <select
+                    value={clienteAsignar}
+                    onChange={e => setClienteAsignar(e.target.value)}
+                    className="input"
+                    required
+                  >
+                    <option value="">Selecciona un cliente</option>
+                    {getClientesSinPlanesActivos().map(cliente => (
+                      <option key={cliente.id} value={cliente.id}>
+                        {cliente.nombre} - {cliente.cedula}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex gap-3 pt-4">
+                  <button type="submit" className="btn btn-primary flex-1">
+                    Asignar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowAsignarCliente(false);
+                      setAutoAsignarCliente(null);
+                      setClienteAsignar('');
                     }}
                     className="btn btn-secondary flex-1"
                   >

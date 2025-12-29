@@ -24,15 +24,21 @@
 -- Password: admin123 (⚠️ CAMBIAR DESPUÉS DEL PRIMER LOGIN)
 -- Rol: admin (acceso completo a todo el sistema)
 
-INSERT INTO "Usuario" ("email", "password", "rol", "createdAt", "updatedAt")
+INSERT INTO
+    "Usuario" (
+        "email",
+        "password",
+        "rol",
+        "createdAt",
+        "updatedAt"
+    )
 VALUES (
-    'admin@quesadaautomoviles.com',
-    '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy',  -- Hash para: admin123
-    'admin',
-    NOW(),
-    NOW()
-)
-ON CONFLICT DO NOTHING;
+        'admin@quesadaautomoviles.com',
+        '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', -- Hash para: admin123
+        'admin',
+        NOW(),
+        NOW()
+    ) ON CONFLICT DO NOTHING;
 
 -- =====================================================
 -- USUARIO ADMINISTRADOR DEMO (compatibilidad)
@@ -41,15 +47,21 @@ ON CONFLICT DO NOTHING;
 -- Password: admin123 (⚠️ CAMBIAR DESPUÉS DEL PRIMER LOGIN)
 -- Rol: admin
 
-INSERT INTO "Usuario" ("email", "password", "rol", "createdAt", "updatedAt")
+INSERT INTO
+    "Usuario" (
+        "email",
+        "password",
+        "rol",
+        "createdAt",
+        "updatedAt"
+    )
 VALUES (
-    'admin@demo.com',
-    '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy',  -- Hash para: admin123
-    'admin',
-    NOW(),
-    NOW()
-)
-ON CONFLICT DO NOTHING;
+        'admin@demo.com',
+        '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', -- Hash para: admin123
+        'admin',
+        NOW(),
+        NOW()
+    ) ON CONFLICT DO NOTHING;
 
 -- =====================================================
 -- USUARIO EMPLEADO
@@ -62,24 +74,30 @@ ON CONFLICT DO NOTHING;
 --          Pagos (ver, registrar, generar cuotas)
 --          NO tiene acceso a: Dashboard, Reportes
 
-INSERT INTO "Usuario" ("email", "password", "rol", "createdAt", "updatedAt")
+INSERT INTO
+    "Usuario" (
+        "email",
+        "password",
+        "rol",
+        "createdAt",
+        "updatedAt"
+    )
 VALUES (
-    'empleado@quesadaautomoviles.com',
-    '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy',  -- Hash para: admin123
-    'empleado',
-    NOW(),
-    NOW()
-)
-ON CONFLICT DO NOTHING;
+        'empleado@quesadaautomoviles.com',
+        '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', -- Hash para: admin123
+        'empleado',
+        NOW(),
+        NOW()
+    ) ON CONFLICT DO NOTHING;
 
 -- =====================================================
 -- VERIFICAR USUARIOS CREADOS
 -- =====================================================
 
-SELECT 
-    id, 
-    email, 
-    rol, 
+SELECT
+    id,
+    email,
+    rol,
     "createdAt",
     CASE rol
         WHEN 'admin' THEN '✅ Acceso completo'
@@ -87,13 +105,13 @@ SELECT
         WHEN 'cliente' THEN '👤 Acceso a su información'
         ELSE '❓ Rol desconocido'
     END as permisos
-FROM "Usuario" 
-ORDER BY 
-    CASE rol 
-        WHEN 'admin' THEN 1 
-        WHEN 'empleado' THEN 2 
-        WHEN 'cliente' THEN 3 
-        ELSE 4 
+FROM "Usuario"
+ORDER BY
+    CASE rol
+        WHEN 'admin' THEN 1
+        WHEN 'empleado' THEN 2
+        WHEN 'cliente' THEN 3
+        ELSE 4
     END,
     email;
 

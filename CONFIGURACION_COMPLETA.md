@@ -9,26 +9,31 @@ Se ha configurado la aplicación para deploy en Vercel con base de datos Neon Po
 ## 🔧 Cambios Realizados
 
 ### 1. ✅ Repositorio Git Configurado
+
 - Remoto actualizado a: `https://github.com/Mateo14RDGZ/QuesadaAutomoviles.git`
 - Cambios commitados y pusheados exitosamente
 
 ### 2. ✅ Configuración de Base de Datos (Neon PostgreSQL)
+
 - **Archivo actualizado**: `api/lib/prisma.js`
   - Ahora soporta `POSTGRES_PRISMA_URL` (para Vercel/Neon)
   - Fallback a `DATABASE_URL` si no está disponible
   - Compatible con el entorno de Vercel
 
 ### 3. ✅ Script de Sincronización de Schema
+
 - **Archivo actualizado**: `api/sync-schema.js`
   - Maneja correctamente `POSTGRES_PRISMA_URL`
   - Mapea automáticamente a `DATABASE_URL` para Prisma
 
 ### 4. ✅ Configuración de Vercel
+
 - **Archivo actualizado**: `vercel.json`
   - Removido JWT_SECRET hardcodeado (debe configurarse como variable de entorno)
   - Configuración lista para producción
 
 ### 5. ✅ Documentación
+
 - **Nuevo archivo**: `DEPLOY_VERCEL_NEON.md`
   - Guía completa paso a paso para deploy
   - Instrucciones para configurar Neon
@@ -71,6 +76,7 @@ FRONTEND_URL=https://tu-proyecto.vercel.app (actualiza después del primer deplo
 Después del primer deploy, las tablas se crearán automáticamente mediante `prisma db push` durante el build.
 
 Si necesitas crear un usuario admin inicial, puedes:
+
 - Usar el script `api/generate-admin.js`
 - O insertar manualmente en la base de datos
 
@@ -95,6 +101,7 @@ Si necesitas crear un usuario admin inicial, puedes:
 ## 🐛 Si Algo Sale Mal
 
 Consulta la sección "Solución de Problemas" en `DEPLOY_VERCEL_NEON.md` o revisa:
+
 - Logs en Vercel: Deployments → View Function Logs
 - Health check: `https://tu-proyecto.vercel.app/api/health`
 - Diagnostic: `https://tu-proyecto.vercel.app/api/diagnostic`
@@ -112,4 +119,3 @@ Consulta la sección "Solución de Problemas" en `DEPLOY_VERCEL_NEON.md` o revis
 - ⏳ Pendiente: Hacer deploy inicial
 
 ¡Todo listo para el deploy! 🎉
-

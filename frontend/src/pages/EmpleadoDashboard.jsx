@@ -1,13 +1,21 @@
 import { useEffect, useState } from 'react';
-import { Car, Users, CreditCard, AlertCircle, CheckCircle, Clock, TrendingUp } from 'lucide-react';
+import { Car, Users, CreditCard, AlertCircle, CheckCircle, Clock, TrendingUp, Bell, FileText, Eye, Check, X } from 'lucide-react';
 import api from '../services/api';
+import { comprobantesService } from '../services';
+import { useToast } from '../context/ToastContext';
 
 const EmpleadoDashboard = () => {
+  const { showToast } = useToast();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [notificaciones, setNotificaciones] = useState([]);
+  const [loadingNotificaciones, setLoadingNotificaciones] = useState(true);
+  const [comprobanteSeleccionado, setComprobanteSeleccionado] = useState(null);
+  const [mostrarComprobante, setMostrarComprobante] = useState(false);
 
   useEffect(() => {
     loadStats();
+    loadNotificaciones();
   }, []);
 
   const loadStats = async () => {
@@ -19,6 +27,69 @@ const EmpleadoDashboard = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const loadNotificaciones = async () => {
+    try {
+      setLoadingNotificaciones(true);
+      const data = await comprobantesService.getNotificaciones({ estado: 'pendiente' });
+      setNotificaciones(data);
+    } catch (error) {
+      console.error('Error al cargar notificaciones:', error);
+    } finally {
+      setLoadingNotificaciones(false);
+    }
+  };
+
+  const verComprobante = (comprobante) => {
+    setComprobanteSeleccionado(comprobante);
+    setMostrarComprobante(true);
+    // Marcar como visto
+    if (!comprobante.visto) {
+      comprobantesService.marcarVisto(comprobante.id, true).then(() => {
+        loadNotificaciones();
+      });
+    }
+  };
+
+  const aprobarComprobante = async (id, notas = '') => {
+    try {
+      await comprobantesService.actualizarEstado(id, 'aprobado', notas);
+      showToast('Comprobante aprobado exitosamente', 'success');
+      setMostrarComprobante(false);
+      setComprobanteSeleccionado(null);
+      await loadNotificaciones();
+      await loadStats(); // Recargar stats para actualizar pagos
+    } catch (error) {
+      showToast(error.message || 'Error al aprobar comprobante', 'error');
+    }
+  };
+
+  const rechazarComprobante = async (id, notas = '') => {
+    try {
+      await comprobantesService.actualizarEstado(id, 'rechazado', notas);
+      showToast('Comprobante rechazado', 'success');
+      setMostrarComprobante(false);
+      setComprobanteSeleccionado(null);
+      await loadNotificaciones();
+    } catch (error) {
+      showToast(error.message || 'Error al rechazar comprobante', 'error');
+    }
+  };
+
+  const formatCurrency = (value) => {
+    return new Intl.NumberFormat('es-UY', {
+      style: 'currency',
+      currency: 'UYU',
+    }).format(value);
+  };
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('es-UY', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    });
   };
 
   if (loading) {
@@ -348,6 +419,202 @@ const EmpleadoDashboard = () => {
                 ))}
               </tbody>
             </table>
+          </div>
+        </div>
+      )}
+
+      {/* Sección de Notificaciones de Comprobantes */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700">
+        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            <Bell className="w-5 h-5 text-yellow-500" />
+            Comprobantes de Pago Pendientes
+            {notificaciones.length > 0 && (
+              <span className="ml-2 px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300">
+                {notificaciones.length}
+              </span>
+            )}
+          </h2>
+        </div>
+        <div className="p-6">
+          {loadingNotificaciones ? (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
+            </div>
+          ) : notificaciones.length === 0 ? (
+            <p className="text-gray-500 dark:text-gray-400 text-center py-8">
+              No hay comprobantes pendientes de revisión
+            </p>
+          ) : (
+            <div className="space-y-3">
+              {notificaciones.map((comprobante) => (
+                <div
+                  key={comprobante.id}
+                  className={`p-4 rounded-lg border ${
+                    comprobante.visto
+                      ? 'bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700'
+                      : 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800'
+                  }`}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <FileText className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+                        <span className="font-semibold text-gray-900 dark:text-white">
+                          {comprobante.pago.auto.cliente.nombre}
+                        </span>
+                        {!comprobante.visto && (
+                          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300">
+                            Nuevo
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        {comprobante.pago.auto.marca} {comprobante.pago.auto.modelo} - Cuota #{comprobante.pago.numeroCuota}
+                      </p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Monto: <span className="font-medium">{formatCurrency(comprobante.pago.monto)}</span>
+                      </p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Cuenta: <span className="font-medium">{comprobante.numeroCuenta}</span>
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        {formatDate(comprobante.createdAt)}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => verComprobante(comprobante)}
+                      className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors flex items-center gap-2"
+                    >
+                      <Eye className="w-4 h-4" />
+                      Ver
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Modal para ver comprobante */}
+      {mostrarComprobante && comprobanteSeleccionado && (
+        <div className="fixed inset-0 bg-black dark:bg-black bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto border border-gray-300 dark:border-gray-700">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                  Comprobante de Pago
+                </h2>
+                <button
+                  onClick={() => {
+                    setMostrarComprobante(false);
+                    setComprobanteSeleccionado(null);
+                  }}
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="space-y-4 mb-4">
+                <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
+                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Información del Cliente</h3>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div>
+                      <span className="text-gray-600 dark:text-gray-400">Cliente:</span>
+                      <p className="font-medium text-gray-900 dark:text-white">
+                        {comprobanteSeleccionado.pago.auto.cliente.nombre}
+                      </p>
+                    </div>
+                    <div>
+                      <span className="text-gray-600 dark:text-gray-400">Cédula:</span>
+                      <p className="font-medium text-gray-900 dark:text-white">
+                        {comprobanteSeleccionado.pago.auto.cliente.cedula}
+                      </p>
+                    </div>
+                    <div>
+                      <span className="text-gray-600 dark:text-gray-400">Teléfono:</span>
+                      <p className="font-medium text-gray-900 dark:text-white">
+                        {comprobanteSeleccionado.pago.auto.cliente.telefono}
+                      </p>
+                    </div>
+                    <div>
+                      <span className="text-gray-600 dark:text-gray-400">Cuenta:</span>
+                      <p className="font-medium text-gray-900 dark:text-white">
+                        {comprobanteSeleccionado.numeroCuenta}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
+                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Información del Pago</h3>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div>
+                      <span className="text-gray-600 dark:text-gray-400">Vehículo:</span>
+                      <p className="font-medium text-gray-900 dark:text-white">
+                        {comprobanteSeleccionado.pago.auto.marca} {comprobanteSeleccionado.pago.auto.modelo}
+                      </p>
+                    </div>
+                    <div>
+                      <span className="text-gray-600 dark:text-gray-400">Cuota:</span>
+                      <p className="font-medium text-gray-900 dark:text-white">
+                        #{comprobanteSeleccionado.pago.numeroCuota}
+                      </p>
+                    </div>
+                    <div>
+                      <span className="text-gray-600 dark:text-gray-400">Monto:</span>
+                      <p className="font-medium text-gray-900 dark:text-white">
+                        {formatCurrency(comprobanteSeleccionado.pago.monto)}
+                      </p>
+                    </div>
+                    <div>
+                      <span className="text-gray-600 dark:text-gray-400">Fecha:</span>
+                      <p className="font-medium text-gray-900 dark:text-white">
+                        {formatDate(comprobanteSeleccionado.createdAt)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Comprobante</h3>
+                  <div className="border border-gray-300 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-900/50">
+                    {comprobanteSeleccionado.archivoUrl.startsWith('data:image') ? (
+                      <img
+                        src={comprobanteSeleccionado.archivoUrl}
+                        alt="Comprobante"
+                        className="max-w-full h-auto rounded"
+                      />
+                    ) : (
+                      <iframe
+                        src={comprobanteSeleccionado.archivoUrl}
+                        className="w-full h-96 rounded"
+                        title="Comprobante PDF"
+                      />
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <button
+                  onClick={() => aprobarComprobante(comprobanteSeleccionado.id)}
+                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex-1 flex items-center justify-center gap-2"
+                >
+                  <Check className="w-4 h-4" />
+                  Aprobar
+                </button>
+                <button
+                  onClick={() => rechazarComprobante(comprobanteSeleccionado.id)}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex-1 flex items-center justify-center gap-2"
+                >
+                  <X className="w-4 h-4" />
+                  Rechazar
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

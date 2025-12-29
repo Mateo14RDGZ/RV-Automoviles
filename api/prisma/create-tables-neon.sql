@@ -125,7 +125,9 @@ BEGIN
         REFERENCES "Cliente" ("id") 
         ON DELETE SET NULL 
         ON UPDATE CASCADE;
-    END IF;
+
+END IF;
+
 END $$;
 
 -- Auto -> Cliente
@@ -197,28 +199,37 @@ END $$;
 -- =====================================================
 
 CREATE INDEX IF NOT EXISTS "idx_cliente_cedula" ON "Cliente" ("cedula");
+
 CREATE INDEX IF NOT EXISTS "idx_cliente_activo" ON "Cliente" ("activo");
+
 CREATE INDEX IF NOT EXISTS "idx_usuario_email" ON "Usuario" ("email");
+
 CREATE INDEX IF NOT EXISTS "idx_auto_clienteId" ON "Auto" ("clienteId");
+
 CREATE INDEX IF NOT EXISTS "idx_auto_estado" ON "Auto" ("estado");
+
 CREATE INDEX IF NOT EXISTS "idx_auto_activo" ON "Auto" ("activo");
+
 CREATE INDEX IF NOT EXISTS "idx_pago_autoId" ON "Pago" ("autoId");
+
 CREATE INDEX IF NOT EXISTS "idx_pago_estado" ON "Pago" ("estado");
+
 CREATE INDEX IF NOT EXISTS "idx_pago_fechaVencimiento" ON "Pago" ("fechaVencimiento");
+
 CREATE INDEX IF NOT EXISTS "idx_permuta_clienteId" ON "Permuta" ("clienteId");
+
 CREATE INDEX IF NOT EXISTS "idx_permuta_autoVendidoId" ON "Permuta" ("autoVendidoId");
 
 -- =====================================================
 -- VERIFICACIÓN (opcional, para confirmar que todo está creado)
 -- =====================================================
 
--- SELECT table_name 
--- FROM information_schema.tables 
--- WHERE table_schema = 'public' 
+-- SELECT table_name
+-- FROM information_schema.tables
+-- WHERE table_schema = 'public'
 -- AND table_type = 'BASE TABLE'
 -- ORDER BY table_name;
 
 -- =====================================================
 -- FIN DEL SCRIPT
 -- =====================================================
-

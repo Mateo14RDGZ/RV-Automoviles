@@ -126,3 +126,35 @@ export const dashboardService = {
     return response.data;
   },
 };
+
+export const comprobantesService = {
+  subir: async (pagoId, numeroCuenta, archivoBase64, tipoArchivo) => {
+    const response = await api.post('/comprobantes', {
+      pagoId,
+      numeroCuenta,
+      archivoBase64,
+      tipoArchivo
+    });
+    return response.data;
+  },
+
+  getNotificaciones: async (params = {}) => {
+    const response = await api.get('/comprobantes/notificaciones', { params });
+    return response.data;
+  },
+
+  marcarVisto: async (id, visto = true) => {
+    const response = await api.put(`/comprobantes/${id}/visto`, { visto });
+    return response.data;
+  },
+
+  actualizarEstado: async (id, estado, notas = null) => {
+    const response = await api.put(`/comprobantes/${id}/estado`, { estado, notas });
+    return response.data;
+  },
+
+  getByPago: async (pagoId) => {
+    const response = await api.get(`/comprobantes/pago/${pagoId}`);
+    return response.data;
+  },
+};

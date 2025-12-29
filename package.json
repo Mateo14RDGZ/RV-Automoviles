@@ -16,10 +16,18 @@
     "db:seed": "cd api && node prisma/seed.js",
     "db:check": "node setup-database.js"
   },
-  "keywords": ["automanager", "car-dealership", "management-system", "rv-automoviles"],
+  "keywords": [
+    "automanager",
+    "car-dealership",
+    "management-system",
+    "rv-automoviles"
+  ],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "concurrently": "^8.2.2"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3"
   }
 }
