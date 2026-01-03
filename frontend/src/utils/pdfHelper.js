@@ -212,17 +212,6 @@ export const addPDFFooter = (doc, options = {}) => {
     doc.setFont(undefined, 'bold');
     doc.setTextColor(255, 255, 255);
     doc.text(`${i}/${pageCount}`, pageWidth - 23, pageHeight - 14.5, { align: 'center' });
-    
-    // Texto legal pequeño
-    doc.setFontSize(6);
-    doc.setTextColor(...COLORS.gray[400]);
-    doc.setFont(undefined, 'italic');
-    doc.text(
-      'Este documento es de carácter informativo y fue generado automáticamente por el sistema.',
-      pageWidth / 2,
-      pageHeight - 3,
-      { align: 'center' }
-    );
   }
 };
 
