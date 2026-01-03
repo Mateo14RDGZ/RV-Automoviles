@@ -117,7 +117,7 @@ const Layout = () => {
             <div className="flex items-center px-4 py-3 bg-gray-50 rounded-lg">
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-900 truncate">
-                  {user?.cliente?.nombre || user?.email}
+                  {user?.nombre || user?.email}
                 </p>
                 <p className="text-xs text-gray-500 truncate">
                   {user?.rol === 'admin' ? 'Administrador' : user?.rol === 'empleado' ? 'Empleado' : 'Cliente'}
@@ -206,10 +206,10 @@ const Layout = () => {
               <div className="flex items-center px-4 py-3 bg-gray-50 rounded-lg">
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-900 truncate">
-                    {user?.nombre}
+                    {user?.nombre || user?.email}
                   </p>
                   <p className="text-xs text-gray-500 truncate">
-                    {user?.email}
+                    {user?.rol === 'admin' ? 'Administrador' : user?.rol === 'empleado' ? 'Empleado' : 'Cliente'}
                   </p>
                 </div>
                 <button
