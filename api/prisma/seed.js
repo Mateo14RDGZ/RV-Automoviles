@@ -43,7 +43,16 @@ async function main() {
     },
   });
 
-  console.log('✅ Usuarios administradores creados');
+  // Crear usuario empleado
+  const empleado1 = await prisma.usuario.create({
+    data: {
+      email: 'empleado@demo.com',
+      password: adminPasswordHash,
+      rol: 'empleado',
+    },
+  });
+
+  console.log('✅ Usuarios administradores y empleado creados');
 
   // Crear clientes con sus usuarios
   const cliente1 = await prisma.cliente.create({

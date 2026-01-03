@@ -297,7 +297,7 @@ app.get('/api/health', async (req, res) => {
 app.get('/api/autos', authenticateToken, async (req, res) => {
   try {
     const { estado, clienteId } = req.query;
-    const where = {};
+    const where = { activo: true }; // Solo mostrar autos activos en el stock
 
     if (estado) where.estado = estado;
     if (clienteId) where.clienteId = parseInt(clienteId);
@@ -1161,6 +1161,53 @@ app.put('/api/comprobantes/:id/estado', authenticateToken, requireStaff, async (
           fechaPago: new Date()
         }
       });
+
+      // Verificar si todas las cuotas del auto están pagadas
+      const todosPagos = await prisma.pago.findMany({
+        where: { autoId: comprobante.pago.autoId }
+      });
+
+      const todosCompletados = todosPagos.every(p => p.estado === 'pagado');
+
+      if (todosCompletados) {
+        console.log('🎉 Todas las cuotas pagadas! Archivando auto:', comprobante.pago.autoId);
+        
+        // Obtener el auto con su cliente
+        const auto = await prisma.auto.findUnique({
+          where: { id: comprobante.pago.autoId },
+          include: { cliente: true }
+        });
+
+        if (auto) {
+          // 1. Marcar auto como vendido y archivado
+          await prisma.auto.update({
+            where: { id: comprobante.pago.autoId },
+            data: { estado: 'vendido', activo: false }
+          });
+          console.log('✅ Auto archivado - ya no aparecerá en el stock');
+
+          // 2. Eliminar cliente y su usuario asociado
+          if (auto.clienteId) {
+            // Eliminar usuario del cliente si existe
+            const usuario = await prisma.usuario.findFirst({
+              where: { clienteId: auto.clienteId }
+            });
+            
+            if (usuario) {
+              await prisma.usuario.delete({
+                where: { id: usuario.id }
+              });
+              console.log('✅ Usuario del cliente eliminado');
+            }
+
+            // Eliminar cliente
+            await prisma.cliente.delete({
+              where: { id: auto.clienteId }
+            });
+            console.log('✅ Cliente eliminado automáticamente');
+          }
+        }
+      }
     }
 
     const comprobanteActualizado = await prisma.comprobantePago.update({
@@ -1331,6 +1378,28 @@ app.get('/api/permutas/stats/resumen', authenticateToken, requireStaff, async (r
 });
 
 // ==================== RUTAS DE DASHBOARD ====================
+
+// Endpoint especial para reportes - incluye TODOS los autos (activos e inactivos)
+app.get('/api/autos/todos', authenticateToken, requireStaff, async (req, res) => {
+  try {
+    console.log('📊 Consultando TODOS los autos para reportes');
+
+    const autos = await prisma.auto.findMany({
+      // Sin filtro de activo: incluye archivados
+      include: {
+        cliente: true,
+        pagos: true
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    console.log(`✅ Autos encontrados (incluyendo archivados): ${autos.length}`);
+    res.json(autos);
+  } catch (error) {
+    console.error('Error obteniendo todos los autos:', error);
+    res.status(500).json({ error: 'Error al obtener autos' });
+  }
+});
 
 app.get('/api/dashboard/stats', authenticateToken, requireAdmin, async (req, res) => {
   try {
