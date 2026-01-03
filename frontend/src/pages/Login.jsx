@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { Car, Lock, Mail, ArrowRight, Sparkles, ShieldCheck, CreditCard, IdCard, Moon, Sun } from 'lucide-react';
+import { Car, Lock, Mail, ArrowRight, Sparkles, ShieldCheck, CreditCard, IdCard, Moon, Sun, Briefcase } from 'lucide-react';
 
 const Login = () => {
-  const [loginMode, setLoginMode] = useState(''); // '' | 'admin' | 'cliente'
+  const [loginMode, setLoginMode] = useState(''); // '' | 'admin' | 'empleado' | 'cliente'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [cedula, setCedula] = useState('');
@@ -22,7 +22,8 @@ const Login = () => {
     setLoading(true);
 
     try {
-      if (loginMode === 'admin') {
+      if (loginMode === 'admin' || loginMode === 'empleado') {
+        // Login de admin o empleado con email y password
         const result = await login(email, password);
         if (result && result.token && result.user) {
           navigate('/', { replace: true });
@@ -124,6 +125,15 @@ const Login = () => {
 
               <button
                 type="button"
+                onClick={() => setLoginMode('empleado')}
+                className="w-full flex items-center justify-center gap-3 bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white py-4 px-6 rounded-lg font-medium text-base transition-all duration-200"
+              >
+                <Briefcase className="w-5 h-5" />
+                <span>Soy Empleado</span>
+              </button>
+
+              <button
+                type="button"
                 onClick={() => setLoginMode('cliente')}
                 className="w-full flex items-center justify-center gap-3 bg-gray-600 hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white py-4 px-6 rounded-lg font-medium text-base transition-all duration-200"
               >
@@ -153,6 +163,11 @@ const Login = () => {
                     <ShieldCheck className="w-5 h-5 text-blue-400 dark:text-blue-500" />
                     Acceso Administrativo
                   </span>
+                ) : loginMode === 'empleado' ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <Briefcase className="w-5 h-5 text-green-500 dark:text-green-400" />
+                    Acceso Empleado
+                  </span>
                 ) : (
                   <span className="flex items-center justify-center gap-2">
                     <CreditCard className="w-5 h-5 text-gray-600 dark:text-gray-400" />
@@ -161,29 +176,43 @@ const Login = () => {
                 )}
               </h3>
 
-              {loginMode === 'admin' ? (
-                /* Formulario para admin */
+              {(loginMode === 'admin' || loginMode === 'empleado') ? (
+                /* Formulario para admin o empleado */
                 <>
-                  {/* Credenciales de prueba para admin */}
+                  {/* Credenciales de prueba */}
                   <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                     <h4 className="text-sm font-semibold text-blue-800 dark:text-blue-300 mb-2 flex items-center gap-2">
                       <Sparkles className="w-4 h-4" />
                       Credenciales de Prueba
                     </h4>
                     <div className="space-y-1 text-xs text-blue-700 dark:text-blue-400">
-                      <div className="pb-2 border-b border-blue-200 dark:border-blue-700">
-                        <p className="font-semibold mb-1">👑 Administrador</p>
-                        <p><span className="font-medium">Email:</span> admin@demo.com</p>
-                        <p><span className="font-medium">Contraseña:</span> admin123</p>
-                      </div>
-                      <div className="pt-2">
-                        <p className="font-semibold mb-1">👤 Empleado</p>
-                        <p><span className="font-medium">Email:</span> empleado@demo.com</p>
-                        <p><span className="font-medium">Contraseña:</span> admin123</p>
-                        <p className="text-[10px] text-blue-600 dark:text-blue-400 mt-1 italic">
-                          Sin acceso a Dashboard ni Reportes
-                        </p>
-                      </div>
+                      {loginMode === 'admin' && (
+                        <>
+                          <div className="pb-2 border-b border-blue-200 dark:border-blue-700">
+                            <p className="font-semibold mb-1">👑 Administrador</p>
+                            <p><span className="font-medium">Email:</span> admin@demo.com</p>
+                            <p><span className="font-medium">Contraseña:</span> admin123</p>
+                          </div>
+                          <div className="pt-2">
+                            <p className="font-semibold mb-1">👤 Empleado</p>
+                            <p><span className="font-medium">Email:</span> empleado@demo.com</p>
+                            <p><span className="font-medium">Contraseña:</span> admin123</p>
+                            <p className="text-[10px] text-blue-600 dark:text-blue-400 mt-1 italic">
+                              Sin acceso a Dashboard ni Reportes
+                            </p>
+                          </div>
+                        </>
+                      )}
+                      {loginMode === 'empleado' && (
+                        <div>
+                          <p className="font-semibold mb-1">👤 Empleado</p>
+                          <p><span className="font-medium">Email:</span> empleado@demo.com</p>
+                          <p><span className="font-medium">Contraseña:</span> admin123</p>
+                          <p className="text-[10px] text-blue-600 dark:text-blue-400 mt-1 italic">
+                            Acceso limitado: Autos, Clientes y Pagos (sin Dashboard ni Reportes)
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -223,7 +252,7 @@ const Login = () => {
                     </div>
                   </div>
                 </>
-              ) : (
+              ) : loginMode === 'cliente' ? (
                 /* Formulario para cliente */
                 <>
                   {/* Cédulas de prueba para clientes */}

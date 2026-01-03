@@ -118,3 +118,5 @@ VALUES (
 3. **Permisos**: Los clientes solo pueden subir comprobantes de sus propios pagos
 4. **Notificaciones**: Solo aparecen comprobantes con estado "pendiente"
 
+
+

@@ -40,3 +40,5 @@ CREATE INDEX IF NOT EXISTS "ComprobantePago_visto_idx" ON "ComprobantePago"("vis
 -- Verificación final
 SELECT 'Tabla ComprobantePago corregida exitosamente. Ya puedes subir comprobantes PDF.' AS resultado;
 
+
+
