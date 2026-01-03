@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { clientesService } from '../services';
-import { Users, Plus, Search, Edit2, Trash2, Phone, Mail, MapPin } from 'lucide-react';
+import { Users, Plus, Search, Edit2, Trash2, Phone, Mail, MapPin, MessageCircle, Copy, ExternalLink } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 import ConfirmDialog from '../components/ConfirmDialog';
 
@@ -12,6 +12,8 @@ const Clientes = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingCliente, setEditingCliente] = useState(null);
   const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, clienteId: null });
+  const [showCredentialsModal, setShowCredentialsModal] = useState(false);
+  const [newClientCredentials, setNewClientCredentials] = useState(null);
   const [formData, setFormData] = useState({
     nombre: '',
     cedula: '',
@@ -67,27 +69,50 @@ const Clientes = () => {
       if (editingCliente) {
         await clientesService.update(editingCliente.id, formData);
         showToast('Cliente actualizado exitosamente', 'success');
+        setShowModal(false);
+        resetForm();
+        loadClientes();
       } else {
         const response = await clientesService.create(formData);
         console.log('✅ Cliente creado:', response);
         
-        showToast('Cliente creado exitosamente', 'success');
+        // Guardar credenciales para mostrar en el modal obligatorio
+        setNewClientCredentials({
+          nombre: formData.nombre,
+          telefono: formData.telefono,
+          email: response.emailUsuario,
+          password: response.passwordTemporal,
+        });
         
-        // Si es un nuevo cliente, enviar credenciales por WhatsApp
-        if (response.passwordTemporal && formData.telefono) {
-          const telefono = formData.telefono.replace(/\D/g, ''); // Remover caracteres no numéricos
-          const urlWeb = window.location.origin; // URL de la web actual
-          
-          // Crear mensaje de WhatsApp con las credenciales
-          const mensaje = `¡Hola ${formData.nombre}! 👋
+        showToast('Cliente creado exitosamente', 'success');
+        setShowModal(false);
+        resetForm();
+        loadClientes();
+        
+        // Mostrar modal obligatorio para enviar credenciales por WhatsApp
+        setShowCredentialsModal(true);
+      }
+    } catch (error) {
+      console.error('❌ Error al guardar cliente:', error);
+      showToast(error.response?.data?.error || error.message || 'Error al guardar el cliente', 'error');
+    }
+  };
+
+  const handleSendWhatsApp = () => {
+    if (!newClientCredentials) return;
+    
+    const telefono = newClientCredentials.telefono.replace(/\D/g, '');
+    const urlWeb = window.location.origin;
+    
+    const mensaje = `¡Hola ${newClientCredentials.nombre}! 👋
 
 Bienvenido a *Nicolas Tejera Automóviles* 🚗
 
 Te compartimos tus credenciales de acceso para ver tus cuotas:
 
 🔐 *Credenciales de Acceso:*
-📧 Usuario: ${response.emailUsuario}
-🔑 Contraseña: ${response.passwordTemporal}
+📧 Usuario: ${newClientCredentials.email}
+🔑 Contraseña: ${newClientCredentials.password}
 
 🌐 *Link de acceso:*
 ${urlWeb}
@@ -96,23 +121,24 @@ Puedes iniciar sesión con tu email o cédula y la contraseña proporcionada.
 
 ¡Cualquier consulta, estamos a tu disposición!`;
 
-          const mensajeEncoded = encodeURIComponent(mensaje);
-          const whatsappUrl = `https://wa.me/${telefono}?text=${mensajeEncoded}`;
-          
-          // Abrir WhatsApp en una nueva pestaña
-          window.open(whatsappUrl, '_blank');
-          
-          showToast('🔐 Credenciales: ' + response.emailUsuario + ' / ' + response.passwordTemporal, 'info', 10000);
-          showToast('📱 Abriendo WhatsApp para enviar credenciales...', 'info', 5000);
-        }
-      }
-      setShowModal(false);
-      resetForm();
-      loadClientes();
-    } catch (error) {
-      console.error('❌ Error al guardar cliente:', error);
-      showToast(error.response?.data?.error || error.message || 'Error al guardar el cliente', 'error');
-    }
+    const mensajeEncoded = encodeURIComponent(mensaje);
+    const whatsappUrl = `https://wa.me/${telefono}?text=${mensajeEncoded}`;
+    
+    window.open(whatsappUrl, '_blank');
+    setShowCredentialsModal(false);
+    setNewClientCredentials(null);
+    showToast('📱 Credenciales enviadas por WhatsApp', 'success');
+  };
+
+  const handleCopyCredentials = () => {
+    if (!newClientCredentials) return;
+    
+    const urlWeb = window.location.origin;
+    const texto = `Usuario: ${newClientCredentials.email}\nContraseña: ${newClientCredentials.password}\nLink: ${urlWeb}`;
+    
+    navigator.clipboard.writeText(texto).then(() => {
+      showToast('📋 Credenciales copiadas al portapapeles', 'success');
+    });
   };
 
   const handleDelete = async (id) => {
@@ -372,6 +398,115 @@ Puedes iniciar sesión con tu email o cédula y la contraseña proporcionada.
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal obligatorio para enviar credenciales por WhatsApp */}
+      {showCredentialsModal && newClientCredentials && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-lg w-full border-4 border-green-500 shadow-2xl">
+            <div className="p-6">
+              <div className="text-center mb-6">
+                <div className="w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <MessageCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
+                </div>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                  ¡Cliente Creado Exitosamente!
+                </h2>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Ahora debes enviar las credenciales al cliente por WhatsApp
+                </p>
+              </div>
+
+              {/* Credenciales generadas */}
+              <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-6 space-y-3">
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-3">
+                  Credenciales Generadas:
+                </h3>
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-start gap-2">
+                    <Users className="w-4 h-4 text-gray-500 mt-0.5" />
+                    <div>
+                      <span className="text-gray-600 dark:text-gray-400">Cliente:</span>
+                      <span className="ml-2 font-medium text-gray-900 dark:text-white">
+                        {newClientCredentials.nombre}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Phone className="w-4 h-4 text-gray-500 mt-0.5" />
+                    <div>
+                      <span className="text-gray-600 dark:text-gray-400">Teléfono:</span>
+                      <span className="ml-2 font-medium text-gray-900 dark:text-white">
+                        {newClientCredentials.telefono}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Mail className="w-4 h-4 text-gray-500 mt-0.5" />
+                    <div>
+                      <span className="text-gray-600 dark:text-gray-400">Usuario:</span>
+                      <span className="ml-2 font-medium text-gray-900 dark:text-white">
+                        {newClientCredentials.email}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <svg className="w-4 h-4 text-gray-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                    <div>
+                      <span className="text-gray-600 dark:text-gray-400">Contraseña:</span>
+                      <span className="ml-2 font-mono font-bold text-green-600 dark:text-green-400 text-base">
+                        {newClientCredentials.password}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Advertencia */}
+              <div className="bg-yellow-50 dark:bg-yellow-900/30 border-l-4 border-yellow-400 p-4 mb-6">
+                <div className="flex">
+                  <div className="flex-shrink-0">
+                    <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm text-yellow-700 dark:text-yellow-200 font-medium">
+                      ⚠️ Importante: Estas credenciales solo se muestran una vez. 
+                      Asegúrate de enviarlas al cliente antes de cerrar esta ventana.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Botones de acción */}
+              <div className="space-y-3">
+                <button
+                  onClick={handleSendWhatsApp}
+                  className="w-full flex items-center justify-center gap-3 bg-green-600 hover:bg-green-700 text-white py-4 px-6 rounded-lg font-semibold text-base transition-all duration-200 shadow-lg hover:shadow-xl"
+                >
+                  <MessageCircle className="w-5 h-5" />
+                  Enviar Credenciales por WhatsApp
+                  <ExternalLink className="w-4 h-4" />
+                </button>
+
+                <button
+                  onClick={handleCopyCredentials}
+                  className="w-full flex items-center justify-center gap-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white py-3 px-6 rounded-lg font-medium text-sm transition-all duration-200"
+                >
+                  <Copy className="w-4 h-4" />
+                  Copiar Credenciales
+                </button>
+              </div>
+
+              <p className="text-xs text-center text-gray-500 dark:text-gray-400 mt-4">
+                El modal se cerrará automáticamente al enviar por WhatsApp
+              </p>
             </div>
           </div>
         </div>
