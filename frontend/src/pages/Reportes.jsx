@@ -106,7 +106,15 @@ const Reportes = () => {
   // Funciones para exportar a PDF
   const handleExportAutosPDF = async () => {
     try {
-      const autos = await autosService.getAll();
+      // Obtener TODOS los autos incluyendo archivados para los reportes
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/autos/todos', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      const autos = await response.json();
+      
       const doc = new jsPDF();
       
       // Agregar encabezado con logo
@@ -123,7 +131,7 @@ const Reportes = () => {
         String(auto.matricula || 'N/A'),
         String(auto.anio || ''),
         String(auto.color || ''),
-        `$${(auto.precio || 0).toLocaleString('es-ES')}`,
+        formatCurrency(auto.precio || 0),
         String(auto.cliente?.nombre || 'Sin cliente'),
         auto.estado === 'vendido' ? 'Vendido' : auto.estado === 'financiado' ? 'Financiado' : 'Disponible'
       ]);
@@ -299,7 +307,7 @@ const Reportes = () => {
           String(`${pago.auto?.marca || ''} ${pago.auto?.modelo || ''}`.trim() || 'N/A'),
           String(pago.auto?.matricula || 'N/A'),
           String(pago.numeroCuota || ''),
-          `$${parseFloat(pago.monto || 0).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+          formatCurrency(parseFloat(pago.monto || 0)),
           pago.fechaVencimiento ? new Date(pago.fechaVencimiento).toLocaleDateString('es-ES') : '-',
           pago.estado === 'pagado' ? 'Pagado' : pago.estado === 'pendiente' ? 'Pendiente' : 'Vencido',
           pago.fechaPago ? new Date(pago.fechaPago).toLocaleDateString('es-ES') : '-'
@@ -370,13 +378,13 @@ const Reportes = () => {
         
         doc.setTextColor(22, 163, 74); // Verde
         doc.setFont(undefined, 'bold');
-        doc.text(`Pagado: $${totalPagado.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 16, yPosition + 17);
+        doc.text(`Pagado: ${formatCurrency(totalPagado)}`, 16, yPosition + 17);
         
         doc.setTextColor(220, 38, 38); // Rojo
-        doc.text(`Pendiente: $${totalPendiente.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 70, yPosition + 17);
+        doc.text(`Pendiente: ${formatCurrency(totalPendiente)}`, 70, yPosition + 17);
         
         doc.setTextColor(0, 0, 0);
-        doc.text(`Total: $${(totalPagado + totalPendiente).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 130, yPosition + 17);
+        doc.text(`Total: ${formatCurrency(totalPagado + totalPendiente)}`, 130, yPosition + 17);
         doc.setFont(undefined, 'normal');
 
         yPosition += 25;
@@ -458,16 +466,16 @@ const Reportes = () => {
       doc.setFontSize(11);
       doc.setTextColor(22, 163, 74);
       doc.setFont(undefined, 'bold');
-      doc.text(`Monto Total Pagado: $${totalGeneralPagado.toLocaleString('es-ES', { minimumFractionDigits: 2 })}`, 35, summaryY);
+      doc.text(`Monto Total Pagado: ${formatCurrency(totalGeneralPagado)}`, 35, summaryY);
       summaryY += 8;
       
       doc.setTextColor(220, 38, 38);
-      doc.text(`Monto Total Pendiente: $${totalGeneralPendiente.toLocaleString('es-ES', { minimumFractionDigits: 2 })}`, 35, summaryY);
+      doc.text(`Monto Total Pendiente: ${formatCurrency(totalGeneralPendiente)}`, 35, summaryY);
       summaryY += 8;
       
       doc.setTextColor(0, 0, 0);
       doc.setFontSize(13);
-      doc.text(`Total General: $${(totalGeneralPagado + totalGeneralPendiente).toLocaleString('es-ES', { minimumFractionDigits: 2 })}`, 35, summaryY);
+      doc.text(`Total General: ${formatCurrency(totalGeneralPagado + totalGeneralPendiente)}`, 35, summaryY);
       doc.setFont(undefined, 'normal');
 
       // Pie de página en todas las páginas
@@ -556,8 +564,8 @@ const Reportes = () => {
       doc.setTextColor(0, 0, 0);
       
       const pagosData = [
-        ['Total Recaudado', `$${(stats?.pagos?.totalRecaudado || 0).toLocaleString()}`],
-        ['Total Pendiente', `$${(stats?.pagos?.totalPendiente || 0).toLocaleString()}`],
+        ['Total Recaudado', formatCurrency(stats?.pagos?.totalRecaudado || 0)],
+        ['Total Pendiente', formatCurrency(stats?.pagos?.totalPendiente || 0)],
         ['Pagos Realizados', String(stats?.pagos?.pagados || 0)],
         ['Cuotas Pendientes', String(stats?.pagos?.pendientes || 0)],
         ['Cuotas Vencidas', String(stats?.pagos?.vencidos || 0)]
@@ -583,7 +591,7 @@ const Reportes = () => {
       doc.text('Resumen Financiero', 20, currentY + 8);
       doc.setFontSize(10);
       const totalActivo = (stats?.pagos?.totalRecaudado || 0) + (stats?.pagos?.totalPendiente || 0);
-      doc.text(`Total en Financiamientos: $${totalActivo.toLocaleString()}`, 20, currentY + 16);
+      doc.text(`Total en Financiamientos: ${formatCurrency(totalActivo)}`, 20, currentY + 16);
       const tasaRecuperacion = totalActivo > 0 ? ((stats?.pagos?.totalRecaudado || 0) / totalActivo) * 100 : 0;
       doc.text(`Tasa de Recuperación: ${tasaRecuperacion.toFixed(1)}%`, 20, currentY + 23);
       
@@ -635,7 +643,7 @@ const Reportes = () => {
           ['Permutas de Autos', String(permutasStats.porTipo?.find(t => t.tipo === 'auto')?._count || 0)],
           ['Permutas de Motos', String(permutasStats.porTipo?.find(t => t.tipo === 'moto')?._count || 0)],
           ['Otras Permutas', String(permutasStats.porTipo?.find(t => t.tipo === 'otros')?._count || 0)],
-          ['Valor Total Estimado', `$${(permutasStats.valorTotal || 0).toLocaleString()}`]
+          ['Valor Total Estimado', formatCurrency(permutasStats.valorTotal || 0)]
         ];
         
         autoTable(doc, {
@@ -659,7 +667,7 @@ const Reportes = () => {
       const permutasTableData = permutas.map(p => [
         p.tipo.toUpperCase(),
         p.descripcion || '-',
-        `$${(p.valorEstimado || 0).toLocaleString()}`,
+        formatCurrency(p.valorEstimado || 0),
         p.cliente?.nombre || '-',
         new Date(p.createdAt).toLocaleDateString('es-ES')
       ]);

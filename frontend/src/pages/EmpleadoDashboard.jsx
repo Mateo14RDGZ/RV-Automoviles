@@ -140,9 +140,9 @@ const EmpleadoDashboard = () => {
   };
 
   const formatCurrency = (value) => {
-    return new Intl.NumberFormat('es-UY', {
+    return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'UYU',
+      currency: 'USD',
     }).format(value);
   };
 

@@ -3,6 +3,7 @@ import { autosService, clientesService } from '../services';
 import { Car, Plus, Search, Edit2, Trash2, Eye } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 import ConfirmDialog from '../components/ConfirmDialog';
+import { formatCurrency } from '../utils/format';
 
 const Autos = () => {
   const { showToast } = useToast();
@@ -322,7 +323,7 @@ const Autos = () => {
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-300">{auto.anio}</td>
                     <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
-                      ${auto.precio.toLocaleString()}
+                      {formatCurrency(auto.precio)}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
                       {auto.cliente ? auto.cliente.nombre : '-'}
@@ -454,7 +455,7 @@ const Autos = () => {
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600 dark:text-gray-400">Precio:</span>
                   <span className="font-medium text-gray-900 dark:text-white">
-                    ${auto.precio.toLocaleString()}
+                    {formatCurrency(auto.precio)}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">

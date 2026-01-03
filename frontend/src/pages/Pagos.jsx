@@ -282,7 +282,7 @@ const Pagos = () => {
         // Validar que el valor de permuta no supere el precio del auto
         const precioAuto = parseFloat(autoSeleccionado.precio);
         if (valorPermuta >= precioAuto) {
-          alert(`El valor de la permuta ($${valorPermuta.toLocaleString()}) no puede ser igual o mayor al precio del vehículo ($${precioAuto.toLocaleString()})`);
+          alert(`El valor de la permuta (${formatCurrency(valorPermuta)}) no puede ser igual o mayor al precio del vehículo (${formatCurrency(precioAuto)})`);
           return;
         }
         
@@ -296,10 +296,10 @@ const Pagos = () => {
         
         if (diferencia > margenPermitido) {
           const confirmacion = confirm(
-            `Advertencia: El total de las cuotas ($${montoTotalEsperado.toLocaleString()}) difiere del precio final con permuta ($${precioFinal.toLocaleString()}).\n\n` +
-            `Precio original: $${precioAuto.toLocaleString()}\n` +
-            `Valor permuta: -$${valorPermuta.toLocaleString()}\n` +
-            `Precio final: $${precioFinal.toLocaleString()}\n\n` +
+            `Advertencia: El total de las cuotas (${formatCurrency(montoTotalEsperado)}) difiere del precio final con permuta (${formatCurrency(precioFinal)}).\n\n` +
+            `Precio original: ${formatCurrency(precioAuto)}\n` +
+            `Valor permuta: -${formatCurrency(valorPermuta)}\n` +
+            `Precio final: ${formatCurrency(precioFinal)}\n\n` +
             `¿Desea continuar de todas formas?`
           );
           if (!confirmacion) {
@@ -1152,7 +1152,7 @@ const Pagos = () => {
                     <option value="">Seleccione un auto...</option>
                     {getAutosSinPlanDeCuotas().map((auto) => (
                       <option key={auto.id} value={auto.id}>
-                        {auto.marca} {auto.modelo} • {auto.cliente?.nombre} • ${auto.precio.toLocaleString()}
+                        {auto.marca} {auto.modelo} • {auto.cliente?.nombre} • {formatCurrency(auto.precio)}
                       </option>
                     ))}
                   </select>
