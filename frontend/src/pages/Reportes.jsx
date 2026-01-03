@@ -104,81 +104,6 @@ const Reportes = () => {
   };
 
   // Funciones para exportar a PDF
-  const handleExportAutosPDF = async () => {
-    try {
-      // Obtener TODOS los autos incluyendo archivados para los reportes
-      const token = localStorage.getItem('token');
-      const response = await fetch('/api/autos/todos', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      const autos = await response.json();
-      
-      const doc = new jsPDF();
-      
-      // Agregar encabezado profesional
-      const startY = await addPDFHeader(
-        doc, 
-        'Inventario de Vehículos',
-        `Total: ${autos.length} vehículos`,
-        'Inventario'
-      );
-      
-      // Tabla única con toda la información
-      const tableData = autos.map(auto => {
-        // Formatear precio usando formatCurrency
-        const precio = auto.precio ? formatCurrency(parseFloat(auto.precio)) : '$0.00';
-        const estado = auto.estado === 'vendido' ? 'Vendido' : auto.estado === 'financiado' ? 'Financiado' : 'Disponible';
-        
-        return [
-          String(auto.marca || '-'),
-          String(auto.modelo || '-'),
-          String(auto.anio || '-'),
-          String(auto.matricula || '0km'),
-          String(auto.color || '-'),
-          precio,
-          String(auto.cliente?.nombre || '-'),
-          estado
-        ];
-      });
-      
-      autoTable(doc, {
-        startY: startY,
-        head: [['Marca', 'Modelo', 'Año', 'Matrícula', 'Color', 'Precio', 'Cliente', 'Estado']],
-        body: tableData,
-        ...getTableStyles('primary'),
-        columnStyles: {
-          0: { cellWidth: 24 },
-          1: { cellWidth: 24 },
-          2: { cellWidth: 15, halign: 'center' },
-          3: { cellWidth: 20, halign: 'center' },
-          4: { cellWidth: 20 },
-          5: { cellWidth: 28, halign: 'right', fontStyle: 'bold' },
-          6: { cellWidth: 28 },
-          7: { cellWidth: 23, halign: 'center' }
-        }
-      });
-      
-      // Agregar pie de página profesional
-      addPDFFooter(doc, {
-        showContact: true,
-        contactInfo: {
-          telefono: '+598 XX XXX XXX',
-          email: 'ventas@nicolastejera.com',
-          web: 'www.nicolastejera.com'
-        }
-      });
-      
-      // Guardar con nombre profesional
-      doc.save(getPDFFileName('Inventario', 'Vehiculos'));
-      showToast('PDF de inventario generado exitosamente', 'success');
-    } catch (error) {
-      console.error('Error al exportar PDF:', error);
-      showToast('Error al exportar inventario a PDF', 'error');
-    }
-  };
-
   const handleExportClientesPDF = async () => {
     try {
       const clientes = await clientesService.getAll();
@@ -755,29 +680,8 @@ const Reportes = () => {
 
       {/* Exportaciones */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-6">
-        {/* Exportar Autos */}
-        <div className="card hover-lift animate-fadeInUp p-3 md:p-6" style={{animationDelay: '0.4s'}}>
-          <div className="flex items-start gap-3 md:gap-4">
-            <div className="p-2 md:p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex-shrink-0">
-              <Car className="w-5 h-5 md:w-6 md:h-6 text-blue-600 dark:text-blue-400" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <h3 className="text-sm md:text-lg font-semibold text-gray-900 dark:text-white mb-1 md:mb-2">
-                Inventario de Autos
-              </h3>
-              <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-2 md:mb-4">
-                Exporta la lista completa de autos con toda su información
-              </p>
-              <button onClick={handleExportAutosPDF} className="bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800 text-white px-3 py-2 md:px-4 md:py-2 rounded-lg font-medium text-xs md:text-sm flex items-center gap-2 transition-all hover:scale-105 active:scale-95 w-full md:w-auto justify-center">
-                <FileText className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                Descargar PDF
-              </button>
-            </div>
-          </div>
-        </div>
-
         {/* Exportar Clientes */}
-        <div className="card hover-lift animate-fadeInUp p-3 md:p-6" style={{animationDelay: '0.5s'}}>
+        <div className="card hover-lift animate-fadeInUp p-3 md:p-6" style={{animationDelay: '0.4s'}}>
           <div className="flex items-start gap-3 md:gap-4">
             <div className="p-2 md:p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex-shrink-0">
               <Users className="w-5 h-5 md:w-6 md:h-6 text-purple-600 dark:text-purple-400" />
@@ -798,7 +702,7 @@ const Reportes = () => {
         </div>
 
         {/* Exportar Pagos */}
-        <div className="card hover-lift animate-fadeInUp p-3 md:p-6" style={{animationDelay: '0.6s'}}>
+        <div className="card hover-lift animate-fadeInUp p-3 md:p-6" style={{animationDelay: '0.5s'}}>
           <div className="flex items-start gap-3 md:gap-4">
             <div className="p-2 md:p-3 bg-green-100 dark:bg-green-900/30 rounded-lg flex-shrink-0">
               <DollarSign className="w-5 h-5 md:w-6 md:h-6 text-green-600 dark:text-green-400" />
@@ -845,7 +749,7 @@ const Reportes = () => {
         </div>
 
         {/* Reporte General */}
-        <div className="card hover-lift animate-fadeInUp p-3 md:p-6" style={{animationDelay: '0.7s'}}>
+        <div className="card hover-lift animate-fadeInUp p-3 md:p-6" style={{animationDelay: '0.6s'}}>
           <div className="flex items-start gap-3 md:gap-4">
             <div className="p-2 md:p-3 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex-shrink-0">
               <FileText className="w-5 h-5 md:w-6 md:h-6 text-yellow-600 dark:text-yellow-400" />
