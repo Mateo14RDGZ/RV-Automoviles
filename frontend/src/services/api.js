@@ -23,7 +23,8 @@ const api = axios.create({
 // Interceptor para agregar el token a todas las peticiones
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    // Buscar el token en localStorage o sessionStorage
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
       console.log('🔐 Request con token a:', config.url);
@@ -42,8 +43,13 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
+      // Limpiar ambos storages
       localStorage.removeItem('token');
       localStorage.removeItem('user');
+      localStorage.removeItem('rememberMe');
+      sessionStorage.removeItem('token');
+      sessionStorage.removeItem('user');
+      sessionStorage.removeItem('rememberMe');
       window.location.href = '/login';
     }
     // Normalizar el formato del error para evitar problemas con React
