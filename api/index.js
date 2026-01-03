@@ -165,7 +165,7 @@ app.post('/api/auth/login-cliente', [
     }
 
     const { cedula, password } = req.body;
-    console.log('Intentando login de cliente con cédula:', cedula);
+    console.log('🔐 Intentando login de cliente con cédula:', cedula);
 
     // Buscar cliente por cédula
     const cliente = await prisma.cliente.findFirst({
@@ -181,20 +181,35 @@ app.post('/api/auth/login-cliente', [
       }
     });
 
-    console.log('Cliente encontrado:', cliente ? `${cliente.nombre} (ID: ${cliente.id})` : 'No encontrado');
+    console.log('👤 Cliente encontrado:', cliente ? `${cliente.nombre} (ID: ${cliente.id})` : 'No encontrado');
     
     if (!cliente) {
+      console.log('❌ Cliente no existe con esa cédula');
       return res.status(401).json({ error: 'Credenciales inválidas' });
+    }
+
+    console.log('🔍 Cliente tiene usuario:', cliente.usuario ? 'SÍ' : 'NO');
+    console.log('🚗 Autos financiados:', cliente.autos?.length || 0);
+
+    // Verificar que tenga usuario
+    if (!cliente.usuario) {
+      console.log('❌ Cliente no tiene usuario asociado');
+      return res.status(401).json({ error: 'Error de configuración. Contacta con la automotora.' });
     }
 
     // Verificar que tenga al menos un auto financiado (plan de cuotas activo)
     if (!cliente.autos || cliente.autos.length === 0) {
+      console.log('❌ Cliente no tiene autos financiados');
       return res.status(401).json({ error: 'No tienes un plan de cuotas activo. Contacta con la automotora.' });
     }
 
     // Verificar contraseña
+    console.log('🔑 Verificando contraseña...');
     const isValidPassword = await bcrypt.compare(password, cliente.usuario.password);
+    console.log('🔑 Contraseña válida:', isValidPassword ? 'SÍ' : 'NO');
+    
     if (!isValidPassword) {
+      console.log('❌ Contraseña incorrecta');
       return res.status(401).json({ error: 'Credenciales inválidas' });
     }
 
