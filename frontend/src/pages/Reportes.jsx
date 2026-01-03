@@ -170,14 +170,12 @@ const Reportes = () => {
       const clientes = await clientesService.getAll();
       const doc = new jsPDF();
       
-      // Encabezado
-      doc.setFontSize(18);
-      doc.setTextColor(147, 51, 234); // Púrpura
-      doc.text('Reporte de Base de Clientes', 105, 20, { align: 'center' });
-      doc.setFontSize(10);
-      doc.setTextColor(100, 100, 100);
-      doc.text(`Fecha de generación: ${new Date().toLocaleDateString('es-ES')}`, 105, 28, { align: 'center' });
-      doc.text(`Total de clientes: ${clientes.length}`, 105, 34, { align: 'center' });
+      // Agregar encabezado con logo
+      const startY = await addPDFHeader(
+        doc,
+        'Reporte de Base de Clientes',
+        `Total de clientes: ${clientes.length}`
+      );
       
       // Tabla de clientes
       const tableData = clientes.map(cliente => [
@@ -189,7 +187,7 @@ const Reportes = () => {
       ]);
       
       autoTable(doc, {
-        startY: 40,
+        startY: startY,
         head: [['Nombre', 'Cédula', 'Teléfono', 'Email', 'Dirección']],
         body: tableData,
         theme: 'striped',
@@ -212,19 +210,8 @@ const Reportes = () => {
         margin: { left: 14, right: 14 }
       });
       
-      // Pie de página
-      const pageCount = doc.internal.getNumberOfPages();
-      for (let i = 1; i <= pageCount; i++) {
-        doc.setPage(i);
-        doc.setFontSize(8);
-        doc.setTextColor(150, 150, 150);
-        doc.text(
-          `Página ${i} de ${pageCount}`,
-          doc.internal.pageSize.getWidth() / 2,
-          doc.internal.pageSize.getHeight() - 10,
-          { align: 'center' }
-        );
-      }
+      // Agregar pie de página
+      addPDFFooter(doc);
       
       doc.save(`clientes_${new Date().toISOString().split('T')[0]}.pdf`);
       showToast('PDF de clientes exportado exitosamente', 'success');
