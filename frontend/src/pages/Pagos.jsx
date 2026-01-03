@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { pagosService, autosService, clientesService } from '../services';
+import { pagosService, autosService, clientesService, comprobantesService } from '../services';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
-import { CreditCard, Plus, AlertCircle, CheckCircle, Calendar, DollarSign, User, ChevronDown, ChevronUp, Car, RefreshCw, MessageSquare, Save, X } from 'lucide-react';
+import { CreditCard, Plus, AlertCircle, CheckCircle, Calendar, DollarSign, User, ChevronDown, ChevronUp, Car, RefreshCw, MessageSquare, Save, X, Upload, FileText } from 'lucide-react';
 
 const Pagos = () => {
   const { user } = useAuth();
@@ -32,6 +32,11 @@ const Pagos = () => {
   const [emailError, setEmailError] = useState(null);
   const [pagoSeleccionado, setPagoSeleccionado] = useState(null);
   const [pagoParaEmail, setPagoParaEmail] = useState(null);
+  // Estados para subir comprobante (clientes)
+  const [showComprobanteModal, setShowComprobanteModal] = useState(false);
+  const [pagoParaComprobante, setPagoParaComprobante] = useState(null);
+  const [archivoSeleccionado, setArchivoSeleccionado] = useState(null);
+  const [subiendoComprobante, setSubiendoComprobante] = useState(false);
   const [formData, setFormData] = useState({
     autoId: '',
     numeroCuota: 1,
@@ -571,6 +576,106 @@ const Pagos = () => {
     }
   };
 
+  // Funciones para manejo de comprobantes (clientes)
+  const abrirModalComprobante = (pago) => {
+    setPagoParaComprobante(pago);
+    setArchivoSeleccionado(null);
+    setShowComprobanteModal(true);
+  };
+
+  const cerrarModalComprobante = () => {
+    setShowComprobanteModal(false);
+    setPagoParaComprobante(null);
+    setArchivoSeleccionado(null);
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validar tipo de archivo por extensión y MIME type
+      const extension = file.name.toLowerCase().split('.').pop();
+      const extensionesPermitidas = ['pdf', 'jpg', 'jpeg', 'png'];
+      const tiposMimePermitidos = [
+        'image/jpeg', 
+        'image/jpg', 
+        'image/png', 
+        'application/pdf',
+        'application/x-pdf',
+        'application/acrobat',
+        'applications/vnd.pdf',
+        'text/pdf',
+        'text/x-pdf'
+      ];
+      
+      // Validar por extensión o tipo MIME
+      const esValido = extensionesPermitidas.includes(extension) || 
+                       tiposMimePermitidos.includes(file.type) ||
+                       file.type === ''; // Algunos navegadores no detectan el tipo MIME
+      
+      if (!esValido) {
+        showToast('Solo se permiten archivos PDF, JPG y PNG', 'error');
+        return;
+      }
+
+      // Validar tamaño (máximo 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        showToast('El archivo no debe exceder 5MB', 'error');
+        return;
+      }
+
+      setArchivoSeleccionado(file);
+    }
+  };
+
+  const convertirArchivoABase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
+  const handleSubirComprobante = async (e) => {
+    e.preventDefault();
+    if (!archivoSeleccionado) {
+      showToast('Por favor selecciona un archivo', 'error');
+      return;
+    }
+
+    try {
+      setSubiendoComprobante(true);
+      const archivoBase64 = await convertirArchivoABase64(archivoSeleccionado);
+      
+      // Determinar tipo MIME correcto si no está disponible
+      let tipoArchivo = archivoSeleccionado.type;
+      if (!tipoArchivo) {
+        const extension = archivoSeleccionado.name.toLowerCase().split('.').pop();
+        const tiposMime = {
+          'pdf': 'application/pdf',
+          'jpg': 'image/jpeg',
+          'jpeg': 'image/jpeg',
+          'png': 'image/png'
+        };
+        tipoArchivo = tiposMime[extension] || 'application/pdf';
+      }
+      
+      await comprobantesService.subir(
+        pagoParaComprobante.id,
+        archivoBase64,
+        tipoArchivo
+      );
+
+      showToast('Comprobante enviado exitosamente. Será revisado por el administrador.', 'success');
+      cerrarModalComprobante();
+      await handleFilter(filter); // Recargar datos
+    } catch (error) {
+      showToast(error.message || 'Error al subir comprobante', 'error');
+    } finally {
+      setSubiendoComprobante(false);
+    }
+  };
+
   const resetForm = () => {
     setFormData({
       autoId: '',
@@ -917,12 +1022,22 @@ const Pagos = () => {
                                         {formatCurrency(pago.monto)}
                                       </div>
                                       {!esPagado && (
-                                        <button
-                                          onClick={() => handleMarcarPagado(pago.id)}
-                                          className="btn btn-success btn-sm whitespace-nowrap text-xs px-3 py-1.5"
-                                        >
-                                          Marcar Pagado
-                                        </button>
+                                        isStaff ? (
+                                          <button
+                                            onClick={() => handleMarcarPagado(pago.id)}
+                                            className="btn btn-success btn-sm whitespace-nowrap text-xs px-3 py-1.5"
+                                          >
+                                            Marcar Pagado
+                                          </button>
+                                        ) : (
+                                          <button
+                                            onClick={() => abrirModalComprobante(pago)}
+                                            className="btn btn-primary btn-sm whitespace-nowrap text-xs px-3 py-1.5 flex items-center gap-1"
+                                          >
+                                            <Upload className="w-4 h-4" />
+                                            Pagar
+                                          </button>
+                                        )
                                       )}
                                     </div>
 
@@ -2073,6 +2188,109 @@ const Pagos = () => {
                   </button>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal para subir comprobante de pago (Clientes) */}
+      {showComprobanteModal && pagoParaComprobante && (
+        <div className="fixed inset-0 bg-black dark:bg-black bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full border border-gray-300 dark:border-gray-700">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                  Pagar con Transferencia
+                </h2>
+                <button
+                  onClick={cerrarModalComprobante}
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  Cuota #{pagoParaComprobante.numeroCuota}
+                </p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  {pagoParaComprobante.auto.marca} {pagoParaComprobante.auto.modelo}
+                </p>
+                <p className="text-lg font-bold text-blue-600 dark:text-blue-400 mt-1">
+                  {formatCurrency(pagoParaComprobante.monto)}
+                </p>
+              </div>
+
+              <form onSubmit={handleSubirComprobante} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Comprobante de Transferencia *
+                  </label>
+                  <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-lg hover:border-primary-500 dark:hover:border-primary-400 transition-colors">
+                    <div className="space-y-1 text-center">
+                      {archivoSeleccionado ? (
+                        <div className="flex items-center justify-center gap-2">
+                          <FileText className="w-8 h-8 text-primary-600 dark:text-primary-400" />
+                          <div className="text-sm">
+                            <p className="font-medium text-gray-900 dark:text-white">
+                              {archivoSeleccionado.name}
+                            </p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                              {(archivoSeleccionado.size / 1024).toFixed(2)} KB
+                            </p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setArchivoSeleccionado(null)}
+                            className="text-red-600 hover:text-red-800 dark:text-red-400"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ) : (
+                        <>
+                          <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                          <div className="flex text-sm text-gray-600 dark:text-gray-400">
+                            <label className="relative cursor-pointer rounded-md font-medium text-primary-600 dark:text-primary-400 hover:text-primary-500">
+                              <span>Seleccionar archivo</span>
+                              <input
+                                type="file"
+                                className="sr-only"
+                                accept=".pdf,.jpg,.jpeg,.png"
+                                onChange={handleFileChange}
+                                required
+                              />
+                            </label>
+                            <p className="pl-1">o arrastra y suelta</p>
+                          </div>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                            PDF, JPG o PNG (máx. 5MB)
+                          </p>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex gap-3 pt-4">
+                  <button
+                    type="submit"
+                    className="btn btn-primary flex-1"
+                    disabled={subiendoComprobante}
+                  >
+                    {subiendoComprobante ? 'Enviando...' : 'Enviar Comprobante'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={cerrarModalComprobante}
+                    className="btn btn-secondary flex-1"
+                    disabled={subiendoComprobante}
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </div>
