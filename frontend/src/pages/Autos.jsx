@@ -884,18 +884,18 @@ const Autos = () => {
                           ) : autoDetalles.matricula}
                         </span>
                       </div>
-                      {autoDetalles.color && (
-                        <div className="flex justify-between">
-                          <span className="text-gray-600 dark:text-gray-400">Color:</span>
-                          <span className="font-semibold text-gray-900 dark:text-white">{autoDetalles.color}</span>
-                        </div>
-                      )}
-                      {autoDetalles.kilometraje && (
-                        <div className="flex justify-between">
-                          <span className="text-gray-600 dark:text-gray-400">Kilometraje:</span>
-                          <span className="font-semibold text-gray-900 dark:text-white">{parseInt(autoDetalles.kilometraje).toLocaleString()} km</span>
-                        </div>
-                      )}
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 dark:text-gray-400">Color:</span>
+                        <span className="font-semibold text-gray-900 dark:text-white">
+                          {autoDetalles.color || <span className="text-gray-400 italic">No especificado</span>}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 dark:text-gray-400">Kilometraje:</span>
+                        <span className="font-semibold text-gray-900 dark:text-white">
+                          {autoDetalles.kilometraje ? `${parseInt(autoDetalles.kilometraje).toLocaleString()} km` : <span className="text-gray-400 italic">No especificado</span>}
+                        </span>
+                      </div>
                     </div>
                   </div>
 
@@ -915,12 +915,12 @@ const Autos = () => {
                           {autoDetalles.estado}
                         </span>
                       </div>
-                      {autoDetalles.valorPatente && (
-                        <div className="flex justify-between">
-                          <span className="text-gray-600 dark:text-gray-400">Valor Patente:</span>
-                          <span className="font-semibold text-gray-900 dark:text-white">{formatCurrency(autoDetalles.valorPatente)}</span>
-                        </div>
-                      )}
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 dark:text-gray-400">Valor Patente:</span>
+                        <span className="font-semibold text-gray-900 dark:text-white">
+                          {autoDetalles.valorPatente ? formatCurrency(autoDetalles.valorPatente) : <span className="text-gray-400 italic">No especificado</span>}
+                        </span>
+                      </div>
                       {autoDetalles.cliente && (
                         <div className="flex justify-between">
                           <span className="text-gray-600 dark:text-gray-400">Cliente:</span>
@@ -933,18 +933,18 @@ const Autos = () => {
 
                 {/* Procedencia y Documentación */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {autoDetalles.departamento && (
-                    <div className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg">
-                      <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Procedencia</h3>
-                      <p className="text-lg font-medium text-gray-900 dark:text-white">{autoDetalles.departamento}</p>
-                    </div>
-                  )}
-                  {autoDetalles.tipoDocumento && (
-                    <div className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg">
-                      <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Documentación</h3>
-                      <p className="text-lg font-medium text-gray-900 dark:text-white">{autoDetalles.tipoDocumento}</p>
-                    </div>
-                  )}
+                  <div className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg">
+                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">📍 Procedencia</h3>
+                    <p className="text-lg font-medium text-gray-900 dark:text-white">
+                      {autoDetalles.departamento || <span className="text-gray-400 italic">No especificado</span>}
+                    </p>
+                  </div>
+                  <div className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg">
+                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">📄 Documentación</h3>
+                    <p className="text-lg font-medium text-gray-900 dark:text-white">
+                      {autoDetalles.tipoDocumento || <span className="text-gray-400 italic">No especificado</span>}
+                    </p>
+                  </div>
                 </div>
 
                 {/* Fechas */}
