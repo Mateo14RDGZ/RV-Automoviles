@@ -1,48 +1,90 @@
 -- ============================================
--- SCRIPT PARA LIMPIAR TODA LA BASE DE DATOS
+-- SCRIPT PARA LIMPIAR DATOS DE LA BASE DE DATOS
 -- ============================================
--- ADVERTENCIA: Este script elimina TODOS los datos de todas las tablas.
--- Úsalo solo para resetear el sistema completamente.
+-- Este script elimina todos los datos EXCEPTO admin y empleado.
+-- Las tablas NO se eliminan, solo su contenido.
 -- Ejecutar en Neon Console o cualquier cliente PostgreSQL.
 
--- Desactivar temporalmente las restricciones de claves foráneas
-SET session_replication_role = 'replica';
-
--- Eliminar todos los datos de las tablas en orden correcto
--- (de tablas dependientes a tablas principales)
-
--- 1. Eliminar comprobantes de pago (dependen de Pago)
+-- ============================================
+-- PASO 1: Eliminar comprobantes de pago
+-- ============================================
 DELETE FROM "ComprobantePago";
 
--- 2. Eliminar pagos (dependen de Auto)
+-- ============================================
+-- PASO 2: Eliminar todos los pagos
+-- ============================================
 DELETE FROM "Pago";
 
--- 3. Eliminar permutas (dependen de Cliente y Auto)
+-- ============================================
+-- PASO 3: Eliminar todas las permutas
+-- ============================================
 DELETE FROM "Permuta";
 
--- 4. Eliminar autos (dependen de Cliente)
+-- ============================================
+-- PASO 4: Eliminar todos los autos
+-- ============================================
 DELETE FROM "Auto";
 
--- 5. Eliminar usuarios (algunos dependen de Cliente, otros no)
+-- ============================================
+-- PASO 5: Eliminar usuarios de clientes (mantener admin y empleado)
+-- ============================================
 DELETE FROM "Usuario" WHERE "clienteId" IS NOT NULL;
 
--- 6. Eliminar clientes
+-- ============================================
+-- PASO 6: Eliminar todos los clientes
+-- ============================================
 DELETE FROM "Cliente";
 
--- 7. Eliminar usuarios restantes (admin y empleado)
-DELETE FROM "Usuario";
+-- ============================================
+-- PASO 7: Reiniciar secuencias (mantener IDs actuales de admin/empleado)
+-- ============================================
+-- Obtener el próximo ID disponible para clientes
+SELECT setval ('"Cliente_id_seq"', 1, false);
 
--- Reactivar las restricciones de claves foráneas
-SET session_replication_role = 'origin';
+-- Obtener el próximo ID disponible para autos
+SELECT setval ('"Auto_id_seq"', 1, false);
 
--- Reiniciar las secuencias de IDs (opcional, para que los IDs empiecen desde 1)
-ALTER SEQUENCE "Usuario_id_seq" RESTART WITH 1;
-ALTER SEQUENCE "Cliente_id_seq" RESTART WITH 1;
-ALTER SEQUENCE "Auto_id_seq" RESTART WITH 1;
-ALTER SEQUENCE "Pago_id_seq" RESTART WITH 1;
-ALTER SEQUENCE "Permuta_id_seq" RESTART WITH 1;
-ALTER SEQUENCE "ComprobantePago_id_seq" RESTART WITH 1;
+-- Obtener el próximo ID disponible para pagos
+SELECT setval ('"Pago_id_seq"', 1, false);
 
--- Mensaje de confirmación (solo para PostgreSQL 12+)
--- SELECT 'Base de datos limpiada exitosamente. Todas las tablas están vacías.' AS resultado;
+-- Obtener el próximo ID disponible para permutas
+SELECT setval ('"Permuta_id_seq"', 1, false);
 
+-- Obtener el próximo ID disponible para comprobantes
+SELECT setval ( '"ComprobantePago_id_seq"', 1, false );
+
+-- Para Usuario, obtener el máximo ID actual y establecer el siguiente
+SELECT setval (
+        '"Usuario_id_seq"', COALESCE(
+            (
+                SELECT MAX(id)
+                FROM "Usuario"
+            ), 0
+        ) + 1, false
+    );
+
+-- ============================================
+-- VERIFICACIÓN: Mostrar usuarios restantes
+-- ============================================
+SELECT id, email, rol, "createdAt" FROM "Usuario" ORDER BY id;
+
+-- ============================================
+-- RESUMEN: Contar registros en cada tabla
+-- ============================================
+SELECT 'Usuario' as tabla, COUNT(*) as registros, 'MANTENIDOS (admin y empleado)' as nota
+FROM "Usuario"
+UNION ALL
+SELECT 'Cliente', COUNT(*), 'ELIMINADOS'
+FROM "Cliente"
+UNION ALL
+SELECT 'Auto', COUNT(*), 'ELIMINADOS'
+FROM "Auto"
+UNION ALL
+SELECT 'Pago', COUNT(*), 'ELIMINADOS'
+FROM "Pago"
+UNION ALL
+SELECT 'Permuta', COUNT(*), 'ELIMINADOS'
+FROM "Permuta"
+UNION ALL
+SELECT 'ComprobantePago', COUNT(*), 'ELIMINADOS'
+FROM "ComprobantePago";

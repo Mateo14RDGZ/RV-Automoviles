@@ -2,12 +2,24 @@
 
 ## ⚠️ ADVERTENCIA IMPORTANTE
 
-Este script **ELIMINA TODOS LOS DATOS** de la base de datos de forma **PERMANENTE**.
+Este script **ELIMINA TODOS LOS DATOS** excepto los usuarios **admin** y **empleado**.
 
-Solo úsalo si quieres:
-- Resetear el sistema completamente
-- Empezar con una base de datos limpia
-- Probar el nuevo sistema de contraseñas desde cero
+Las tablas NO se eliminan, solo su contenido.
+
+## ✅ ¿Qué se MANTIENE?
+
+- ✅ Usuarios admin y empleado
+- ✅ Todas las tablas de la base de datos
+- ✅ Estructura de la base de datos
+
+## 🗑️ ¿Qué se ELIMINA?
+
+- ❌ Todos los clientes
+- ❌ Todos los autos
+- ❌ Todos los pagos
+- ❌ Todas las permutas
+- ❌ Todos los comprobantes de pago
+- ❌ Usuarios vinculados a clientes
 
 ## 📋 Instrucciones de Uso
 
@@ -54,60 +66,45 @@ psql "postgresql://usuario:password@host/database?sslmode=require" -f limpiar-ba
 
 El script realiza las siguientes operaciones en orden:
 
-1. ✅ **Desactiva restricciones de claves foráneas** temporalmente
-2. 🗑️ **Elimina datos de todas las tablas** en el orden correcto:
-   - ComprobantePago (depende de Pago)
-   - Pago (depende de Auto)
-   - Permuta (depende de Cliente y Auto)
-   - Auto (depende de Cliente)
-   - Usuario (vinculados a clientes)
-   - Cliente
-   - Usuario (admin y empleado)
-3. ♻️ **Reinicia las secuencias de IDs** (los IDs volverán a empezar desde 1)
-4. ✅ **Reactiva las restricciones de claves foráneas**
+1. 🗑️ **Elimina ComprobantePago** (todos los comprobantes)
+2. 🗑️ **Elimina Pago** (todos los pagos)
+3. 🗑️ **Elimina Permuta** (todas las permutas)
+4. 🗑️ **Elimina Auto** (todos los autos)
+5. 🗑️ **Elimina usuarios vinculados a clientes** (mantiene admin y empleado)
+6. 🗑️ **Elimina Cliente** (todos los clientes)
+7. ♻️ **Reinicia las secuencias de IDs** (los nuevos IDs empezarán desde 1)
+8. ✅ **Muestra usuarios restantes** (verás admin y empleado)
+9. 📊 **Muestra resumen** (conteo de registros por tabla)
 
 ## 🔄 Después de Limpiar
 
-### Paso 1: Crear Usuarios Admin y Empleado
+### ✅ Ya tienes Admin y Empleado
 
-Necesitarás recrear los usuarios administrativos. Usa el script `crear-empleado.sql` o ejecuta:
+**No necesitas recrear nada**, los usuarios admin y empleado ya están en la base de datos.
 
-```sql
--- Crear Admin
-INSERT INTO "Usuario" (email, password, rol, "createdAt", "updatedAt")
-VALUES (
-  'admin@demo.com',
-  '$2b$10$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGH',  -- Reemplaza con hash real
-  'admin',
-  NOW(),
-  NOW()
-);
+Puedes iniciar sesión inmediatamente con:
 
--- Crear Empleado
-INSERT INTO "Usuario" (email, password, rol, "createdAt", "updatedAt")
-VALUES (
-  'empleado@demo.com',
-  '$2b$10$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGH',  -- Reemplaza con hash real
-  'empleado',
-  NOW(),
-  NOW()
-);
-```
+**Admin:**
+- Email: `admin@demo.com`
+- Contraseña: `admin123`
 
-> **Nota**: Puedes usar el script `api/generate-empleado.js` para generar el hash correcto de la contraseña.
+**Empleado:**
+- Email: `empleado@demo.com`
+- Contraseña: `admin123`
 
-### Paso 2: Verificar el Sistema
+### 🧪 Verificar el Sistema
 
-1. Intenta iniciar sesión con las credenciales de admin
+1. Inicia sesión como admin o empleado
 2. Crea un nuevo cliente
 3. Verifica que el modal de WhatsApp aparezca con las credenciales
 4. Intenta iniciar sesión como cliente con las credenciales generadas
 
 ## 🔒 Seguridad
 
-- ⚠️ **Nunca ejecutes este script en producción sin un backup**
-- ⚠️ **Todos los datos se perderán permanentemente**
+- ⚠️ **Este script NO afecta a admin y empleado**
+- ⚠️ **Todos los demás datos se perderán permanentemente**
 - ⚠️ **No hay forma de recuperar los datos después de ejecutar este script**
+- ✅ **Puedes volver a ejecutarlo cuantas veces quieras**
 
 ## 💡 Alternativa: Limpiar Solo Algunos Datos
 
@@ -132,24 +129,29 @@ DELETE FROM "Auto" WHERE "clienteId" IS NULL;
 
 ## ✅ Verificación Post-Limpieza
 
-Ejecuta este query para verificar que todas las tablas están vacías:
+Ejecuta este query para verificar el resultado:
 
 ```sql
 SELECT 
-  'Usuario' as tabla, COUNT(*) as registros FROM "Usuario"
+  'Usuario' as tabla, 
+  COUNT(*) as registros,
+  'Deben quedar 2 (admin y empleado)' as nota
+FROM "Usuario"
 UNION ALL
-SELECT 'Cliente', COUNT(*) FROM "Cliente"
+SELECT 'Cliente', COUNT(*), 'Debe ser 0' FROM "Cliente"
 UNION ALL
-SELECT 'Auto', COUNT(*) FROM "Auto"
+SELECT 'Auto', COUNT(*), 'Debe ser 0' FROM "Auto"
 UNION ALL
-SELECT 'Pago', COUNT(*) FROM "Pago"
+SELECT 'Pago', COUNT(*), 'Debe ser 0' FROM "Pago"
 UNION ALL
-SELECT 'Permuta', COUNT(*) FROM "Permuta"
+SELECT 'Permuta', COUNT(*), 'Debe ser 0' FROM "Permuta"
 UNION ALL
-SELECT 'ComprobantePago', COUNT(*) FROM "ComprobantePago";
+SELECT 'ComprobantePago', COUNT(*), 'Debe ser 0' FROM "ComprobantePago";
 ```
 
-Todas las tablas deberían mostrar `0` registros.
+**Resultado esperado:**
+- Usuario: 2 registros (admin y empleado)
+- Todas las demás tablas: 0 registros
 
 ## 📞 Soporte
 
