@@ -230,36 +230,36 @@ const Autos = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 animate-fadeInUp" style={{animationDelay: '0.1s'}}>
+    <div className="space-y-4 md:space-y-6">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-3 md:gap-4 animate-fadeInUp" style={{animationDelay: '0.1s'}}>
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Gestión de Autos</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">Administra el inventario de vehículos</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Gestión de Autos</h1>
+          <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 mt-1">Administra el inventario de vehículos</p>
         </div>
         <button
           onClick={() => {
             resetForm();
             setShowModal(true);
           }}
-          className="btn btn-primary flex items-center justify-center gap-2 w-full md:w-auto"
+          className="btn btn-primary flex items-center justify-center gap-2 w-full md:w-auto py-2.5 md:py-2"
         >
           <Plus className="w-5 h-5" />
-          Nuevo Auto
+          <span className="text-sm md:text-base">Nuevo Auto</span>
         </button>
       </div>
 
       {/* Filtros y búsqueda */}
-      <div className="card animate-fadeInUp" style={{animationDelay: '0.2s'}}>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="card animate-fadeInUp p-4 md:p-6" style={{animationDelay: '0.2s'}}>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
           <div className="md:col-span-2">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4 md:w-5 md:h-5" />
               <input
                 type="text"
-                placeholder="Buscar por marca, modelo o matrícula..."
+                placeholder="Buscar por marca, modelo..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="input pl-10"
+                className="input pl-9 md:pl-10 text-sm md:text-base"
               />
             </div>
           </div>
@@ -267,7 +267,7 @@ const Autos = () => {
             <select
               value={estadoFilter}
               onChange={(e) => setEstadoFilter(e.target.value)}
-              className="input"
+              className="input text-sm md:text-base"
             >
               <option value="">Todos los estados</option>
               <option value="disponible">Disponible</option>
@@ -439,7 +439,7 @@ const Autos = () => {
       </div>
 
       {/* Cards para móvil */}
-      <div className="md:hidden space-y-4">
+      <div className="md:hidden space-y-3 px-2">
         {loading ? (
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
@@ -447,85 +447,86 @@ const Autos = () => {
         ) : filteredAutos.length === 0 ? (
           <div className="card text-center py-12">
             <Car className="w-12 h-12 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
-            <p className="text-gray-500 dark:text-gray-400">{searchTerm || estadoFilter ? 'No se encontraron autos con ese criterio' : 'No hay autos registrados'}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{searchTerm || estadoFilter ? 'No se encontraron autos' : 'No hay autos registrados'}</p>
           </div>
         ) : (
           filteredAutos.map((auto, index) => (
-            <div key={auto.id} className="card hover-lift animate-fadeInUp" style={{animationDelay: `${0.1 * (index % 6)}s`}}>
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center">
-                    <Car className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+            <div key={auto.id} className="card p-4 hover-lift animate-fadeInUp" style={{animationDelay: `${0.1 * (index % 6)}s`}}>
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                  <div className="w-10 h-10 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Car className="w-5 h-5 text-primary-600 dark:text-primary-400" />
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900 dark:text-white">
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-semibold text-sm text-gray-900 dark:text-white truncate">
                       {auto.marca} {auto.modelo}
                     </h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-xs text-gray-600 dark:text-gray-400">
                       {auto.matricula === '0km' ? (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">
                           0km
                         </span>
                       ) : auto.matricula}
                     </p>
                   </div>
                 </div>
-                <span className={getEstadoBadge(auto.estado)}>
+                <span className={`${getEstadoBadge(auto.estado)} text-[10px] px-2 py-1 whitespace-nowrap ml-2`}>
                   {auto.estado}
                 </span>
               </div>
 
-              <div className="space-y-2 mb-4">
-                <div className="flex justify-between text-sm">
+              <div className="space-y-1.5 mb-3">
+                <div className="flex justify-between text-xs">
                   <span className="text-gray-600 dark:text-gray-400">Año:</span>
                   <span className="font-medium text-gray-900 dark:text-white">{auto.anio}</span>
                 </div>
-                <div className="flex justify-between text-sm">
+                <div className="flex justify-between text-xs">
                   <span className="text-gray-600 dark:text-gray-400">Precio:</span>
-                  <span className="font-medium text-gray-900 dark:text-white">
+                  <span className="font-semibold text-gray-900 dark:text-white">
                     {formatCurrency(auto.precio)}
                   </span>
                 </div>
-                <div className="flex justify-between text-sm">
+                <div className="flex justify-between text-xs">
                   <span className="text-gray-600 dark:text-gray-400">Cliente:</span>
-                  <span className="font-medium text-gray-900 dark:text-white">
+                  <span className="font-medium text-gray-900 dark:text-white truncate ml-2">
                     {auto.cliente ? auto.cliente.nombre : 'Sin asignar'}
                   </span>
                 </div>
               </div>
 
-              <div className="flex gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
+              {/* Botones adaptados para mobile - Grid de 2 columnas */}
+              <div className="grid grid-cols-2 gap-2 pt-3 border-t border-gray-200 dark:border-gray-700">
                 <button
                   onClick={() => {
                     setAutoDetalles(auto);
                     setShowDetalles(true);
                   }}
-                  className="flex-1 btn btn-secondary text-sm py-2 flex items-center justify-center gap-2"
+                  className="btn btn-secondary text-xs py-2 flex items-center justify-center gap-1.5"
                 >
-                  <Eye className="w-4 h-4" />
-                  Ver Detalles
+                  <Eye className="w-3.5 h-3.5" />
+                  Ver
                 </button>
                 <button
                   onClick={() => handleEdit(auto)}
-                  className="flex-1 btn btn-secondary text-sm py-2 flex items-center justify-center gap-2"
+                  className="btn btn-secondary text-xs py-2 flex items-center justify-center gap-1.5"
                 >
-                  <Edit2 className="w-4 h-4" />
+                  <Edit2 className="w-3.5 h-3.5" />
                   Editar
                 </button>
                 {!auto.cliente && (
                   <button
                     onClick={() => abrirAsignarCliente(auto)}
-                    className="flex-1 btn btn-primary text-sm py-2 flex items-center justify-center gap-2"
+                    className="btn btn-primary text-xs py-2 flex items-center justify-center gap-1.5"
                   >
-                    <Plus className="w-4 h-4" />
-                    Asignar Cliente
+                    <Plus className="w-3.5 h-3.5" />
+                    Asignar
                   </button>
                 )}
                 <button
                   onClick={() => handleDelete(auto.id)}
-                  className="flex-1 btn btn-danger text-sm py-2 flex items-center justify-center gap-2"
+                  className="btn btn-danger text-xs py-2 flex items-center justify-center gap-1.5"
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="w-3.5 h-3.5" />
                   Eliminar
                 </button>
               </div>
@@ -536,17 +537,17 @@ const Autos = () => {
 
       {/* Modal de formulario */}
       {showModal && (
-        <div className="fixed inset-0 bg-black dark:bg-black bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center p-4 z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-gray-300 dark:border-gray-700">
-            <div className="p-6">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+        <div className="fixed inset-0 bg-black dark:bg-black bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center p-2 md:p-4 z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-2xl w-full max-h-[95vh] overflow-y-auto border border-gray-300 dark:border-gray-700">
+            <div className="p-4 md:p-6">
+              <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-4 md:mb-6">
                 {editingAuto ? 'Editar Auto' : 'Nuevo Auto'}
               </h2>
               
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 md:mb-2">
                       Marca *
                     </label>
                     <input
@@ -554,12 +555,12 @@ const Autos = () => {
                       required
                       value={formData.marca}
                       onChange={(e) => setFormData({ ...formData, marca: e.target.value })}
-                      className="input"
+                      className="input text-sm md:text-base"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 md:mb-2">
                       Modelo *
                     </label>
                     <input
@@ -567,12 +568,12 @@ const Autos = () => {
                       required
                       value={formData.modelo}
                       onChange={(e) => setFormData({ ...formData, modelo: e.target.value })}
-                      className="input"
+                      className="input text-sm md:text-base"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 md:mb-2">
                       Año *
                     </label>
                     <input
@@ -582,28 +583,28 @@ const Autos = () => {
                       max={new Date().getFullYear() + 1}
                       value={formData.anio}
                       onChange={(e) => setFormData({ ...formData, anio: e.target.value })}
-                      className="input"
+                      className="input text-sm md:text-base"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 md:mb-2">
                       Matrícula
                     </label>
                     <input
                       type="text"
                       value={formData.matricula}
                       onChange={(e) => setFormData({ ...formData, matricula: e.target.value })}
-                      placeholder="Dejar vacío para autos 0km"
-                      className="input"
+                      placeholder="Dejar vacío para 0km"
+                      className="input text-sm md:text-base"
                     />
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    <p className="text-[10px] md:text-xs text-gray-500 dark:text-gray-400 mt-1">
                       Si no tiene matrícula, se mostrará como "0km"
                     </p>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 md:mb-2">
                       Precio *
                     </label>
                     <input
@@ -613,22 +614,22 @@ const Autos = () => {
                       step="0.01"
                       value={formData.precio}
                       onChange={(e) => setFormData({ ...formData, precio: e.target.value })}
-                      className="input"
+                      className="input text-sm md:text-base"
                     />
                   </div>
 
                   {editingAuto && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 md:mb-2">
                         Estado (Automático)
                       </label>
-                      <div className="input bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-400 cursor-not-allowed">
+                      <div className="input bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-400 cursor-not-allowed text-xs md:text-sm">
                         {editingAuto.estado === 'disponible' && '🟢 Disponible'}
                         {editingAuto.estado === 'financiado' && '🟡 En Financiamiento'}
                         {editingAuto.estado === 'vendido' && '🔵 Vendido'}
                       </div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        El estado se actualiza automáticamente según el flujo de venta
+                      <p className="text-[10px] md:text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        El estado se actualiza automáticamente
                       </p>
                     </div>
                   )}
@@ -637,13 +638,13 @@ const Autos = () => {
                     {/* Campo de cliente solo al crear, no al editar */}
                     {!editingAuto && (
                       <>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 md:mb-2">
                           Cliente Asignado
                         </label>
                         <select
                           value={formData.clienteId}
                           onChange={(e) => setFormData({ ...formData, clienteId: e.target.value })}
-                          className="input"
+                          className="input text-sm md:text-base"
                         >
                           <option value="">Sin cliente asignado</option>
                           {getClientesSinPlanesActivos().map((cliente) => (
@@ -652,8 +653,8 @@ const Autos = () => {
                             </option>
                           ))}
                         </select>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                          Solo se muestran clientes sin planes de cuotas activos
+                        <p className="text-[10px] md:text-xs text-gray-500 dark:text-gray-400 mt-1">
+                          Solo clientes sin planes activos
                         </p>
                       </>
                     )}
@@ -661,20 +662,20 @@ const Autos = () => {
 
                   {/* Nuevos campos adicionales */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 md:mb-2">
                       Color
                     </label>
                     <input
                       type="text"
                       value={formData.color}
                       onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                      placeholder="Ej: Blanco, Negro, Rojo"
-                      className="input"
+                      placeholder="Ej: Blanco, Negro"
+                      className="input text-sm md:text-base"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 md:mb-2">
                       Kilometraje
                     </label>
                     <input
@@ -683,23 +684,23 @@ const Autos = () => {
                       value={formData.kilometraje}
                       onChange={(e) => setFormData({ ...formData, kilometraje: e.target.value })}
                       placeholder="Ej: 50000"
-                      className="input"
+                      className="input text-sm md:text-base"
                     />
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    <p className="text-[10px] md:text-xs text-gray-500 dark:text-gray-400 mt-1">
                       Dejar vacío si es 0km
                     </p>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 md:mb-2">
                       Departamento
                     </label>
                     <select
                       value={formData.departamento}
                       onChange={(e) => setFormData({ ...formData, departamento: e.target.value })}
-                      className="input"
+                      className="input text-sm md:text-base"
                     >
-                      <option value="">Seleccionar departamento</option>
+                      <option value="">Seleccionar</option>
                       <option value="Montevideo">Montevideo</option>
                       <option value="Canelones">Canelones</option>
                       <option value="Maldonado">Maldonado</option>
@@ -723,13 +724,13 @@ const Autos = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 md:mb-2">
                       Tipo de Documentación
                     </label>
                     <select
                       value={formData.tipoDocumento}
                       onChange={(e) => setFormData({ ...formData, tipoDocumento: e.target.value })}
-                      className="input"
+                      className="input text-sm md:text-base"
                     >
                       <option value="">Seleccionar tipo</option>
                       <option value="Titulo Original">Título Original</option>
@@ -742,7 +743,7 @@ const Autos = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 md:mb-2">
                       Valor de Patente
                     </label>
                     <input
@@ -752,16 +753,16 @@ const Autos = () => {
                       value={formData.valorPatente}
                       onChange={(e) => setFormData({ ...formData, valorPatente: e.target.value })}
                       placeholder="Ej: 15000"
-                      className="input"
+                      className="input text-sm md:text-base"
                     />
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    <p className="text-[10px] md:text-xs text-gray-500 dark:text-gray-400 mt-1">
                       Costo anual de la patente
                     </p>
                   </div>
                 </div>
 
-                <div className="flex gap-3 pt-4">
-                  <button type="submit" className="btn btn-primary flex-1">
+                <div className="flex gap-2 md:gap-3 pt-3 md:pt-4">
+                  <button type="submit" className="btn btn-primary flex-1 text-sm md:text-base py-2.5">
                     {editingAuto ? 'Actualizar' : 'Crear'} Auto
                   </button>
                   <button
@@ -770,7 +771,7 @@ const Autos = () => {
                       setShowModal(false);
                       resetForm();
                     }}
-                    className="btn btn-secondary flex-1"
+                    className="btn btn-secondary flex-1 text-sm md:text-base py-2.5"
                   >
                     Cancelar
                   </button>
@@ -783,24 +784,24 @@ const Autos = () => {
 
       {/* Modal para asignar cliente (mobile y desktop) */}
       {showAsignarCliente && autoAsignarCliente && (
-        <div className="fixed inset-0 bg-black dark:bg-black bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-black dark:bg-black bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center p-2 md:p-4 z-50">
           <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full border border-gray-300 dark:border-gray-700">
-            <div className="p-6">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+            <div className="p-4 md:p-6">
+              <h2 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-3 md:mb-4">
                 Asignar Cliente
               </h2>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-3 md:mb-4">
                 Auto: {autoAsignarCliente.marca} {autoAsignarCliente.modelo}
               </p>
-              <form onSubmit={handleAsignarCliente} className="space-y-4">
+              <form onSubmit={handleAsignarCliente} className="space-y-3 md:space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 md:mb-2">
                     Cliente
                   </label>
                   <select
                     value={clienteAsignar}
                     onChange={e => setClienteAsignar(e.target.value)}
-                    className="input"
+                    className="input text-sm md:text-base"
                     required
                   >
                     <option value="">Selecciona un cliente</option>
@@ -811,8 +812,8 @@ const Autos = () => {
                     ))}
                   </select>
                 </div>
-                <div className="flex gap-3 pt-4">
-                  <button type="submit" className="btn btn-primary flex-1">
+                <div className="flex gap-2 md:gap-3 pt-2 md:pt-4">
+                  <button type="submit" className="btn btn-primary flex-1 text-sm md:text-base py-2.5">
                     Asignar
                   </button>
                   <button
@@ -822,7 +823,7 @@ const Autos = () => {
                       setAutoAsignarCliente(null);
                       setClienteAsignar('');
                     }}
-                    className="btn btn-secondary flex-1"
+                    className="btn btn-secondary flex-1 text-sm md:text-base py-2.5"
                   >
                     Cancelar
                   </button>
@@ -835,11 +836,11 @@ const Autos = () => {
 
       {/* Modal de Detalles del Auto */}
       {showDetalles && autoDetalles && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
-          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto border border-gray-300 dark:border-gray-700">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 md:p-4 z-50 overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-3xl w-full max-h-[95vh] overflow-y-auto border border-gray-300 dark:border-gray-700 my-2 md:my-4">
+            <div className="p-4 md:p-6">
+              <div className="flex items-center justify-between mb-4 md:mb-6">
+                <h2 className="text-lg md:text-2xl font-bold text-gray-900 dark:text-white">
                   Detalles del Vehículo
                 </h2>
                 <button
@@ -849,82 +850,82 @@ const Autos = () => {
                   }}
                   className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                 >
-                  <X className="w-6 h-6" />
+                  <X className="w-5 h-5 md:w-6 md:h-6" />
                 </button>
               </div>
 
-              <div className="space-y-6">
+              <div className="space-y-4 md:space-y-6">
                 {/* Información Principal */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 p-4 rounded-lg">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                      <Car className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                      Información del Vehículo
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 p-3 md:p-4 rounded-lg">
+                    <h3 className="text-sm md:text-lg font-semibold text-gray-900 dark:text-white mb-2 md:mb-3 flex items-center gap-2">
+                      <Car className="w-4 h-4 md:w-5 md:h-5 text-blue-600 dark:text-blue-400" />
+                      <span className="text-sm md:text-base">Información del Vehículo</span>
                     </h3>
-                    <div className="space-y-2">
-                      <div className="flex justify-between">
+                    <div className="space-y-1.5 md:space-y-2">
+                      <div className="flex justify-between text-xs md:text-sm">
                         <span className="text-gray-600 dark:text-gray-400">Marca:</span>
                         <span className="font-semibold text-gray-900 dark:text-white">{autoDetalles.marca}</span>
                       </div>
-                      <div className="flex justify-between">
+                      <div className="flex justify-between text-xs md:text-sm">
                         <span className="text-gray-600 dark:text-gray-400">Modelo:</span>
                         <span className="font-semibold text-gray-900 dark:text-white">{autoDetalles.modelo}</span>
                       </div>
-                      <div className="flex justify-between">
+                      <div className="flex justify-between text-xs md:text-sm">
                         <span className="text-gray-600 dark:text-gray-400">Año:</span>
                         <span className="font-semibold text-gray-900 dark:text-white">{autoDetalles.anio}</span>
                       </div>
-                      <div className="flex justify-between">
+                      <div className="flex justify-between text-xs md:text-sm">
                         <span className="text-gray-600 dark:text-gray-400">Matrícula:</span>
                         <span className="font-semibold text-gray-900 dark:text-white">
                           {autoDetalles.matricula === '0km' || !autoDetalles.matricula ? (
-                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">
+                            <span className="inline-flex items-center px-1.5 py-0.5 md:px-2 md:py-1 rounded-full text-[10px] md:text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">
                               0km
                             </span>
                           ) : autoDetalles.matricula}
                         </span>
                       </div>
-                      <div className="flex justify-between">
+                      <div className="flex justify-between text-xs md:text-sm">
                         <span className="text-gray-600 dark:text-gray-400">Color:</span>
                         <span className="font-semibold text-gray-900 dark:text-white">
-                          {autoDetalles.color || <span className="text-gray-400 italic">No especificado</span>}
+                          {autoDetalles.color || <span className="text-gray-400 italic text-xs">No especificado</span>}
                         </span>
                       </div>
-                      <div className="flex justify-between">
+                      <div className="flex justify-between text-xs md:text-sm">
                         <span className="text-gray-600 dark:text-gray-400">Kilometraje:</span>
                         <span className="font-semibold text-gray-900 dark:text-white">
-                          {autoDetalles.kilometraje ? `${parseInt(autoDetalles.kilometraje).toLocaleString()} km` : <span className="text-gray-400 italic">No especificado</span>}
+                          {autoDetalles.kilometraje ? `${parseInt(autoDetalles.kilometraje).toLocaleString()} km` : <span className="text-gray-400 italic text-xs">No especificado</span>}
                         </span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 p-4 rounded-lg">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                      <DollarSign className="w-5 h-5 text-green-600 dark:text-green-400" />
-                      Información Comercial
+                  <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 p-3 md:p-4 rounded-lg">
+                    <h3 className="text-sm md:text-lg font-semibold text-gray-900 dark:text-white mb-2 md:mb-3 flex items-center gap-2">
+                      <DollarSign className="w-4 h-4 md:w-5 md:h-5 text-green-600 dark:text-green-400" />
+                      <span className="text-sm md:text-base">Información Comercial</span>
                     </h3>
-                    <div className="space-y-2">
-                      <div className="flex justify-between">
+                    <div className="space-y-1.5 md:space-y-2">
+                      <div className="flex justify-between text-xs md:text-sm">
                         <span className="text-gray-600 dark:text-gray-400">Precio:</span>
-                        <span className="font-bold text-green-700 dark:text-green-400 text-lg">{formatCurrency(autoDetalles.precio)}</span>
+                        <span className="font-bold text-green-700 dark:text-green-400 text-sm md:text-lg">{formatCurrency(autoDetalles.precio)}</span>
                       </div>
-                      <div className="flex justify-between">
+                      <div className="flex justify-between text-xs md:text-sm">
                         <span className="text-gray-600 dark:text-gray-400">Estado:</span>
-                        <span className={getEstadoBadge(autoDetalles.estado)}>
+                        <span className={`${getEstadoBadge(autoDetalles.estado)} text-[10px] md:text-xs px-1.5 py-0.5 md:px-2 md:py-1`}>
                           {autoDetalles.estado}
                         </span>
                       </div>
-                      <div className="flex justify-between">
+                      <div className="flex justify-between text-xs md:text-sm">
                         <span className="text-gray-600 dark:text-gray-400">Valor Patente:</span>
                         <span className="font-semibold text-gray-900 dark:text-white">
-                          {autoDetalles.valorPatente ? formatCurrency(autoDetalles.valorPatente) : <span className="text-gray-400 italic">No especificado</span>}
+                          {autoDetalles.valorPatente ? formatCurrency(autoDetalles.valorPatente) : <span className="text-gray-400 italic text-xs">No especificado</span>}
                         </span>
                       </div>
                       {autoDetalles.cliente && (
-                        <div className="flex justify-between">
+                        <div className="flex justify-between text-xs md:text-sm">
                           <span className="text-gray-600 dark:text-gray-400">Cliente:</span>
-                          <span className="font-semibold text-gray-900 dark:text-white">{autoDetalles.cliente.nombre}</span>
+                          <span className="font-semibold text-gray-900 dark:text-white truncate ml-2">{autoDetalles.cliente.nombre}</span>
                         </div>
                       )}
                     </div>
@@ -932,25 +933,25 @@ const Autos = () => {
                 </div>
 
                 {/* Procedencia y Documentación */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg">
-                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Procedencia</h3>
-                    <p className="text-lg font-medium text-gray-900 dark:text-white">
-                      {autoDetalles.departamento || <span className="text-gray-400 italic">No especificado</span>}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-6">
+                  <div className="bg-gray-50 dark:bg-gray-700/50 p-3 md:p-4 rounded-lg">
+                    <h3 className="text-xs md:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5 md:mb-2">Procedencia</h3>
+                    <p className="text-sm md:text-lg font-medium text-gray-900 dark:text-white">
+                      {autoDetalles.departamento || <span className="text-gray-400 italic text-xs">No especificado</span>}
                     </p>
                   </div>
-                  <div className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg">
-                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Documentación</h3>
-                    <p className="text-lg font-medium text-gray-900 dark:text-white">
-                      {autoDetalles.tipoDocumento || <span className="text-gray-400 italic">No especificado</span>}
+                  <div className="bg-gray-50 dark:bg-gray-700/50 p-3 md:p-4 rounded-lg">
+                    <h3 className="text-xs md:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5 md:mb-2">Documentación</h3>
+                    <p className="text-sm md:text-lg font-medium text-gray-900 dark:text-white">
+                      {autoDetalles.tipoDocumento || <span className="text-gray-400 italic text-xs">No especificado</span>}
                     </p>
                   </div>
                 </div>
 
                 {/* Fechas */}
-                <div className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg">
-                  <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Información del Sistema</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                <div className="bg-gray-50 dark:bg-gray-700/50 p-3 md:p-4 rounded-lg">
+                  <h3 className="text-xs md:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 md:mb-3">Información del Sistema</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3 text-xs md:text-sm">
                     <div>
                       <span className="text-gray-600 dark:text-gray-400">Fecha de registro:</span>
                       <span className="ml-2 font-medium text-gray-900 dark:text-white">
@@ -967,23 +968,23 @@ const Autos = () => {
                 </div>
               </div>
 
-              <div className="flex gap-3 mt-6">
+              <div className="flex gap-2 md:gap-3 mt-4 md:mt-6">
                 <button
                   onClick={() => {
                     setShowDetalles(false);
                     handleEdit(autoDetalles);
                   }}
-                  className="btn btn-primary flex-1"
+                  className="btn btn-primary flex-1 text-xs md:text-sm py-2 md:py-2.5"
                 >
-                  <Edit2 className="w-4 h-4 inline mr-2" />
-                  Editar Auto
+                  <Edit2 className="w-3.5 h-3.5 md:w-4 md:h-4 inline mr-1.5 md:mr-2" />
+                  Editar
                 </button>
                 <button
                   onClick={() => {
                     setShowDetalles(false);
                     setAutoDetalles(null);
                   }}
-                  className="btn btn-secondary flex-1"
+                  className="btn btn-secondary flex-1 text-xs md:text-sm py-2 md:py-2.5"
                 >
                   Cerrar
                 </button>

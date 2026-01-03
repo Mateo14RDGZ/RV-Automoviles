@@ -129,34 +129,34 @@ const Clientes = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center animate-fadeInUp" style={{animationDelay: '0.1s'}}>
+    <div className="space-y-4 md:space-y-6">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-3 md:gap-4 animate-fadeInUp" style={{animationDelay: '0.1s'}}>
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Gestión de Clientes</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">Administra la información de tus clientes</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Gestión de Clientes</h1>
+          <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 mt-1">Administra la información de tus clientes</p>
         </div>
         <button
           onClick={() => {
             resetForm();
             setShowModal(true);
           }}
-          className="btn btn-primary flex items-center gap-2"
+          className="btn btn-primary flex items-center justify-center gap-2 w-full md:w-auto py-2.5 md:py-2"
         >
           <Plus className="w-5 h-5" />
-          Nuevo Cliente
+          <span className="text-sm md:text-base">Nuevo Cliente</span>
         </button>
       </div>
 
       {/* Búsqueda */}
-      <div className="card animate-fadeInUp" style={{animationDelay: '0.2s'}}>
+      <div className="card animate-fadeInUp p-4 md:p-6" style={{animationDelay: '0.2s'}}>
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4 md:w-5 md:h-5" />
           <input
             type="text"
-            placeholder="Buscar por nombre, cédula, teléfono o email..."
+            placeholder="Buscar por nombre, cédula..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="input pl-10"
+            className="input pl-9 md:pl-10 text-sm md:text-base"
           />
         </div>
       </div>
@@ -169,53 +169,53 @@ const Clientes = () => {
       ) : filteredClientes.length === 0 ? (
         <div className="card text-center py-12">
           <Users className="w-12 h-12 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
-          <p className="text-gray-500 dark:text-gray-400">{searchTerm ? 'No se encontraron clientes con ese criterio' : 'No hay clientes registrados'}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{searchTerm ? 'No se encontraron clientes' : 'No hay clientes registrados'}</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6 px-2 md:px-0">
           {filteredClientes.map((cliente, index) => (
-            <div key={cliente.id} className="card hover:shadow-xl hover-lift transition-all duration-300 animate-fadeInUp" style={{animationDelay: `${0.1 * (index % 6)}s`}}>
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center">
-                    <Users className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+            <div key={cliente.id} className="card p-4 md:p-6 hover:shadow-xl hover-lift transition-all duration-300 animate-fadeInUp" style={{animationDelay: `${0.1 * (index % 6)}s`}}>
+              <div className="flex items-start justify-between mb-3 md:mb-4">
+                <div className="flex items-center gap-2.5 md:gap-3">
+                  <div className="w-10 h-10 md:w-12 md:h-12 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Users className="w-5 h-5 md:w-6 md:h-6 text-primary-600 dark:text-primary-400" />
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900 dark:text-white">{cliente.nombre}</h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">CI: {cliente.cedula}</p>
+                  <div className="min-w-0">
+                    <h3 className="font-semibold text-sm md:text-base text-gray-900 dark:text-white truncate">{cliente.nombre}</h3>
+                    <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400">CI: {cliente.cedula}</p>
                   </div>
                 </div>
               </div>
 
-              <div className="space-y-2 mb-4">
-                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                  <Phone className="w-4 h-4" />
-                  <span>{cliente.telefono}</span>
+              <div className="space-y-1.5 md:space-y-2 mb-3 md:mb-4">
+                <div className="flex items-center gap-2 text-xs md:text-sm text-gray-600 dark:text-gray-400">
+                  <Phone className="w-3.5 h-3.5 md:w-4 md:h-4 flex-shrink-0" />
+                  <span className="truncate">{cliente.telefono}</span>
                 </div>
                 {cliente.email && (
-                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                    <Mail className="w-4 h-4" />
-                    <span>{cliente.email}</span>
+                  <div className="flex items-center gap-2 text-xs md:text-sm text-gray-600 dark:text-gray-400">
+                    <Mail className="w-3.5 h-3.5 md:w-4 md:h-4 flex-shrink-0" />
+                    <span className="truncate">{cliente.email}</span>
                   </div>
                 )}
                 {cliente.direccion && (
-                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                    <MapPin className="w-4 h-4" />
+                  <div className="flex items-start gap-2 text-xs md:text-sm text-gray-600 dark:text-gray-400">
+                    <MapPin className="w-3.5 h-3.5 md:w-4 md:h-4 flex-shrink-0 mt-0.5" />
                     <span className="line-clamp-2">{cliente.direccion}</span>
                   </div>
                 )}
               </div>
 
               {cliente.autos && cliente.autos.length > 0 && (
-                <div className="mb-4 pb-4 border-t border-gray-200 dark:border-gray-700 pt-4">
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Autos asociados:</p>
+                <div className="mb-3 md:mb-4 pb-3 md:pb-4 border-t border-gray-200 dark:border-gray-700 pt-3 md:pt-4">
+                  <p className="text-[10px] md:text-xs text-gray-500 dark:text-gray-400 mb-2">Autos asociados:</p>
                   <div className="space-y-1">
                     {cliente.autos.map((auto) => (
-                      <div key={auto.id} className="flex items-center justify-between text-xs">
-                        <span className="text-gray-700 dark:text-gray-300">
+                      <div key={auto.id} className="flex items-center justify-between text-[10px] md:text-xs">
+                        <span className="text-gray-700 dark:text-gray-300 truncate flex-1">
                           {auto.marca} {auto.modelo}
                         </span>
-                        <span className={`badge badge-${auto.estado === 'disponible' ? 'success' : auto.estado === 'vendido' ? 'info' : 'warning'}`}>
+                        <span className={`badge badge-${auto.estado === 'disponible' ? 'success' : auto.estado === 'vendido' ? 'info' : 'warning'} text-[10px] px-1.5 py-0.5 ml-2 flex-shrink-0`}>
                           {auto.estado}
                         </span>
                       </div>
@@ -224,19 +224,19 @@ const Clientes = () => {
                 </div>
               )}
 
-              <div className="flex gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex gap-2 pt-3 md:pt-4 border-t border-gray-200 dark:border-gray-700">
                 <button
                   onClick={() => handleEdit(cliente)}
-                  className="flex-1 btn btn-secondary text-sm py-2 flex items-center justify-center gap-2"
+                  className="flex-1 btn btn-secondary text-xs md:text-sm py-2 flex items-center justify-center gap-1.5"
                 >
-                  <Edit2 className="w-4 h-4" />
+                  <Edit2 className="w-3.5 h-3.5 md:w-4 md:h-4" />
                   Editar
                 </button>
                 <button
                   onClick={() => handleDelete(cliente.id)}
-                  className="flex-1 btn btn-danger text-sm py-2 flex items-center justify-center gap-2"
+                  className="flex-1 btn btn-danger text-xs md:text-sm py-2 flex items-center justify-center gap-1.5"
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="w-3.5 h-3.5 md:w-4 md:h-4" />
                   Eliminar
                 </button>
               </div>
@@ -247,16 +247,16 @@ const Clientes = () => {
 
       {/* Modal de formulario */}
       {showModal && (
-        <div className="fixed inset-0 bg-black dark:bg-black bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center p-4 z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-gray-300 dark:border-gray-700">
-            <div className="p-6">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+        <div className="fixed inset-0 bg-black dark:bg-black bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center p-2 md:p-4 z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-2xl w-full max-h-[95vh] overflow-y-auto border border-gray-300 dark:border-gray-700">
+            <div className="p-4 md:p-6">
+              <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-4 md:mb-6">
                 {editingCliente ? 'Editar Cliente' : 'Nuevo Cliente'}
               </h2>
               
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 md:mb-2">
                     Nombre Completo *
                   </label>
                   <input
@@ -264,13 +264,13 @@ const Clientes = () => {
                     required
                     value={formData.nombre}
                     onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
-                    className="input"
+                    className="input text-sm md:text-base"
                   />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 md:mb-2">
                       Cédula *
                     </label>
                     <input
@@ -286,12 +286,12 @@ const Clientes = () => {
                       maxLength="8"
                       pattern="[0-9]{8}"
                       placeholder="Ej: 12345678"
-                      className="input"
+                      className="input text-sm md:text-base"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 md:mb-2">
                       Teléfono *
                     </label>
                     <input
@@ -299,42 +299,41 @@ const Clientes = () => {
                       required
                       value={formData.telefono}
                       onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
-                      className="input"
+                      className="input text-sm md:text-base"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 md:mb-2">
                     Email
                   </label>
                   <input
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="input"
+                    className="input text-sm md:text-base"
                     placeholder="correo@ejemplo.com"
                   />
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    Si proporcionas un email, se creará un usuario para acceso al portal. 
-                    El cliente podrá iniciar sesión usando su cédula de 8 dígitos.
+                  <p className="text-[10px] md:text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Si proporcionas email, se creará usuario. Login con cédula de 8 dígitos.
                   </p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 md:mb-2">
                     Dirección
                   </label>
                   <textarea
                     rows={3}
                     value={formData.direccion}
                     onChange={(e) => setFormData({ ...formData, direccion: e.target.value })}
-                    className="input"
+                    className="input text-sm md:text-base"
                   />
                 </div>
 
-                <div className="flex gap-3 pt-4">
-                  <button type="submit" className="btn btn-primary flex-1">
+                <div className="flex gap-2 md:gap-3 pt-3 md:pt-4">
+                  <button type="submit" className="btn btn-primary flex-1 text-sm md:text-base py-2.5">
                     {editingCliente ? 'Actualizar' : 'Crear'} Cliente
                   </button>
                   <button
@@ -343,7 +342,7 @@ const Clientes = () => {
                       setShowModal(false);
                       resetForm();
                     }}
-                    className="btn btn-secondary flex-1"
+                    className="btn btn-secondary flex-1 text-sm md:text-base py-2.5"
                   >
                     Cancelar
                   </button>

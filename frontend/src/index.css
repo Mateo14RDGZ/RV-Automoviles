@@ -512,8 +512,67 @@
     animation-delay: 4s;
   }
 
-  /* Transición suave para todos los elementos interactivos */
+  /* Transición suave para todos los elementos interactivos */}
   .smooth-transition {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
+
+  /* Mejoras específicas para mobile */
+  @media (max-width: 768px) {
+    .btn {
+      @apply active:scale-95 touch-manipulation;
+      min-height: 44px; /* Tamaño táctil recomendado por Apple/Google */
+    }
+
+    .input,
+    select,
+    textarea {
+      @apply text-base; /* Evita zoom en iOS */
+      min-height: 44px;
+    }
+
+    /* Mejora el espacio táctil para botones pequeños */
+    button {
+      @apply touch-manipulation;
+    }
+
+    /* Elimina el hover lift en mobile */
+    .hover-lift:hover {
+      transform: none;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    /* Ajusta el tamaño de las cards en mobile */
+    .card {
+      @apply p-4;
+    }
+
+    /* Mejora los modales en mobile */
+    .modal-mobile {
+      max-height: 95vh !important;
+      margin: 0.5rem !important;
+    }
+  }
+
+  /* Previene zoom en inputs en iOS sin perder accesibilidad */
+  @media screen and (max-width: 768px) {
+    select,
+    textarea,
+    input[type="text"],
+    input[type="password"],
+    input[type="datetime"],
+    input[type="datetime-local"],
+    input[type="date"],
+    input[type="month"],
+    input[type="time"],
+    input[type="week"],
+    input[type="number"],
+    input[type="email"],
+    input[type="url"],
+    input[type="search"],
+    input[type="tel"] {
+      font-size: 16px !important;
+    }
+  }
 }
+
