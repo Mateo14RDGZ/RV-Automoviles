@@ -3,7 +3,7 @@ import { autosService, clientesService } from '../services';
 import { Car, Plus, Search, Edit2, Trash2, Eye, DollarSign, X } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 import ConfirmDialog from '../components/ConfirmDialog';
-import { formatCurrency } from '../utils/format';
+import { formatCurrency, formatPesos } from '../utils/format';
 
 const Autos = () => {
   const { showToast } = useToast();
@@ -750,7 +750,7 @@ const Autos = () => {
 
                   <div>
                     <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 md:mb-2">
-                      Valor de Patente
+                      Valor de Patente ($ UYU)
                     </label>
                     <input
                       type="number"
@@ -762,7 +762,7 @@ const Autos = () => {
                       className="input text-sm md:text-base"
                     />
                     <p className="text-[10px] md:text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      Costo anual de la patente
+                      Costo anual de la patente en pesos uruguayos
                     </p>
                   </div>
                 </div>
@@ -923,9 +923,9 @@ const Autos = () => {
                         </span>
                       </div>
                       <div className="flex justify-between text-xs md:text-sm">
-                        <span className="text-gray-600 dark:text-gray-400">Valor Patente:</span>
+                        <span className="text-gray-600 dark:text-gray-400">Valor Patente ($ UYU):</span>
                         <span className="font-semibold text-gray-900 dark:text-white">
-                          {autoDetalles.valorPatente ? formatCurrency(autoDetalles.valorPatente) : <span className="text-gray-400 italic text-xs">No especificado</span>}
+                          {autoDetalles.valorPatente ? formatPesos(autoDetalles.valorPatente) : <span className="text-gray-400 italic text-xs">No especificado</span>}
                         </span>
                       </div>
                       {autoDetalles.cliente && (

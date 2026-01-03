@@ -10,6 +10,17 @@ export const formatCurrency = (value) => {
   return `U$S ${formatted}`;
 };
 
+export const formatPesos = (value) => {
+  // Formatear con punto para miles y coma para decimales (formato uruguayo)
+  const formatted = new Intl.NumberFormat('es-UY', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value);
+  
+  // Agregar símbolo $ delante (pesos uruguayos)
+  return `$ ${formatted}`;
+};
+
 export const formatDate = (dateString) => {
   return new Date(dateString).toLocaleDateString('es-UY', {
     day: 'numeric',
