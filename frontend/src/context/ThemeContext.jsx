@@ -11,24 +11,14 @@ export const useTheme = () => {
 };
 
 // Función para obtener el tema inicial antes del render
+// Siempre forzar modo claro
 const getInitialTheme = () => {
-  // Primero intentar obtener de localStorage
-  const savedTheme = localStorage.getItem('theme');
-  if (savedTheme) {
-    return savedTheme;
-  }
-  
-  // Si no hay tema guardado, detectar preferencia del sistema
-  if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-    return 'dark';
-  }
-  
   return 'light';
 };
 
 // Aplicar tema inmediatamente antes del render para prevenir flash
 const applyThemeImmediately = () => {
-  const theme = getInitialTheme();
+  const theme = 'light'; // Siempre modo claro
   const root = window.document.documentElement;
   root.classList.remove('light', 'dark');
   root.classList.add(theme);
@@ -36,59 +26,31 @@ const applyThemeImmediately = () => {
 };
 
 export const ThemeProvider = ({ children }) => {
-  // Inicializar con el tema aplicado inmediatamente
-  const [theme, setTheme] = useState(() => applyThemeImmediately());
-  const [isTransitioning, setIsTransitioning] = useState(false);
+  // Siempre forzar modo claro
+  const [theme] = useState('light');
+  const [isTransitioning] = useState(false);
 
   useEffect(() => {
-    // Aplicar clase al HTML con animación suave
+    // Aplicar clase al HTML - siempre modo claro
     const root = window.document.documentElement;
-    
-    // Activar transición
-    setIsTransitioning(true);
-    
     root.classList.remove('light', 'dark');
-    root.classList.add(theme);
+    root.classList.add('light');
     
     // Guardar en localStorage
-    localStorage.setItem('theme', theme);
-    
-    // Desactivar bandera de transición después de la animación
-    const timer = setTimeout(() => {
-      setIsTransitioning(false);
-    }, 300);
-    
-    return () => clearTimeout(timer);
-  }, [theme]);
-
-  // Escuchar cambios en la preferencia del sistema
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    
-    const handleChange = (e) => {
-      // Solo aplicar si no hay tema guardado manualmente
-      if (!localStorage.getItem('theme')) {
-        setTheme(e.matches ? 'dark' : 'light');
-      }
-    };
-    
-    // Agregar listener para cambios en el sistema
-    if (mediaQuery.addEventListener) {
-      mediaQuery.addEventListener('change', handleChange);
-      return () => mediaQuery.removeEventListener('change', handleChange);
-    }
+    localStorage.setItem('theme', 'light');
   }, []);
 
+  // No hay toggleTheme - siempre modo claro
   const toggleTheme = () => {
-    setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
+    // No hacer nada - siempre modo claro
   };
 
   const value = {
-    theme,
-    setTheme,
+    theme: 'light',
+    setTheme: () => {}, // No hacer nada
     toggleTheme,
-    isDark: theme === 'dark',
-    isTransitioning
+    isDark: false,
+    isTransitioning: false
   };
 
   return (
