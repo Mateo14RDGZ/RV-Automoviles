@@ -41,7 +41,7 @@ const StatCard = ({
         <div className="flex-1 min-w-0 pr-2">
           <p className="text-xs md:text-sm font-medium text-gray-600 dark:text-gray-400">{title}</p>
           <div className="flex items-baseline gap-2 mt-1 md:mt-2">
-            <p className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white break-words">{value}</p>
+            <p className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white break-words">{value}</p>
             {trend && (
               <span className={`text-sm font-medium ${trend === 'up' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                 {trend === 'up' ? '↑' : '↓'} {trendValue}
