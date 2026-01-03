@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import { dashboardService, comprobantesService } from '../services';
+import { formatCurrency } from '../utils/format';
 import { 
   Car, 
   Users, 
@@ -104,19 +105,23 @@ const Dashboard = () => {
         year: 'numeric'
       });
       
-      const mensaje = `✅ *Pago Confirmado - Gestión Automotora*\n\n` +
-        `Estimado/a *${cliente.nombre}*,\n\n` +
-        `Le confirmamos que hemos recibido su pago correspondiente a:\n\n` +
-        `🚗 *Vehículo:* ${auto.marca} ${auto.modelo} ${auto.anio}\n` +
-        `📋 *Matrícula:* ${auto.matricula}\n` +
-        `🔢 *Cuota:* #${pagoAprobado.numeroCuota}\n` +
-        `💰 *Monto Pagado:* $${parseFloat(pagoAprobado.monto).toFixed(2)}\n` +
-        `📅 *Fecha de Pago:* ${fechaPago}\n\n` +
-        `Agradecemos su puntualidad.\n\n` +
-        `💻 *Control en Línea*\n` +
-        `Puede ver el estado de todas sus cuotas en nuestro portal web.\n` +
-        `Ingrese con su número de cédula.\n\n` +
-        `_Gestión Automotora - Sistema Demo_`;
+      const mensaje = `*CONFIRMACIÓN DE PAGO*\n` +
+        `Nicolas Tejera Automóviles\n\n` +
+        `Estimado/a ${cliente.nombre},\n\n` +
+        `Le confirmamos la recepción de su pago correspondiente a:\n\n` +
+        `Vehículo: ${auto.marca} ${auto.modelo} ${auto.anio}\n` +
+        `Matrícula: ${auto.matricula}\n` +
+        `Cuota N°: ${pagoAprobado.numeroCuota}\n` +
+        `Monto Pagado: ${formatCurrency(parseFloat(pagoAprobado.monto))}\n` +
+        `Fecha de Pago: ${fechaPago}\n\n` +
+        `Agradecemos su puntualidad en el cumplimiento de sus obligaciones.\n\n` +
+        `*CONSULTA DE CUOTAS EN LÍNEA*\n\n` +
+        `Puede consultar el estado de todas sus cuotas ingresando a:\n` +
+        `${window.location.origin}\n\n` +
+        `Usuario: ${cliente.cedula}\n` +
+        `Contraseña: (la recibida por WhatsApp)\n\n` +
+        `Saludos cordiales,\n` +
+        `*Nicolas Tejera Automóviles*`;
       
       // Limpiar el número de teléfono (quitar espacios, guiones, etc.)
       let telefono = cliente.telefono.replace(/[^0-9]/g, '');

@@ -104,26 +104,29 @@ const Clientes = () => {
     const telefono = newClientCredentials.telefono.replace(/\D/g, '');
     const urlWeb = window.location.origin;
     
-    const mensaje = `¡Hola ${newClientCredentials.nombre}! 👋
+    const mensaje = `Hola ${newClientCredentials.nombre},
 
-Bienvenido a *Nicolas Tejera Automóviles* 🚗
+Bienvenido/a a *Nicolas Tejera Automóviles*.
 
-Te compartimos tus credenciales de acceso para ver tus cuotas:
+Le enviamos sus credenciales de acceso a nuestro portal web para consultar el estado de sus cuotas:
 
-🔐 *CREDENCIALES DE ACCESO:*
+*CREDENCIALES DE ACCESO*
 
-📱 *Usuario:* ${newClientCredentials.cedula}
-🔑 *Contraseña:* ${newClientCredentials.password}
+Usuario: ${newClientCredentials.cedula}
+Contraseña: ${newClientCredentials.password}
 
-🌐 *Link de acceso:*
+*ACCESO AL PORTAL*
 ${urlWeb}
 
-📝 *Importante:*
-- Ingresa con tu número de cédula (8 dígitos)
-- Usa la contraseña proporcionada arriba
-- Guarda esta información en un lugar seguro
+*Instrucciones:*
+• Ingrese con su número de cédula (8 dígitos)
+• Utilice la contraseña proporcionada
+• Guarde esta información de forma segura
 
-¡Cualquier consulta, estamos a tu disposición! 😊`;
+Ante cualquier consulta, estamos a su disposición.
+
+Saludos cordiales,
+*Nicolas Tejera Automóviles*`;
 
     const mensajeEncoded = encodeURIComponent(mensaje);
     const whatsappUrl = `https://wa.me/${telefono}?text=${mensajeEncoded}`;
@@ -131,7 +134,7 @@ ${urlWeb}
     window.open(whatsappUrl, '_blank');
     setShowCredentialsModal(false);
     setNewClientCredentials(null);
-    showToast('📱 Credenciales enviadas por WhatsApp', 'success');
+    showToast('Credenciales enviadas por WhatsApp', 'success');
   };
 
   const handleCopyCredentials = () => {
