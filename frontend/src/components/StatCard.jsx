@@ -36,20 +36,18 @@ const StatCard = ({
   };
 
   return (
-    <div className="card hover:shadow-xl transition-shadow duration-300">
+    <div className="card p-4 md:p-6 dark:bg-gray-800 dark:border-gray-700 hover-lift">
       <div className="flex items-center justify-between">
-        <div className="flex-1 min-w-0 pr-2">
+        <div className="flex-1 min-w-0">
           <p className="text-xs md:text-sm font-medium text-gray-600 dark:text-gray-400">{title}</p>
-          <div className="flex items-baseline gap-2 mt-1 md:mt-2">
-            <p className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white break-words">{value}</p>
-            {trend && (
-              <span className={`text-sm font-medium ${trend === 'up' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                {trend === 'up' ? '↑' : '↓'} {trendValue}
-              </span>
-            )}
-          </div>
+          <p className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mt-1 md:mt-2 break-words">{value}</p>
           {subtitle && (
-            <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mt-0.5 md:mt-1">{subtitle}</p>
+            <p className="text-[10px] md:text-xs text-gray-500 dark:text-gray-400 mt-0.5 md:mt-1">{subtitle}</p>
+          )}
+          {trend && (
+            <span className={`text-sm font-medium mt-1 ${trend === 'up' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+              {trend === 'up' ? '↑' : '↓'} {trendValue}
+            </span>
           )}
         </div>
         <div className={`p-2.5 md:p-3 ${bgColor} ${getDarkBgColor(bgColor)} rounded-full flex-shrink-0`}>
