@@ -69,13 +69,13 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const loginCliente = async (cedula) => {
+  const loginCliente = async (identificador, password) => {
     try {
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
       const response = await fetch(`${API_URL}/auth/login-cliente`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cedula })
+        body: JSON.stringify({ identificador, password })
       });
 
       if (!response.ok) {

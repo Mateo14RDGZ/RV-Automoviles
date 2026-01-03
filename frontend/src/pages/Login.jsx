@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Car, Lock, Mail, ArrowRight, Sparkles, ShieldCheck, CreditCard, IdCard } from 'lucide-react';
+import { Car, Lock, Mail, ArrowRight, Sparkles, ShieldCheck, CreditCard, IdCard, User } from 'lucide-react';
 
 const Login = () => {
   const [loginMode, setLoginMode] = useState(''); // '' | 'admin' | 'cliente'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [cedula, setCedula] = useState('');
+  const [identificadorCliente, setIdentificadorCliente] = useState(''); // email o cédula
+  const [passwordCliente, setPasswordCliente] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [focusedInput, setFocusedInput] = useState('');
@@ -30,8 +31,8 @@ const Login = () => {
           setLoading(false);
         }
       } else {
-        // Login de cliente con cédula
-        const result = await loginCliente(cedula);
+        // Login de cliente con identificador (email o cédula) y contraseña
+        const result = await loginCliente(identificadorCliente, passwordCliente);
         if (result && result.token && result.user) {
           navigate('/', { replace: true });
         } else {
@@ -51,7 +52,8 @@ const Login = () => {
     setError('');
     setEmail('');
     setPassword('');
-    setCedula('');
+    setIdentificadorCliente('');
+    setPasswordCliente('');
   };
 
   return (
@@ -208,44 +210,54 @@ const Login = () => {
               ) : loginMode === 'cliente' ? (
                 /* Formulario para cliente */
                 <>
-                  {/* Cédulas de prueba para clientes */}
+                  {/* Info para clientes */}
                   <div className="mb-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
                     <h4 className="text-sm font-semibold text-gray-800 mb-2 flex items-center gap-2">
                       <Sparkles className="w-4 h-4" />
-                      Cédulas de Prueba
+                      Información de Acceso
                     </h4>
-                    <div className="space-y-1 text-xs text-gray-700">
-                      <p><span className="font-medium">Juan Pérez:</span> 12345678</p>
-                      <p><span className="font-medium">María González:</span> 23456789</p>
-                      <p><span className="font-medium">Carlos Rodríguez:</span> 34567890</p>
+                    <p className="text-xs text-gray-700">
+                      Al crear tu cuenta, recibirás tu contraseña por WhatsApp. 
+                      Puedes iniciar sesión con tu email o cédula.
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="identificador" className="block text-sm font-medium text-gray-700">
+                      Email o Cédula
+                    </label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                      <input
+                        id="identificador"
+                        type="text"
+                        value={identificadorCliente}
+                        onChange={(e) => setIdentificadorCliente(e.target.value)}
+                        className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all"
+                        placeholder="email@ejemplo.com o 12345678"
+                        required
+                      />
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <label htmlFor="cedula" className="block text-sm font-medium text-gray-700">
-                      Número de Cédula
+                    <label htmlFor="passwordCliente" className="block text-sm font-medium text-gray-700">
+                      Contraseña
                     </label>
                     <div className="relative">
-                      <IdCard className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                       <input
-                        id="cedula"
-                        type="text"
-                        value={cedula}
-                        onChange={(e) => {
-                          const value = e.target.value.replace(/\D/g, '');
-                          if (value.length <= 8) {
-                            setCedula(value);
-                          }
-                        }}
+                        id="passwordCliente"
+                        type="password"
+                        value={passwordCliente}
+                        onChange={(e) => setPasswordCliente(e.target.value)}
                         className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all"
-                        placeholder="Ej: 12345678"
-                        maxLength="8"
-                        pattern="[0-9]{8}"
+                        placeholder="••••••••"
                         required
                       />
                     </div>
                     <p className="text-gray-500 text-xs mt-2">
-                      Ingresa tu número de cédula (8 dígitos) para ver tus pagos pendientes
+                      Ingresa la contraseña que recibiste por WhatsApp
                     </p>
                   </div>
                 </>

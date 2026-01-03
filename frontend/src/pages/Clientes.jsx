@@ -73,13 +73,37 @@ const Clientes = () => {
         
         showToast('Cliente creado exitosamente', 'success');
         
-        // Si hubo ajustes automáticos, informar al admin
-        if (response.mensajeInfo) {
-          showToast(response.mensajeInfo, 'warning', 6000);
-        }
-        
-        if (response.passwordTemporal) {
-          showToast(`🔐 Credenciales: ${response.email} / ${response.passwordTemporal}`, 'info', 8000);
+        // Si es un nuevo cliente, enviar credenciales por WhatsApp
+        if (response.passwordTemporal && formData.telefono) {
+          const telefono = formData.telefono.replace(/\D/g, ''); // Remover caracteres no numéricos
+          const urlWeb = window.location.origin; // URL de la web actual
+          
+          // Crear mensaje de WhatsApp con las credenciales
+          const mensaje = `¡Hola ${formData.nombre}! 👋
+
+Bienvenido a *Nicolas Tejera Automóviles* 🚗
+
+Te compartimos tus credenciales de acceso para ver tus cuotas:
+
+🔐 *Credenciales de Acceso:*
+📧 Usuario: ${response.emailUsuario}
+🔑 Contraseña: ${response.passwordTemporal}
+
+🌐 *Link de acceso:*
+${urlWeb}
+
+Puedes iniciar sesión con tu email o cédula y la contraseña proporcionada.
+
+¡Cualquier consulta, estamos a tu disposición!`;
+
+          const mensajeEncoded = encodeURIComponent(mensaje);
+          const whatsappUrl = `https://wa.me/${telefono}?text=${mensajeEncoded}`;
+          
+          // Abrir WhatsApp en una nueva pestaña
+          window.open(whatsappUrl, '_blank');
+          
+          showToast('🔐 Credenciales: ' + response.emailUsuario + ' / ' + response.passwordTemporal, 'info', 10000);
+          showToast('📱 Abriendo WhatsApp para enviar credenciales...', 'info', 5000);
         }
       }
       setShowModal(false);

@@ -152,9 +152,10 @@ app.post('/api/auth/login', [
   }
 });
 
-// Login cliente - solo requiere cédula
+// Login cliente - requiere email/cedula y contraseña
 app.post('/api/auth/login-cliente', [
-  body('cedula').trim().isLength({ min: 8, max: 13 }).isNumeric().withMessage('La cédula debe tener entre 8 y 13 dígitos numéricos')
+  body('identificador').trim().notEmpty().withMessage('Se requiere email o cédula'),
+  body('password').notEmpty().withMessage('Se requiere contraseña')
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -163,13 +164,19 @@ app.post('/api/auth/login-cliente', [
       return res.status(400).json({ error: 'Datos inválidos', details: errors.array() });
     }
 
-    const { cedula } = req.body;
-    console.log('Intentando login de cliente con cédula:', cedula);
+    const { identificador, password } = req.body;
+    console.log('Intentando login de cliente con identificador:', identificador);
 
-    // Buscar cliente por cédula con sus autos y permutas
+    // Buscar cliente por email o cédula
     const cliente = await prisma.cliente.findFirst({
-      where: { cedula },
+      where: {
+        OR: [
+          { email: identificador },
+          { cedula: identificador }
+        ]
+      },
       include: { 
+        usuario: true,
         autos: {
           where: {
             estado: 'financiado'
@@ -182,12 +189,18 @@ app.post('/api/auth/login-cliente', [
     console.log('Cliente encontrado:', cliente ? `${cliente.nombre} (ID: ${cliente.id})` : 'No encontrado');
     
     if (!cliente) {
-      return res.status(401).json({ error: 'Cliente no encontrado' });
+      return res.status(401).json({ error: 'Credenciales inválidas' });
     }
 
-    // Verificar que tenga al menos un auto financiado (plan de cuotas) o una permuta
-    if ((!cliente.autos || cliente.autos.length === 0) && (!cliente.permutas || cliente.permutas.length === 0)) {
-      return res.status(401).json({ error: 'Cliente sin plan de cuotas activo ni permutas' });
+    // Verificar que tenga al menos un auto financiado (plan de cuotas activo)
+    if (!cliente.autos || cliente.autos.length === 0) {
+      return res.status(401).json({ error: 'No tienes un plan de cuotas activo. Contacta con la automotora.' });
+    }
+
+    // Verificar contraseña
+    const isValidPassword = await bcrypt.compare(password, cliente.usuario.password);
+    if (!isValidPassword) {
+      return res.status(401).json({ error: 'Credenciales inválidas' });
     }
 
     console.log(`Cliente ${cliente.nombre} tiene ${cliente.autos.length} auto(s) financiado(s)`);
@@ -195,7 +208,7 @@ app.post('/api/auth/login-cliente', [
     // Generar token JWT
     const token = jwt.sign(
       {
-        id: cliente.id,
+        id: cliente.usuario.id,
         clienteId: cliente.id,
         nombre: cliente.nombre,
         cedula: cliente.cedula,
@@ -208,7 +221,7 @@ app.post('/api/auth/login-cliente', [
     res.json({
       token,
       user: {
-        id: cliente.id,
+        id: cliente.usuario.id,
         nombre: cliente.nombre,
         cedula: cliente.cedula,
         email: cliente.email,
@@ -546,7 +559,18 @@ app.post('/api/clientes', authenticateToken, requireStaff, async (req, res) => {
     console.log('👤 Creando cliente:', { nombre, cedula, telefono, email });
     console.log('📊 DATABASE_URL configurada:', process.env.DATABASE_URL ? 'SÍ' : 'NO');
 
-    const hashedPassword = await bcrypt.hash(cedula, 10);
+    // Generar contraseña aleatoria de 8 caracteres (letras y números)
+    const generatePassword = () => {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+      let password = '';
+      for (let i = 0; i < 8; i++) {
+        password += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return password;
+    };
+
+    const passwordTemporal = generatePassword();
+    const hashedPassword = await bcrypt.hash(passwordTemporal, 10);
 
     const cliente = await prisma.cliente.create({
       data: {
@@ -569,6 +593,7 @@ app.post('/api/clientes', authenticateToken, requireStaff, async (req, res) => {
     });
 
     console.log('✅ Cliente creado exitosamente en DB:', { id: cliente.id, nombre: cliente.nombre });
+    console.log('🔑 Contraseña generada:', passwordTemporal);
     
     // Verificar que el cliente realmente se guardó
     const clienteVerificado = await prisma.cliente.findUnique({
@@ -577,7 +602,12 @@ app.post('/api/clientes', authenticateToken, requireStaff, async (req, res) => {
     
     console.log('🔍 Verificación de cliente en DB:', clienteVerificado ? 'EXISTE' : 'NO EXISTE');
 
-    res.status(201).json(cliente);
+    // Devolver el cliente con la contraseña temporal para que el frontend pueda enviarla por WhatsApp
+    res.status(201).json({
+      ...cliente,
+      passwordTemporal, // Solo se envía una vez al crear el cliente
+      emailUsuario: email || `${cedula}@cliente.com`
+    });
   } catch (error) {
     console.error('❌ Error creando cliente:', error);
     res.status(500).json({ error: 'Error al crear cliente', details: error.message });
