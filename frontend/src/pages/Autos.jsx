@@ -934,13 +934,13 @@ const Autos = () => {
                 {/* Procedencia y Documentación */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg">
-                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">📍 Procedencia</h3>
+                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Procedencia</h3>
                     <p className="text-lg font-medium text-gray-900 dark:text-white">
                       {autoDetalles.departamento || <span className="text-gray-400 italic">No especificado</span>}
                     </p>
                   </div>
                   <div className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg">
-                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">📄 Documentación</h3>
+                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Documentación</h3>
                     <p className="text-lg font-medium text-gray-900 dark:text-white">
                       {autoDetalles.tipoDocumento || <span className="text-gray-400 italic">No especificado</span>}
                     </p>
