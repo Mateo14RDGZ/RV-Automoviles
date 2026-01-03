@@ -5,6 +5,7 @@ import { exportToCSV, exportToJSON, formatDataForExport } from '../utils/export'
 import { formatCurrency, formatDate } from '../utils/format';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { addPDFHeader, addPDFFooter } from '../utils/pdfHelper';
 import { 
   FileDown, 
   FileText, 
