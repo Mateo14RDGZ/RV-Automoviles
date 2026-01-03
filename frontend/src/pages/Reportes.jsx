@@ -121,88 +121,42 @@ const Reportes = () => {
       const startY = await addPDFHeader(
         doc, 
         'Inventario de Vehículos',
-        `Reporte completo del inventario de automóviles`,
+        `Total: ${autos.length} vehículos`,
         'Inventario'
       );
       
-      // Agregar sección de resumen
-      const sectionY = addSection(
-        doc,
-        startY,
-        'Resumen del Inventario',
-        `Total de vehículos: ${autos.length} | Fecha: ${new Date().toLocaleDateString('es-ES')}`
-      );
-      
-      // Calcular estadísticas
-      const disponibles = autos.filter(a => a.estado === 'disponible').length;
-      const financiados = autos.filter(a => a.estado === 'financiado').length;
-      const vendidos = autos.filter(a => a.estado === 'vendido').length;
-      
-      // Tabla de resumen
-      autoTable(doc, {
-        startY: sectionY,
-        head: [['Estado', 'Cantidad', 'Porcentaje']],
-        body: [
-          ['Disponibles', disponibles.toString(), `${((disponibles/autos.length)*100).toFixed(1)}%`],
-          ['En Financiamiento', financiados.toString(), `${((financiados/autos.length)*100).toFixed(1)}%`],
-          ['Vendidos', vendidos.toString(), `${((vendidos/autos.length)*100).toFixed(1)}%`]
-        ],
-        ...getTableStyles('success'),
-        columnStyles: {
-          0: { cellWidth: 60, fontStyle: 'bold' },
-          1: { cellWidth: 60, halign: 'center' },
-          2: { cellWidth: 60, halign: 'center' }
-        }
+      // Tabla única con toda la información
+      const tableData = autos.map(auto => {
+        // Formatear precio sin símbolo, solo número
+        const precio = auto.precio ? `$ ${parseFloat(auto.precio).toLocaleString('es-UY', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '$ 0.00';
+        const estado = auto.estado === 'vendido' ? 'Vendido' : auto.estado === 'financiado' ? 'Financiado' : 'Disponible';
+        
+        return [
+          String(auto.marca || '-'),
+          String(auto.modelo || '-'),
+          String(auto.anio || '-'),
+          String(auto.matricula || '0km'),
+          String(auto.color || '-'),
+          precio,
+          String(auto.cliente?.nombre || '-'),
+          estado
+        ];
       });
       
-      // Sección de detalle
-      const detailY = addSection(
-        doc,
-        doc.lastAutoTable.finalY + 10,
-        'Detalle Completo de Vehículos'
-      );
-      
-      // Tabla detallada de autos
-      const tableData = autos.map(auto => [
-        String(auto.marca || '-'),
-        String(auto.modelo || '-'),
-        String(auto.matricula || '0km'),
-        String(auto.anio || '-'),
-        String(auto.color || '-'),
-        formatCurrency(auto.precio || 0),
-        String(auto.cliente?.nombre || 'Disponible'),
-        auto.estado === 'vendido' ? '✓ Vendido' : auto.estado === 'financiado' ? '⟳ Financiado' : '● Disponible'
-      ]);
-      
       autoTable(doc, {
-        startY: detailY,
-        head: [['Marca', 'Modelo', 'Matrícula', 'Año', 'Color', 'Precio', 'Cliente/Estado', 'Estado']],
+        startY: startY,
+        head: [['Marca', 'Modelo', 'Año', 'Matrícula', 'Color', 'Precio', 'Cliente', 'Estado']],
         body: tableData,
         ...getTableStyles('primary'),
         columnStyles: {
-          0: { cellWidth: 22, fontStyle: 'bold' },
+          0: { cellWidth: 24 },
           1: { cellWidth: 24 },
-          2: { cellWidth: 20, halign: 'center', fontSize: 7 },
-          3: { cellWidth: 15, halign: 'center' },
-          4: { cellWidth: 18 },
-          5: { cellWidth: 26, halign: 'right', fontStyle: 'bold', textColor: COLORS.success },
-          6: { cellWidth: 30, fontSize: 7 },
-          7: { cellWidth: 27, halign: 'center', fontSize: 7 }
-        },
-        didParseCell: function(data) {
-          // Colorear estados
-          if (data.column.index === 7 && data.section === 'body') {
-            if (data.cell.text[0].includes('Vendido')) {
-              data.cell.styles.textColor = COLORS.success;
-              data.cell.styles.fontStyle = 'bold';
-            } else if (data.cell.text[0].includes('Financiado')) {
-              data.cell.styles.textColor = COLORS.warning;
-              data.cell.styles.fontStyle = 'bold';
-            } else {
-              data.cell.styles.textColor = COLORS.secondary;
-              data.cell.styles.fontStyle = 'bold';
-            }
-          }
+          2: { cellWidth: 15, halign: 'center' },
+          3: { cellWidth: 20, halign: 'center' },
+          4: { cellWidth: 20 },
+          5: { cellWidth: 28, halign: 'right', fontStyle: 'bold' },
+          6: { cellWidth: 28 },
+          7: { cellWidth: 23, halign: 'center' }
         }
       });
       
@@ -234,19 +188,11 @@ const Reportes = () => {
       const startY = await addPDFHeader(
         doc,
         'Base de Datos de Clientes',
-        `Registro completo de clientes activos`,
+        `Total: ${clientes.length} clientes`,
         'Base de Clientes'
       );
       
-      // Agregar sección de resumen
-      const sectionY = addSection(
-        doc,
-        startY,
-        'Información General',
-        `Total de clientes registrados: ${clientes.length} | Fecha: ${new Date().toLocaleDateString('es-ES')}`
-      );
-      
-      // Tabla de clientes
+      // Tabla única con toda la información
       const tableData = clientes.map(cliente => [
         String(cliente.nombre || '-'),
         String(cliente.cedula || '-'),
@@ -256,25 +202,16 @@ const Reportes = () => {
       ]);
       
       autoTable(doc, {
-        startY: sectionY,
-        head: [['Nombre Completo', 'Cédula', 'Teléfono', 'Correo Electrónico', 'Dirección']],
+        startY: startY,
+        head: [['Nombre Completo', 'Cédula', 'Teléfono', 'Email', 'Dirección']],
         body: tableData,
         ...getTableStyles('secondary'),
         columnStyles: {
           0: { cellWidth: 42, fontStyle: 'bold' },
           1: { cellWidth: 24, halign: 'center' },
           2: { cellWidth: 26, halign: 'center' },
-          3: { cellWidth: 42, fontSize: 7 },
-          4: { cellWidth: 48, fontSize: 7 }
-        },
-        didParseCell: function(data) {
-          // Resaltar filas sin email
-          if (data.column.index === 3 && data.section === 'body') {
-            if (data.cell.text[0] === 'Sin email') {
-              data.cell.styles.textColor = COLORS.gray[400];
-              data.cell.styles.fontStyle = 'italic';
-            }
-          }
+          3: { cellWidth: 42 },
+          4: { cellWidth: 48 }
         }
       });
       
@@ -305,77 +242,43 @@ const Reportes = () => {
       // Agregar encabezado profesional
       const startY = await addPDFHeader(
         doc,
-        'Historial de Pagos y Financiamientos',
-        'Registro detallado de pagos por cliente',
+        'Historial de Pagos',
+        `Total: ${pagos.length} cuotas registradas`,
         'Historial de Pagos'
       );
 
-      // Calcular estadísticas globales primero
-      const totalGeneralPagado = pagos
+      // Calcular totales
+      const totalPagado = pagos
         .filter(p => p.estado === 'pagado')
         .reduce((sum, p) => sum + (parseFloat(p.monto) || 0), 0);
       
-      const totalGeneralPendiente = pagos
+      const totalPendiente = pagos
         .filter(p => p.estado !== 'pagado')
         .reduce((sum, p) => sum + (parseFloat(p.monto) || 0), 0);
 
-      const totalCuotasPagadas = pagos.filter(p => p.estado === 'pagado').length;
-      const totalCuotasPendientes = pagos.filter(p => p.estado !== 'pagado').length;
+      const cuotasPagadas = pagos.filter(p => p.estado === 'pagado').length;
+      const cuotasPendientes = pagos.filter(p => p.estado !== 'pagado').length;
 
-      // Sección de resumen global
-      let currentY = addSection(
-        doc,
-        startY,
-        'Resumen Global de Financiamientos'
-      );
+      // Tabla de resumen al inicio
+      const resumenData = [
+        ['Cuotas Pagadas', cuotasPagadas.toString(), `$ ${totalPagado.toLocaleString('es-UY', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`],
+        ['Cuotas Pendientes', cuotasPendientes.toString(), `$ ${totalPendiente.toLocaleString('es-UY', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`],
+        ['TOTAL', (cuotasPagadas + cuotasPendientes).toString(), `$ ${(totalPagado + totalPendiente).toLocaleString('es-UY', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`]
+      ];
 
-      // Tabla de resumen global
       autoTable(doc, {
-        startY: currentY,
-        head: [['Concepto', 'Cantidad', 'Monto', 'Porcentaje']],
-        body: [
-          [
-            'Cuotas Pagadas',
-            totalCuotasPagadas.toString(),
-            formatCurrency(totalGeneralPagado),
-            `${totalCuotasPagadas > 0 ? ((totalCuotasPagadas/(totalCuotasPagadas + totalCuotasPendientes))*100).toFixed(1) : 0}%`
-          ],
-          [
-            'Cuotas Pendientes',
-            totalCuotasPendientes.toString(),
-            formatCurrency(totalGeneralPendiente),
-            `${totalCuotasPendientes > 0 ? ((totalCuotasPendientes/(totalCuotasPagadas + totalCuotasPendientes))*100).toFixed(1) : 0}%`
-          ],
-          [
-            'Total General',
-            (totalCuotasPagadas + totalCuotasPendientes).toString(),
-            formatCurrency(totalGeneralPagado + totalGeneralPendiente),
-            '100%'
-          ]
-        ],
+        startY: startY,
+        head: [['Concepto', 'Cantidad', 'Monto']],
+        body: resumenData,
         ...getTableStyles('success'),
         columnStyles: {
-          0: { cellWidth: 50, fontStyle: 'bold' },
-          1: { cellWidth: 40, halign: 'center' },
-          2: { cellWidth: 50, halign: 'right', fontStyle: 'bold', textColor: COLORS.success },
-          3: { cellWidth: 42, halign: 'center' }
-        },
-        didParseCell: function(data) {
-          if (data.section === 'body') {
-            if (data.row.index === 0) {
-              // Fila de pagados en verde claro
-              data.cell.styles.fillColor = [220, 252, 231];
-            } else if (data.row.index === 1) {
-              // Fila de pendientes en amarillo claro
-              data.cell.styles.fillColor = [254, 243, 199];
-            } else if (data.row.index === 2) {
-              // Fila de total en azul claro
-              data.cell.styles.fillColor = COLORS.gray[100];
-              data.cell.styles.fontStyle = 'bold';
-            }
-          }
+          0: { cellWidth: 80, fontStyle: 'bold' },
+          1: { cellWidth: 50, halign: 'center' },
+          2: { cellWidth: 52, halign: 'right', fontStyle: 'bold' }
         }
       });
+
+      let currentY = doc.lastAutoTable.finalY + 10;
 
       // Agrupar pagos por cliente
       const pagosPorCliente = pagos.reduce((acc, pago) => {
@@ -392,14 +295,6 @@ const Reportes = () => {
         return acc;
       }, {});
 
-      // Sección de detalle por cliente
-      currentY = addSection(
-        doc,
-        doc.lastAutoTable.finalY + 10,
-        'Detalle por Cliente',
-        `Total de ${Object.keys(pagosPorCliente).length} clientes con financiamientos activos`
-      );
-
       // Iterar por cada cliente
       Object.entries(pagosPorCliente).forEach(([clienteId, data], index) => {
         const { cliente, nombre, pagos: pagoCliente } = data;
@@ -407,81 +302,104 @@ const Reportes = () => {
         // Verificar si necesitamos una nueva página
         if (currentY > 240) {
           doc.addPage();
-          currentY = 20;
-        }
-
-        // Header del cliente con estilo profesional
-        doc.setFillColor(...COLORS.primary);
-        doc.roundedRect(14, currentY, 182, 12, 2, 2, 'F');
-        
-        doc.setFontSize(11);
-        doc.setTextColor(255, 255, 255);
-        doc.setFont(undefined, 'bold');
-        doc.text(`👤 ${nombre}`, 18, currentY + 8);
-        doc.setFont(undefined, 'normal');
-        
-        currentY += 14;
-
-        // Información del cliente en línea
-        if (cliente) {
-          doc.setFontSize(8);
-          doc.setTextColor(...COLORS.gray[600]);
-          doc.text(`CI: ${cliente.cedula || 'N/A'}`, 16, currentY);
-          doc.text(`📞 ${cliente.telefono || 'N/A'}`, 60, currentY);
-          if (cliente.email) {
-            doc.text(`✉ ${cliente.email}`, 110, currentY);
-          }
-          currentY += 6;
+          currentY = 50;
         }
 
         // Calcular totales del cliente
-        const totalPagado = pagoCliente
+        const clienteTotalPagado = pagoCliente
           .filter(p => p.estado === 'pagado')
           .reduce((sum, p) => sum + (parseFloat(p.monto) || 0), 0);
         
-        const totalPendiente = pagoCliente
+        const clienteTotalPendiente = pagoCliente
           .filter(p => p.estado !== 'pagado')
           .reduce((sum, p) => sum + (parseFloat(p.monto) || 0), 0);
+
+        // Título del cliente
+        doc.setFillColor(...COLORS.primary);
+        doc.rect(14, currentY, 182, 8, 'F');
+        doc.setFontSize(10);
+        doc.setTextColor(255, 255, 255);
+        doc.setFont(undefined, 'bold');
+        doc.text(nombre, 16, currentY + 5.5);
+        doc.setFont(undefined, 'normal');
         
-        const cuotasPagadas = pagoCliente.filter(p => p.estado === 'pagado').length;
-        const cuotasPendientes = pagoCliente.filter(p => p.estado !== 'pagado').length;
+        currentY += 10;
+
+        // Tabla de datos del cliente
+        const clienteInfoData = [];
+        if (cliente) {
+          clienteInfoData.push([
+            'Cédula',
+            cliente.cedula || 'N/A',
+            'Teléfono',
+            cliente.telefono || 'N/A'
+          ]);
+          if (cliente.email) {
+            clienteInfoData.push([
+              'Email',
+              cliente.email,
+              '',
+              ''
+            ]);
+          }
+        }
+
+        if (clienteInfoData.length > 0) {
+          autoTable(doc, {
+            startY: currentY,
+            body: clienteInfoData,
+            theme: 'plain',
+            styles: {
+              fontSize: 8,
+              cellPadding: 1
+            },
+            columnStyles: {
+              0: { cellWidth: 20, fontStyle: 'bold', textColor: COLORS.gray[600] },
+              1: { cellWidth: 70 },
+              2: { cellWidth: 20, fontStyle: 'bold', textColor: COLORS.gray[600] },
+              3: { cellWidth: 72 }
+            }
+          });
+          currentY = doc.lastAutoTable.finalY + 3;
+        }
 
         // Tabla de pagos del cliente
         const tableData = pagoCliente.map(pago => {
-          const estado = pago.estado === 'pagado' ? '✓ Pagado' : 
-                        pago.estado === 'pendiente' ? '○ Pendiente' : '✕ Vencido';
+          const monto = `$ ${parseFloat(pago.monto || 0).toLocaleString('es-UY', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+          const estado = pago.estado === 'pagado' ? 'Pagado' : 
+                        pago.estado === 'pendiente' ? 'Pendiente' : 'Vencido';
           return [
             String(`${pago.auto?.marca || ''} ${pago.auto?.modelo || ''}`.trim() || 'N/A'),
             String(pago.auto?.matricula || '0km'),
             `#${String(pago.numeroCuota || '')}`,
-            formatCurrency(parseFloat(pago.monto || 0)),
-            pago.fechaVencimiento ? new Date(pago.fechaVencimiento).toLocaleDateString('es-ES', {day: '2-digit', month: 'short'}) : '-',
+            monto,
+            pago.fechaVencimiento ? new Date(pago.fechaVencimiento).toLocaleDateString('es-UY', {day: '2-digit', month: '2-digit', year: '2-digit'}) : '-',
             estado,
-            pago.fechaPago ? new Date(pago.fechaPago).toLocaleDateString('es-ES', {day: '2-digit', month: 'short'}) : '-'
+            pago.fechaPago ? new Date(pago.fechaPago).toLocaleDateString('es-UY', {day: '2-digit', month: '2-digit', year: '2-digit'}) : '-'
           ];
         });
 
         autoTable(doc, {
           startY: currentY,
-          head: [['Vehículo', 'Matrícula', 'Cuota', 'Monto', 'Venc.', 'Estado', 'F. Pago']],
+          head: [['Vehículo', 'Matrícula', 'Cuota', 'Monto', 'Vencimiento', 'Estado', 'Fecha Pago']],
           body: tableData,
           ...getTableStyles('secondary'),
           columnStyles: {
-            0: { cellWidth: 36, fontSize: 7 },
-            1: { cellWidth: 22, halign: 'center', fontSize: 7 },
+            0: { cellWidth: 38 },
+            1: { cellWidth: 22, halign: 'center' },
             2: { cellWidth: 15, halign: 'center', fontStyle: 'bold' },
             3: { cellWidth: 26, halign: 'right', fontStyle: 'bold' },
-            4: { cellWidth: 22, halign: 'center', fontSize: 7 },
-            5: { cellWidth: 26, halign: 'center', fontSize: 7 },
-            6: { cellWidth: 22, halign: 'center', fontSize: 7 }
+            4: { cellWidth: 22, halign: 'center' },
+            5: { cellWidth: 22, halign: 'center' },
+            6: { cellWidth: 22, halign: 'center' }
           },
           didParseCell: function(data) {
             if (data.section === 'body' && data.column.index === 5) {
               const estado = data.cell.text[0];
-              if (estado.includes('Pagado')) {
+              if (estado === 'Pagado') {
                 data.cell.styles.textColor = COLORS.success;
                 data.cell.styles.fontStyle = 'bold';
-              } else if (estado.includes('Vencido')) {
+              } else if (estado === 'Vencido') {
                 data.cell.styles.textColor = COLORS.danger;
                 data.cell.styles.fontStyle = 'bold';
               } else {
@@ -489,51 +407,43 @@ const Reportes = () => {
                 data.cell.styles.fontStyle = 'bold';
               }
             }
-            // Resaltar montos
-            if (data.section === 'body' && data.column.index === 3) {
-              data.cell.styles.textColor = COLORS.primary;
-            }
           }
         });
 
-        currentY = doc.lastAutoTable.finalY + 3;
+        currentY = doc.lastAutoTable.finalY + 2;
 
-        // Resumen del cliente con diseño profesional
-        doc.setFillColor(...COLORS.gray[50]);
-        doc.roundedRect(14, currentY, 182, 16, 1, 1, 'F');
-        doc.setDrawColor(...COLORS.gray[200]);
-        doc.roundedRect(14, currentY, 182, 16, 1, 1);
-        
-        doc.setFontSize(8);
-        doc.setFont(undefined, 'bold');
-        doc.setTextColor(...COLORS.gray[700]);
-        doc.text('Resumen:', 18, currentY + 5);
-        doc.setFont(undefined, 'normal');
-        
-        doc.text(`Pagadas: ${cuotasPagadas}`, 18, currentY + 10);
-        doc.text(`Pendientes: ${cuotasPendientes}`, 55, currentY + 10);
-        
-        doc.setTextColor(...COLORS.success);
-        doc.setFont(undefined, 'bold');
-        doc.text(`✓ ${formatCurrency(totalPagado)}`, 18, currentY + 14);
-        
-        doc.setTextColor(...COLORS.danger);
-        doc.text(`○ ${formatCurrency(totalPendiente)}`, 80, currentY + 14);
-        
-        doc.setTextColor(...COLORS.gray[800]);
-        doc.setFontSize(9);
-        doc.text(`Total: ${formatCurrency(totalPagado + totalPendiente)}`, 140, currentY + 14);
-        doc.setFont(undefined, 'normal');
+        // Tabla de totales del cliente
+        const clienteTotalesData = [
+          [
+            'Pagado',
+            `$ ${clienteTotalPagado.toLocaleString('es-UY', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+            'Pendiente',
+            `$ ${clienteTotalPendiente.toLocaleString('es-UY', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+            'TOTAL',
+            `$ ${(clienteTotalPagado + clienteTotalPendiente).toLocaleString('es-UY', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+          ]
+        ];
 
-        currentY += 20;
+        autoTable(doc, {
+          startY: currentY,
+          body: clienteTotalesData,
+          theme: 'plain',
+          styles: {
+            fontSize: 9,
+            cellPadding: 2,
+            fillColor: COLORS.gray[50]
+          },
+          columnStyles: {
+            0: { cellWidth: 30, fontStyle: 'bold', textColor: COLORS.success },
+            1: { cellWidth: 30, halign: 'right', fontStyle: 'bold', textColor: COLORS.success },
+            2: { cellWidth: 30, fontStyle: 'bold', textColor: COLORS.danger },
+            3: { cellWidth: 30, halign: 'right', fontStyle: 'bold', textColor: COLORS.danger },
+            4: { cellWidth: 30, fontStyle: 'bold' },
+            5: { cellWidth: 32, halign: 'right', fontStyle: 'bold' }
+          }
+        });
 
-        // Línea separadora entre clientes
-        if (index < Object.keys(pagosPorCliente).length - 1) {
-          doc.setDrawColor(...COLORS.gray[300]);
-          doc.setLineWidth(0.3);
-          doc.line(14, currentY, 196, currentY);
-          currentY += 8;
-        }
+        currentY = doc.lastAutoTable.finalY + 8;
       });
 
       // Agregar pie de página profesional
