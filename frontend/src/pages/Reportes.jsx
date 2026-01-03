@@ -127,8 +127,8 @@ const Reportes = () => {
       
       // Tabla única con toda la información
       const tableData = autos.map(auto => {
-        // Formatear precio con U$S
-        const precio = auto.precio ? `U$S ${parseFloat(auto.precio).toLocaleString('es-UY', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : 'U$S 0,00';
+        // Formatear precio usando formatCurrency
+        const precio = auto.precio ? formatCurrency(parseFloat(auto.precio)) : '$0.00';
         const estado = auto.estado === 'vendido' ? 'Vendido' : auto.estado === 'financiado' ? 'Financiado' : 'Disponible';
         
         return [
@@ -261,9 +261,9 @@ const Reportes = () => {
 
       // Tabla de resumen al inicio
       const resumenData = [
-        ['Cuotas Pagadas', cuotasPagadas.toString(), `U$S ${totalPagado.toLocaleString('es-UY', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`],
-        ['Cuotas Pendientes', cuotasPendientes.toString(), `U$S ${totalPendiente.toLocaleString('es-UY', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`],
-        ['TOTAL', (cuotasPagadas + cuotasPendientes).toString(), `U$S ${(totalPagado + totalPendiente).toLocaleString('es-UY', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`]
+        ['Cuotas Pagadas', cuotasPagadas.toString(), formatCurrency(totalPagado)],
+        ['Cuotas Pendientes', cuotasPendientes.toString(), formatCurrency(totalPendiente)],
+        ['TOTAL', (cuotasPagadas + cuotasPendientes).toString(), formatCurrency(totalPagado + totalPendiente)]
       ];
 
       autoTable(doc, {
@@ -365,7 +365,7 @@ const Reportes = () => {
 
         // Tabla de pagos del cliente
         const tableData = pagoCliente.map(pago => {
-          const monto = `U$S ${parseFloat(pago.monto || 0).toLocaleString('es-UY', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+          const monto = formatCurrency(parseFloat(pago.monto || 0));
           const estado = pago.estado === 'pagado' ? 'Pagado' : 
                         pago.estado === 'pendiente' ? 'Pendiente' : 'Vencido';
           return [
@@ -416,11 +416,11 @@ const Reportes = () => {
         const clienteTotalesData = [
           [
             'Pagado',
-            `U$S ${clienteTotalPagado.toLocaleString('es-UY', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+            formatCurrency(clienteTotalPagado),
             'Pendiente',
-            `U$S ${clienteTotalPendiente.toLocaleString('es-UY', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+            formatCurrency(clienteTotalPendiente),
             'TOTAL',
-            `U$S ${(clienteTotalPagado + clienteTotalPendiente).toLocaleString('es-UY', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+            formatCurrency(clienteTotalPagado + clienteTotalPendiente)
           ]
         ];
 
