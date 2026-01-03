@@ -14,6 +14,7 @@ import EmpleadoDashboard from './pages/EmpleadoDashboard';
 import Autos from './pages/Autos';
 import Clientes from './pages/Clientes';
 import Pagos from './pages/Pagos';
+import Comprobantes from './pages/Comprobantes';
 import Reportes from './pages/Reportes';
 import ClienteDashboard from './pages/ClienteDashboard';
 
@@ -44,6 +45,7 @@ function App() {
                   <Route path="/autos" element={<Autos />} />
                   <Route path="/clientes" element={<Clientes />} />
                   <Route path="/pagos" element={<Pagos />} />
+                  <Route path="/comprobantes" element={<Comprobantes />} />
                   
                   {/* Ruta para clientes */}
                   <Route path="/mi-dashboard" element={<ClienteDashboard />} />

@@ -13,7 +13,8 @@ import {
   TrendingUp,
   History,
   MessageCircle,
-  AlertCircle
+  AlertCircle,
+  Receipt
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import api from '../services/api';
@@ -67,6 +68,7 @@ const Layout = () => {
         { to: '/autos', icon: Car, label: 'Autos' },
         { to: '/clientes', icon: Users, label: 'Clientes' },
         { to: '/pagos', icon: CreditCard, label: 'Pagos' },
+        { to: '/comprobantes', icon: Receipt, label: 'Comprobantes' },
         { to: '/reportes', icon: FileText, label: 'Reportes' },
       ];
     }
@@ -77,6 +79,7 @@ const Layout = () => {
         { to: '/autos', icon: Car, label: 'Autos' },
         { to: '/clientes', icon: Users, label: 'Clientes' },
         { to: '/pagos', icon: CreditCard, label: 'Pagos' },
+        { to: '/comprobantes', icon: Receipt, label: 'Comprobantes' },
       ];
     }
     
