@@ -9,6 +9,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [cedula, setCedula] = useState('');
   const [passwordCliente, setPasswordCliente] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [focusedInput, setFocusedInput] = useState('');
@@ -32,7 +33,7 @@ const Login = () => {
         }
       } else {
         // Login de cliente con cédula y contraseña
-        const result = await loginCliente(cedula, passwordCliente);
+        const result = await loginCliente(cedula, passwordCliente, rememberMe);
         if (result && result.token && result.user) {
           navigate('/', { replace: true });
         } else {
@@ -54,6 +55,7 @@ const Login = () => {
     setPassword('');
     setCedula('');
     setPasswordCliente('');
+    setRememberMe(false);
   };
 
   return (
@@ -217,8 +219,7 @@ const Login = () => {
                       Información de Acceso
                     </h4>
                     <p className="text-xs text-gray-700">
-                      Al crear tu cuenta, recibirás tu contraseña por WhatsApp. 
-                      Inicia sesión con tu número de cédula.
+                      Inicia sesión con tu número de cédula y contraseña.
                     </p>
                   </div>
 
@@ -245,9 +246,6 @@ const Login = () => {
                         required
                       />
                     </div>
-                    <p className="text-gray-500 text-xs mt-2">
-                      Ingresa tu cédula de 8 dígitos
-                    </p>
                   </div>
 
                   <div className="space-y-2">
@@ -266,9 +264,20 @@ const Login = () => {
                         required
                       />
                     </div>
-                    <p className="text-gray-500 text-xs mt-2">
-                      Ingresa la contraseña que recibiste por WhatsApp
-                    </p>
+                  </div>
+
+                  {/* Checkbox Mantener sesión iniciada */}
+                  <div className="flex items-center">
+                    <input
+                      id="remember-me"
+                      type="checkbox"
+                      checked={rememberMe}
+                      onChange={(e) => setRememberMe(e.target.checked)}
+                      className="h-4 w-4 text-blue-400 focus:ring-blue-400 border-gray-300 rounded"
+                    />
+                    <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
+                      Mantener sesión iniciada
+                    </label>
                   </div>
                 </>
               ) : null}

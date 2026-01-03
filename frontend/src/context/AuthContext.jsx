@@ -16,9 +16,9 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Verificar si hay un token guardado
-    const token = localStorage.getItem('token');
-    const savedUser = localStorage.getItem('user');
+    // Verificar si hay un token guardado en localStorage o sessionStorage
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    const savedUser = localStorage.getItem('user') || sessionStorage.getItem('user');
 
     console.log('AuthContext - Inicializando:', { hasToken: !!token, hasSavedUser: !!savedUser });
 
@@ -37,6 +37,8 @@ export const AuthProvider = ({ children }) => {
             console.log('AuthContext - Token inválido, limpiando...');
             localStorage.removeItem('token');
             localStorage.removeItem('user');
+            sessionStorage.removeItem('token');
+            sessionStorage.removeItem('user');
             setUser(null);
           }
         })
@@ -44,6 +46,8 @@ export const AuthProvider = ({ children }) => {
           console.error('AuthContext - Error verificando token:', error);
           localStorage.removeItem('token');
           localStorage.removeItem('user');
+          sessionStorage.removeItem('token');
+          sessionStorage.removeItem('user');
           setUser(null);
         })
         .finally(() => {
@@ -69,7 +73,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const loginCliente = async (cedula, password) => {
+  const loginCliente = async (cedula, password, rememberMe = false) => {
     try {
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
       const response = await fetch(`${API_URL}/auth/login-cliente`, {
@@ -84,8 +88,25 @@ export const AuthProvider = ({ children }) => {
       }
 
       const data = await response.json();
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
+      
+      // Si "Mantener sesión" está activado, guardar en localStorage
+      // Si no, guardar en sessionStorage
+      const storage = rememberMe ? localStorage : sessionStorage;
+      storage.setItem('token', data.token);
+      storage.setItem('user', JSON.stringify(data.user));
+      storage.setItem('rememberMe', rememberMe.toString());
+      
+      // Limpiar el otro storage
+      if (rememberMe) {
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('user');
+        sessionStorage.removeItem('rememberMe');
+      } else {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('rememberMe');
+      }
+      
       setUser(data.user);
       return data;
     } catch (error) {
@@ -96,6 +117,13 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     authService.logout();
+    // Limpiar ambos storages
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('rememberMe');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('user');
+    sessionStorage.removeItem('rememberMe');
     setUser(null);
   };
 

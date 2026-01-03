@@ -679,15 +679,15 @@ const Reportes = () => {
   if (loading) return <Loading message="Cargando reportes..." />;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       <div className="animate-fadeInUp" style={{animationDelay: '0.1s'}}>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Reportes y Exportación</h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-1">Genera y descarga reportes del sistema</p>
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Reportes y Exportación</h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-1 text-sm md:text-base">Genera y descarga reportes del sistema</p>
       </div>
 
       {/* Estadísticas Generales */}
       {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-fadeInUp" style={{animationDelay: '0.2s'}}>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 animate-fadeInUp" style={{animationDelay: '0.2s'}}>
           <StatCard
             title="Total Autos"
             value={stats.autos.total}
@@ -725,141 +725,141 @@ const Reportes = () => {
       )}
 
       {/* Rango de Fechas */}
-      <div className="card animate-fadeInUp" style={{animationDelay: '0.3s'}}>
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Rango de Fechas</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="card animate-fadeInUp p-4 md:p-6" style={{animationDelay: '0.3s'}}>
+        <h3 className="text-base md:text-lg font-semibold text-gray-900 dark:text-white mb-3 md:mb-4">Rango de Fechas</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 md:mb-2">
               Fecha Inicio
             </label>
             <input
               type="date"
               value={dateRange.start}
               onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
-              className="input"
+              className="input text-sm md:text-base"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 md:mb-2">
               Fecha Fin
             </label>
             <input
               type="date"
               value={dateRange.end}
               onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
-              className="input"
+              className="input text-sm md:text-base"
             />
           </div>
         </div>
       </div>
 
       {/* Exportaciones */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-6">
         {/* Exportar Autos */}
-        <div className="card hover-lift animate-fadeInUp" style={{animationDelay: '0.4s'}}>
-          <div className="flex items-start gap-4">
-            <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-              <Car className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+        <div className="card hover-lift animate-fadeInUp p-3 md:p-6" style={{animationDelay: '0.4s'}}>
+          <div className="flex items-start gap-3 md:gap-4">
+            <div className="p-2 md:p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex-shrink-0">
+              <Car className="w-5 h-5 md:w-6 md:h-6 text-blue-600 dark:text-blue-400" />
             </div>
-            <div className="flex-1">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+            <div className="flex-1 min-w-0">
+              <h3 className="text-sm md:text-lg font-semibold text-gray-900 dark:text-white mb-1 md:mb-2">
                 Inventario de Autos
               </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-2 md:mb-4">
                 Exporta la lista completa de autos con toda su información
               </p>
-              <button onClick={handleExportAutosPDF} className="bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800 text-white px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-all hover:scale-105 active:scale-95">
-                <FileText className="w-4 h-4" />
-                PDF
+              <button onClick={handleExportAutosPDF} className="bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800 text-white px-3 py-2 md:px-4 md:py-2 rounded-lg font-medium text-xs md:text-sm flex items-center gap-2 transition-all hover:scale-105 active:scale-95 w-full md:w-auto justify-center">
+                <FileText className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                Descargar PDF
               </button>
             </div>
           </div>
         </div>
 
         {/* Exportar Clientes */}
-        <div className="card hover-lift animate-fadeInUp" style={{animationDelay: '0.5s'}}>
-          <div className="flex items-start gap-4">
-            <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-              <Users className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+        <div className="card hover-lift animate-fadeInUp p-3 md:p-6" style={{animationDelay: '0.5s'}}>
+          <div className="flex items-start gap-3 md:gap-4">
+            <div className="p-2 md:p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex-shrink-0">
+              <Users className="w-5 h-5 md:w-6 md:h-6 text-purple-600 dark:text-purple-400" />
             </div>
-            <div className="flex-1">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+            <div className="flex-1 min-w-0">
+              <h3 className="text-sm md:text-lg font-semibold text-gray-900 dark:text-white mb-1 md:mb-2">
                 Base de Clientes
               </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-2 md:mb-4">
                 Exporta la información completa de todos los clientes
               </p>
-              <button onClick={handleExportClientesPDF} className="bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800 text-white px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-all hover:scale-105 active:scale-95">
-                <FileText className="w-4 h-4" />
-                PDF
+              <button onClick={handleExportClientesPDF} className="bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800 text-white px-3 py-2 md:px-4 md:py-2 rounded-lg font-medium text-xs md:text-sm flex items-center gap-2 transition-all hover:scale-105 active:scale-95 w-full md:w-auto justify-center">
+                <FileText className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                Descargar PDF
               </button>
             </div>
           </div>
         </div>
 
         {/* Exportar Pagos */}
-        <div className="card hover-lift animate-fadeInUp" style={{animationDelay: '0.6s'}}>
-          <div className="flex items-start gap-4">
-            <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-lg">
-              <DollarSign className="w-6 h-6 text-green-600 dark:text-green-400" />
+        <div className="card hover-lift animate-fadeInUp p-3 md:p-6" style={{animationDelay: '0.6s'}}>
+          <div className="flex items-start gap-3 md:gap-4">
+            <div className="p-2 md:p-3 bg-green-100 dark:bg-green-900/30 rounded-lg flex-shrink-0">
+              <DollarSign className="w-5 h-5 md:w-6 md:h-6 text-green-600 dark:text-green-400" />
             </div>
-            <div className="flex-1">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+            <div className="flex-1 min-w-0">
+              <h3 className="text-sm md:text-lg font-semibold text-gray-900 dark:text-white mb-1 md:mb-2">
                 Historial de Pagos
               </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-2 md:mb-4">
                 Exporta el registro completo de pagos y cuotas
               </p>
-              <button onClick={handleExportPagosPDF} className="bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800 text-white px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-all hover:scale-105 active:scale-95">
-                <FileText className="w-4 h-4" />
-                PDF
+              <button onClick={handleExportPagosPDF} className="bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800 text-white px-3 py-2 md:px-4 md:py-2 rounded-lg font-medium text-xs md:text-sm flex items-center gap-2 transition-all hover:scale-105 active:scale-95 w-full md:w-auto justify-center">
+                <FileText className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                Descargar PDF
               </button>
             </div>
           </div>
         </div>
 
         {/* Exportar Permutas */}
-        <div className="card hover-lift animate-fadeInUp" style={{animationDelay: '0.65s'}}>
-          <div className="flex items-start gap-4">
-            <div className="p-3 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
-              <RefreshCw className="w-6 h-6 text-orange-600 dark:text-orange-400" />
+        <div className="card hover-lift animate-fadeInUp p-3 md:p-6" style={{animationDelay: '0.65s'}}>
+          <div className="flex items-start gap-3 md:gap-4">
+            <div className="p-2 md:p-3 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex-shrink-0">
+              <RefreshCw className="w-5 h-5 md:w-6 md:h-6 text-orange-600 dark:text-orange-400" />
             </div>
-            <div className="flex-1">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+            <div className="flex-1 min-w-0">
+              <h3 className="text-sm md:text-lg font-semibold text-gray-900 dark:text-white mb-1 md:mb-2">
                 Permutas
               </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-2 md:mb-4">
                 Exporta el registro de permutas y estadísticas
               </p>
               {permutasStats && (
-                <div className="text-xs text-gray-600 dark:text-gray-400 mb-3">
+                <div className="text-[10px] md:text-xs text-gray-600 dark:text-gray-400 mb-2 md:mb-3">
                   Total: {permutasStats.total || 0} | Valor: {formatCurrency(permutasStats.valorTotal || 0)}
                 </div>
               )}
-              <button onClick={handleExportPermutasPDF} className="bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800 text-white px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-all hover:scale-105 active:scale-95">
-                <FileText className="w-4 h-4" />
-                PDF
+              <button onClick={handleExportPermutasPDF} className="bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800 text-white px-3 py-2 md:px-4 md:py-2 rounded-lg font-medium text-xs md:text-sm flex items-center gap-2 transition-all hover:scale-105 active:scale-95 w-full md:w-auto justify-center">
+                <FileText className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                Descargar PDF
               </button>
             </div>
           </div>
         </div>
 
         {/* Reporte General */}
-        <div className="card hover-lift animate-fadeInUp" style={{animationDelay: '0.7s'}}>
-          <div className="flex items-start gap-4">
-            <div className="p-3 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg">
-              <FileText className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
+        <div className="card hover-lift animate-fadeInUp p-3 md:p-6" style={{animationDelay: '0.7s'}}>
+          <div className="flex items-start gap-3 md:gap-4">
+            <div className="p-2 md:p-3 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex-shrink-0">
+              <FileText className="w-5 h-5 md:w-6 md:h-6 text-yellow-600 dark:text-yellow-400" />
             </div>
-            <div className="flex-1">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+            <div className="flex-1 min-w-0">
+              <h3 className="text-sm md:text-lg font-semibold text-gray-900 dark:text-white mb-1 md:mb-2">
                 Reporte General
               </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-2 md:mb-4">
                 Exporta un resumen completo de todas las estadísticas
               </p>
-              <button onClick={handleExportGeneralPDF} className="bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800 text-white px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-all hover:scale-105 active:scale-95">
-                <FileText className="w-4 h-4" />
-                PDF
+              <button onClick={handleExportGeneralPDF} className="bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800 text-white px-3 py-2 md:px-4 md:py-2 rounded-lg font-medium text-xs md:text-sm flex items-center gap-2 transition-all hover:scale-105 active:scale-95 w-full md:w-auto justify-center">
+                <FileText className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                Descargar PDF
               </button>
             </div>
           </div>
