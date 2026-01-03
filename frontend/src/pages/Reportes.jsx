@@ -302,11 +302,80 @@ const Reportes = () => {
       const pagos = await pagosService.getAll();
       const doc = new jsPDF();
       
-      // Agregar encabezado con logo
+      // Agregar encabezado profesional
       const startY = await addPDFHeader(
         doc,
-        'Historial de Pagos por Cliente'
+        'Historial de Pagos y Financiamientos',
+        'Registro detallado de pagos por cliente',
+        'Historial de Pagos'
       );
+
+      // Calcular estadísticas globales primero
+      const totalGeneralPagado = pagos
+        .filter(p => p.estado === 'pagado')
+        .reduce((sum, p) => sum + (parseFloat(p.monto) || 0), 0);
+      
+      const totalGeneralPendiente = pagos
+        .filter(p => p.estado !== 'pagado')
+        .reduce((sum, p) => sum + (parseFloat(p.monto) || 0), 0);
+
+      const totalCuotasPagadas = pagos.filter(p => p.estado === 'pagado').length;
+      const totalCuotasPendientes = pagos.filter(p => p.estado !== 'pagado').length;
+
+      // Sección de resumen global
+      let currentY = addSection(
+        doc,
+        startY,
+        'Resumen Global de Financiamientos'
+      );
+
+      // Tabla de resumen global
+      autoTable(doc, {
+        startY: currentY,
+        head: [['Concepto', 'Cantidad', 'Monto', 'Porcentaje']],
+        body: [
+          [
+            'Cuotas Pagadas',
+            totalCuotasPagadas.toString(),
+            formatCurrency(totalGeneralPagado),
+            `${totalCuotasPagadas > 0 ? ((totalCuotasPagadas/(totalCuotasPagadas + totalCuotasPendientes))*100).toFixed(1) : 0}%`
+          ],
+          [
+            'Cuotas Pendientes',
+            totalCuotasPendientes.toString(),
+            formatCurrency(totalGeneralPendiente),
+            `${totalCuotasPendientes > 0 ? ((totalCuotasPendientes/(totalCuotasPagadas + totalCuotasPendientes))*100).toFixed(1) : 0}%`
+          ],
+          [
+            'Total General',
+            (totalCuotasPagadas + totalCuotasPendientes).toString(),
+            formatCurrency(totalGeneralPagado + totalGeneralPendiente),
+            '100%'
+          ]
+        ],
+        ...getTableStyles('success'),
+        columnStyles: {
+          0: { cellWidth: 50, fontStyle: 'bold' },
+          1: { cellWidth: 40, halign: 'center' },
+          2: { cellWidth: 50, halign: 'right', fontStyle: 'bold', textColor: COLORS.success },
+          3: { cellWidth: 42, halign: 'center' }
+        },
+        didParseCell: function(data) {
+          if (data.section === 'body') {
+            if (data.row.index === 0) {
+              // Fila de pagados en verde claro
+              data.cell.styles.fillColor = [220, 252, 231];
+            } else if (data.row.index === 1) {
+              // Fila de pendientes en amarillo claro
+              data.cell.styles.fillColor = [254, 243, 199];
+            } else if (data.row.index === 2) {
+              // Fila de total en azul claro
+              data.cell.styles.fillColor = COLORS.gray[100];
+              data.cell.styles.fontStyle = 'bold';
+            }
+          }
+        }
+      });
 
       // Agrupar pagos por cliente
       const pagosPorCliente = pagos.reduce((acc, pago) => {
@@ -323,38 +392,46 @@ const Reportes = () => {
         return acc;
       }, {});
 
-      let yPosition = startY;
+      // Sección de detalle por cliente
+      currentY = addSection(
+        doc,
+        doc.lastAutoTable.finalY + 10,
+        'Detalle por Cliente',
+        `Total de ${Object.keys(pagosPorCliente).length} clientes con financiamientos activos`
+      );
 
       // Iterar por cada cliente
       Object.entries(pagosPorCliente).forEach(([clienteId, data], index) => {
         const { cliente, nombre, pagos: pagoCliente } = data;
 
         // Verificar si necesitamos una nueva página
-        if (yPosition > 250) {
+        if (currentY > 240) {
           doc.addPage();
-          yPosition = 20;
+          currentY = 20;
         }
 
-        // Encabezado del cliente con fondo azul
-        doc.setFillColor(96, 165, 250); // Azul claro
-        doc.rect(14, yPosition, 182, 10, 'F');
+        // Header del cliente con estilo profesional
+        doc.setFillColor(...COLORS.primary);
+        doc.roundedRect(14, currentY, 182, 12, 2, 2, 'F');
         
-        doc.setFontSize(12);
+        doc.setFontSize(11);
         doc.setTextColor(255, 255, 255);
         doc.setFont(undefined, 'bold');
-        doc.text(`Cliente: ${nombre}`, 16, yPosition + 7);
+        doc.text(`👤 ${nombre}`, 18, currentY + 8);
         doc.setFont(undefined, 'normal');
         
-        yPosition += 12;
+        currentY += 14;
 
-        // Información adicional del cliente
+        // Información del cliente en línea
         if (cliente) {
-          doc.setFontSize(9);
-          doc.setTextColor(100, 100, 100);
-          doc.text(`Cédula: ${cliente.cedula || 'N/A'}`, 16, yPosition);
-          doc.text(`Teléfono: ${cliente.telefono || 'N/A'}`, 80, yPosition);
-          doc.text(`Email: ${cliente.email || 'N/A'}`, 140, yPosition);
-          yPosition += 6;
+          doc.setFontSize(8);
+          doc.setTextColor(...COLORS.gray[600]);
+          doc.text(`CI: ${cliente.cedula || 'N/A'}`, 16, currentY);
+          doc.text(`📞 ${cliente.telefono || 'N/A'}`, 60, currentY);
+          if (cliente.email) {
+            doc.text(`✉ ${cliente.email}`, 110, currentY);
+          }
+          currentY += 6;
         }
 
         // Calcular totales del cliente
@@ -370,194 +447,111 @@ const Reportes = () => {
         const cuotasPendientes = pagoCliente.filter(p => p.estado !== 'pagado').length;
 
         // Tabla de pagos del cliente
-        const tableData = pagoCliente.map(pago => [
-          String(`${pago.auto?.marca || ''} ${pago.auto?.modelo || ''}`.trim() || 'N/A'),
-          String(pago.auto?.matricula || 'N/A'),
-          String(pago.numeroCuota || ''),
-          formatCurrency(parseFloat(pago.monto || 0)),
-          pago.fechaVencimiento ? new Date(pago.fechaVencimiento).toLocaleDateString('es-ES') : '-',
-          pago.estado === 'pagado' ? 'Pagado' : pago.estado === 'pendiente' ? 'Pendiente' : 'Vencido',
-          pago.fechaPago ? new Date(pago.fechaPago).toLocaleDateString('es-ES') : '-'
-        ]);
+        const tableData = pagoCliente.map(pago => {
+          const estado = pago.estado === 'pagado' ? '✓ Pagado' : 
+                        pago.estado === 'pendiente' ? '○ Pendiente' : '✕ Vencido';
+          return [
+            String(`${pago.auto?.marca || ''} ${pago.auto?.modelo || ''}`.trim() || 'N/A'),
+            String(pago.auto?.matricula || '0km'),
+            `#${String(pago.numeroCuota || '')}`,
+            formatCurrency(parseFloat(pago.monto || 0)),
+            pago.fechaVencimiento ? new Date(pago.fechaVencimiento).toLocaleDateString('es-ES', {day: '2-digit', month: 'short'}) : '-',
+            estado,
+            pago.fechaPago ? new Date(pago.fechaPago).toLocaleDateString('es-ES', {day: '2-digit', month: 'short'}) : '-'
+          ];
+        });
 
         autoTable(doc, {
-          startY: yPosition,
-          head: [['Auto', 'Matrícula', 'Cuota', 'Monto', 'Vencimiento', 'Estado', 'Fecha Pago']],
+          startY: currentY,
+          head: [['Vehículo', 'Matrícula', 'Cuota', 'Monto', 'Venc.', 'Estado', 'F. Pago']],
           body: tableData,
-          theme: 'striped',
-          headStyles: { 
-            fillColor: [96, 165, 250],
-            textColor: [255, 255, 255],
-            fontSize: 9,
-            fontStyle: 'bold',
-            halign: 'center'
-          },
-          bodyStyles: { 
-            fontSize: 8,
-            cellPadding: 3
-          },
+          ...getTableStyles('secondary'),
           columnStyles: {
-            0: { cellWidth: 38 },
-            1: { cellWidth: 25 },
-            2: { cellWidth: 15, halign: 'center' },
-            3: { cellWidth: 28, halign: 'right' },
-            4: { cellWidth: 25, halign: 'center' },
-            5: { cellWidth: 22, halign: 'center' },
-            6: { cellWidth: 25, halign: 'center' }
+            0: { cellWidth: 36, fontSize: 7 },
+            1: { cellWidth: 22, halign: 'center', fontSize: 7 },
+            2: { cellWidth: 15, halign: 'center', fontStyle: 'bold' },
+            3: { cellWidth: 26, halign: 'right', fontStyle: 'bold' },
+            4: { cellWidth: 22, halign: 'center', fontSize: 7 },
+            5: { cellWidth: 26, halign: 'center', fontSize: 7 },
+            6: { cellWidth: 22, halign: 'center', fontSize: 7 }
           },
           didParseCell: function(data) {
             if (data.section === 'body' && data.column.index === 5) {
-              const estado = data.cell.raw;
-              if (estado === 'Pagado') {
-                data.cell.styles.fillColor = [220, 252, 231]; // Verde claro
-                data.cell.styles.textColor = [22, 163, 74]; // Verde oscuro
+              const estado = data.cell.text[0];
+              if (estado.includes('Pagado')) {
+                data.cell.styles.textColor = COLORS.success;
                 data.cell.styles.fontStyle = 'bold';
-              } else if (estado === 'Vencido') {
-                data.cell.styles.fillColor = [254, 226, 226]; // Rojo claro
-                data.cell.styles.textColor = [220, 38, 38]; // Rojo oscuro
+              } else if (estado.includes('Vencido')) {
+                data.cell.styles.textColor = COLORS.danger;
                 data.cell.styles.fontStyle = 'bold';
               } else {
-                data.cell.styles.fillColor = [254, 243, 199]; // Amarillo claro
-                data.cell.styles.textColor = [217, 119, 6]; // Amarillo oscuro
+                data.cell.styles.textColor = COLORS.warning;
                 data.cell.styles.fontStyle = 'bold';
               }
             }
-          },
-          margin: { left: 14, right: 14 }
+            // Resaltar montos
+            if (data.section === 'body' && data.column.index === 3) {
+              data.cell.styles.textColor = COLORS.primary;
+            }
+          }
         });
 
-        // Obtener la posición Y después de la tabla
-        yPosition = doc.lastAutoTable.finalY + 5;
+        currentY = doc.lastAutoTable.finalY + 3;
 
-        // Resumen financiero del cliente con fondo gris
-        doc.setFillColor(245, 245, 245);
-        doc.rect(14, yPosition, 182, 20, 'F');
+        // Resumen del cliente con diseño profesional
+        doc.setFillColor(...COLORS.gray[50]);
+        doc.roundedRect(14, currentY, 182, 16, 1, 1, 'F');
+        doc.setDrawColor(...COLORS.gray[200]);
+        doc.roundedRect(14, currentY, 182, 16, 1, 1);
         
-        doc.setFontSize(10);
-        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(8);
         doc.setFont(undefined, 'bold');
-        doc.text('Resumen del Cliente:', 16, yPosition + 7);
+        doc.setTextColor(...COLORS.gray[700]);
+        doc.text('Resumen:', 18, currentY + 5);
         doc.setFont(undefined, 'normal');
         
+        doc.text(`Pagadas: ${cuotasPagadas}`, 18, currentY + 10);
+        doc.text(`Pendientes: ${cuotasPendientes}`, 55, currentY + 10);
+        
+        doc.setTextColor(...COLORS.success);
+        doc.setFont(undefined, 'bold');
+        doc.text(`✓ ${formatCurrency(totalPagado)}`, 18, currentY + 14);
+        
+        doc.setTextColor(...COLORS.danger);
+        doc.text(`○ ${formatCurrency(totalPendiente)}`, 80, currentY + 14);
+        
+        doc.setTextColor(...COLORS.gray[800]);
         doc.setFontSize(9);
-        doc.text(`Cuotas Pagadas: ${cuotasPagadas}`, 16, yPosition + 13);
-        doc.text(`Cuotas Pendientes: ${cuotasPendientes}`, 70, yPosition + 13);
-        
-        doc.setTextColor(22, 163, 74); // Verde
-        doc.setFont(undefined, 'bold');
-        doc.text(`Pagado: ${formatCurrency(totalPagado)}`, 16, yPosition + 17);
-        
-        doc.setTextColor(220, 38, 38); // Rojo
-        doc.text(`Pendiente: ${formatCurrency(totalPendiente)}`, 70, yPosition + 17);
-        
-        doc.setTextColor(0, 0, 0);
-        doc.text(`Total: ${formatCurrency(totalPagado + totalPendiente)}`, 130, yPosition + 17);
+        doc.text(`Total: ${formatCurrency(totalPagado + totalPendiente)}`, 140, currentY + 14);
         doc.setFont(undefined, 'normal');
 
-        yPosition += 25;
+        currentY += 20;
 
-        // Línea separadora entre clientes (si no es el último)
+        // Línea separadora entre clientes
         if (index < Object.keys(pagosPorCliente).length - 1) {
-          doc.setDrawColor(200, 200, 200);
-          doc.setLineWidth(0.5);
-          doc.line(14, yPosition, 196, yPosition);
-          yPosition += 10;
+          doc.setDrawColor(...COLORS.gray[300]);
+          doc.setLineWidth(0.3);
+          doc.line(14, currentY, 196, currentY);
+          currentY += 8;
         }
       });
 
-      // Resumen General Final en nueva página
-      doc.addPage();
-      doc.setFontSize(18);
-      doc.setTextColor(220, 38, 38);
-      doc.text('Resumen General', 105, 20, { align: 'center' });
-      
-      doc.setDrawColor(220, 38, 38);
-      doc.setLineWidth(0.5);
-      doc.line(60, 23, 150, 23);
+      // Agregar pie de página profesional
+      addPDFFooter(doc, {
+        showContact: true,
+        contactInfo: {
+          telefono: '+598 XX XXX XXX',
+          email: 'cobranzas@nicolastejera.com',
+          web: 'www.nicolastejera.com'
+        }
+      });
 
-      const totalGeneralPagado = pagos
-        .filter(p => p.estado === 'pagado')
-        .reduce((sum, p) => sum + (parseFloat(p.monto) || 0), 0);
-      
-      const totalGeneralPendiente = pagos
-        .filter(p => p.estado !== 'pagado')
-        .reduce((sum, p) => sum + (parseFloat(p.monto) || 0), 0);
-
-      const totalClientes = Object.keys(pagosPorCliente).length;
-      const totalCuotasPagadas = pagos.filter(p => p.estado === 'pagado').length;
-      const totalCuotasPendientes = pagos.filter(p => p.estado !== 'pagado').length;
-      const totalCuotas = pagos.length;
-
-      let summaryY = 35;
-      
-      // Recuadro de estadísticas
-      doc.setFillColor(248, 250, 252);
-      doc.rect(30, summaryY, 150, 70, 'F');
-      doc.setDrawColor(96, 165, 250);
-      doc.setLineWidth(1);
-      doc.rect(30, summaryY, 150, 70, 'S');
-      
-      summaryY += 10;
-      
-      doc.setFontSize(12);
-      doc.setTextColor(0, 0, 0);
-      doc.setFont(undefined, 'bold');
-      doc.text('Estadísticas Generales:', 35, summaryY);
-      doc.setFont(undefined, 'normal');
-      summaryY += 10;
-      
-      doc.setFontSize(11);
-      doc.text(`Total de Clientes: ${totalClientes}`, 35, summaryY);
-      summaryY += 8;
-      
-      doc.text(`Total de Cuotas: ${totalCuotas}`, 35, summaryY);
-      summaryY += 8;
-      
-      doc.setTextColor(22, 163, 74);
-      doc.text(`Cuotas Pagadas: ${totalCuotasPagadas} (${((totalCuotasPagadas/totalCuotas)*100).toFixed(1)}%)`, 35, summaryY);
-      summaryY += 8;
-      
-      doc.setTextColor(220, 38, 38);
-      doc.text(`Cuotas Pendientes: ${totalCuotasPendientes} (${((totalCuotasPendientes/totalCuotas)*100).toFixed(1)}%)`, 35, summaryY);
-      
-      summaryY += 18;
-      
-      // Resumen financiero
-      doc.setFontSize(12);
-      doc.setTextColor(0, 0, 0);
-      doc.setFont(undefined, 'bold');
-      doc.text('Resumen Financiero:', 35, summaryY);
-      doc.setFont(undefined, 'normal');
-      summaryY += 10;
-      
-      doc.setFontSize(11);
-      doc.setTextColor(22, 163, 74);
-      doc.setFont(undefined, 'bold');
-      doc.text(`Monto Total Pagado: ${formatCurrency(totalGeneralPagado)}`, 35, summaryY);
-      summaryY += 8;
-      
-      doc.setTextColor(220, 38, 38);
-      doc.text(`Monto Total Pendiente: ${formatCurrency(totalGeneralPendiente)}`, 35, summaryY);
-      summaryY += 8;
-      
-      doc.setTextColor(0, 0, 0);
-      doc.setFontSize(13);
-      doc.text(`Total General: ${formatCurrency(totalGeneralPagado + totalGeneralPendiente)}`, 35, summaryY);
-      doc.setFont(undefined, 'normal');
-
-      // Pie de página en todas las páginas
-      const pageCount = doc.internal.getNumberOfPages();
-      for (let i = 1; i <= pageCount; i++) {
-        doc.setPage(i);
-        doc.setFontSize(8);
-        doc.setTextColor(150, 150, 150);
-        doc.text(`Página ${i} de ${pageCount}`, 105, 287, { align: 'center' });
-      }
-
-      doc.save(`historial_pagos_por_cliente_${new Date().toISOString().split('T')[0]}.pdf`);
+      // Guardar con nombre profesional
+      doc.save(getPDFFileName('Pagos', 'Historial'));
+      showToast('Historial de pagos generado exitosamente', 'success');
     } catch (error) {
       console.error('Error al exportar PDF:', error);
-      alert('Error al exportar pagos a PDF');
+      showToast('Error al exportar historial de pagos', 'error');
     }
   };
 
