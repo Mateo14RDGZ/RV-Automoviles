@@ -136,14 +136,20 @@ const Autos = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Preparar datos para enviar al backend
+      // Preparar datos para enviar al backend (incluyendo TODOS los campos)
       const dataToSend = {
         marca: formData.marca,
         modelo: formData.modelo,
         anio: parseInt(formData.anio),
         matricula: formData.matricula,
         precio: parseFloat(formData.precio),
-        clienteId: formData.clienteId ? parseInt(formData.clienteId) : null
+        clienteId: formData.clienteId ? parseInt(formData.clienteId) : null,
+        // Nuevos campos adicionales
+        kilometraje: formData.kilometraje ? parseInt(formData.kilometraje) : null,
+        color: formData.color || null,
+        departamento: formData.departamento || null,
+        tipoDocumento: formData.tipoDocumento || null,
+        valorPatente: formData.valorPatente ? parseFloat(formData.valorPatente) : null
       };
       
       // Solo incluir estado si estamos editando

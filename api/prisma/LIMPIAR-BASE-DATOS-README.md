@@ -26,20 +26,24 @@ Las tablas NO se eliminan, solo su contenido.
 ### Opción 1: Ejecutar en Neon Console (Recomendado)
 
 1. **Accede a Neon Console**:
+
    - Ve a https://console.neon.tech
    - Inicia sesión con tu cuenta
    - Selecciona tu proyecto
 
 2. **Abre SQL Editor**:
+
    - En el menú lateral, haz clic en "SQL Editor"
    - Se abrirá el editor de consultas
 
 3. **Copia y Pega el Script**:
+
    - Abre el archivo `limpiar-base-datos.sql`
    - Copia TODO el contenido
    - Pégalo en el editor de Neon
 
 4. **Ejecuta el Script**:
+
    - Haz clic en "Run" o presiona `Ctrl+Enter`
    - Espera a que termine (debe ser muy rápido)
 
@@ -85,10 +89,12 @@ El script realiza las siguientes operaciones en orden:
 Puedes iniciar sesión inmediatamente con:
 
 **Admin:**
+
 - Email: `admin@demo.com`
 - Contraseña: `admin123`
 
 **Empleado:**
+
 - Email: `empleado@demo.com`
 - Contraseña: `admin123`
 
@@ -132,8 +138,8 @@ DELETE FROM "Auto" WHERE "clienteId" IS NULL;
 Ejecuta este query para verificar el resultado:
 
 ```sql
-SELECT 
-  'Usuario' as tabla, 
+SELECT
+  'Usuario' as tabla,
   COUNT(*) as registros,
   'Deben quedar 2 (admin y empleado)' as nota
 FROM "Usuario"
@@ -150,13 +156,14 @@ SELECT 'ComprobantePago', COUNT(*), 'Debe ser 0' FROM "ComprobantePago";
 ```
 
 **Resultado esperado:**
+
 - Usuario: 2 registros (admin y empleado)
 - Todas las demás tablas: 0 registros
 
 ## 📞 Soporte
 
 Si tienes problemas al ejecutar el script:
+
 1. Verifica que tienes permisos de escritura en la base de datos
 2. Asegúrate de estar conectado a la base de datos correcta
 3. Revisa los logs de errores de PostgreSQL
-

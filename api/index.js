@@ -358,9 +358,26 @@ app.get('/api/autos/:id', authenticateToken, async (req, res) => {
 
 app.post('/api/autos', authenticateToken, requireStaff, async (req, res) => {
   try {
-    const { marca, modelo, anio, matricula, precio, estado, clienteId } = req.body;
+    const { 
+      marca, 
+      modelo, 
+      anio, 
+      matricula, 
+      precio, 
+      estado, 
+      clienteId,
+      // Nuevos campos
+      kilometraje,
+      color,
+      departamento,
+      tipoDocumento,
+      valorPatente
+    } = req.body;
 
-    console.log('🚗 Creando auto:', { marca, modelo, anio, matricula, precio, estado, clienteId });
+    console.log('🚗 Creando auto:', { 
+      marca, modelo, anio, matricula, precio, estado, clienteId,
+      kilometraje, color, departamento, tipoDocumento, valorPatente
+    });
     console.log('📊 DATABASE_URL configurada:', process.env.DATABASE_URL ? 'SÍ' : 'NO');
 
     // Si no hay matrícula o está vacía, usar "0km"
@@ -392,12 +409,24 @@ app.post('/api/autos', authenticateToken, requireStaff, async (req, res) => {
         matricula: matriculaFinal,
         precio: parseFloat(precio),
         estado: estado || 'disponible',
-        clienteId: clienteId ? parseInt(clienteId) : null
+        clienteId: clienteId ? parseInt(clienteId) : null,
+        // Nuevos campos adicionales
+        kilometraje: kilometraje ? parseInt(kilometraje) : null,
+        color: color || null,
+        departamento: departamento || null,
+        tipoDocumento: tipoDocumento || null,
+        valorPatente: valorPatente ? parseFloat(valorPatente) : null
       },
       include: { cliente: true }
     });
 
-    console.log('✅ Auto creado exitosamente en DB:', { id: auto.id, marca: auto.marca, modelo: auto.modelo });
+    console.log('✅ Auto creado exitosamente en DB:', { 
+      id: auto.id, 
+      marca: auto.marca, 
+      modelo: auto.modelo,
+      kilometraje: auto.kilometraje,
+      color: auto.color
+    });
     
     // Verificar que el auto realmente se guardó
     const autoVerificado = await prisma.auto.findUnique({
@@ -436,7 +465,21 @@ app.post('/api/autos', authenticateToken, requireStaff, async (req, res) => {
 
 app.put('/api/autos/:id', authenticateToken, requireStaff, async (req, res) => {
   try {
-    const { marca, modelo, anio, matricula, precio, estado, clienteId } = req.body;
+    const { 
+      marca, 
+      modelo, 
+      anio, 
+      matricula, 
+      precio, 
+      estado, 
+      clienteId,
+      // Nuevos campos
+      kilometraje,
+      color,
+      departamento,
+      tipoDocumento,
+      valorPatente
+    } = req.body;
 
     // Si no hay matrícula o está vacía, usar "0km"
     const matriculaFinal = !matricula || matricula.trim() === '' ? '0km' : matricula.trim();
@@ -464,7 +507,13 @@ app.put('/api/autos/:id', authenticateToken, requireStaff, async (req, res) => {
         matricula: matriculaFinal,
         precio: parseFloat(precio),
         estado,
-        clienteId: clienteId ? parseInt(clienteId) : null
+        clienteId: clienteId ? parseInt(clienteId) : null,
+        // Nuevos campos adicionales
+        kilometraje: kilometraje ? parseInt(kilometraje) : null,
+        color: color || null,
+        departamento: departamento || null,
+        tipoDocumento: tipoDocumento || null,
+        valorPatente: valorPatente ? parseFloat(valorPatente) : null
       },
       include: { cliente: true }
     });
