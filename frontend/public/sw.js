@@ -1,6 +1,6 @@
-// Service Worker para PWA - RV Automóviles
-const CACHE_NAME = 'rv-autos-v9';
-const CACHE_VERSION = '9.0.0';
+// Service Worker para PWA - Nicolas Tejera Automoviles
+const CACHE_NAME = 'nicolas-tejera-v10';
+const CACHE_VERSION = '10.0.0';
 
 // Archivos esenciales que se cachearán durante la instalación
 const STATIC_ASSETS = [

@@ -2,7 +2,7 @@
   "name": "Nicolas Tejera Automoviles",
   "short_name": "Nicolas Tejera Automoviles",
   "description": "Sistema de gestión de cuotas y pagos automotor - Nicolas Tejera Automoviles",
-  "start_url": "/",
+  "start_url": "/?v=2",
   "scope": "/",
   "display": "standalone",
   "background_color": "#1e3a8a",
