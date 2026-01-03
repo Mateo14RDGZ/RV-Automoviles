@@ -790,9 +790,9 @@ app.get('/api/pagos/:id', authenticateToken, async (req, res) => {
 
 app.post('/api/pagos/generar-cuotas', authenticateToken, requireStaff, async (req, res) => {
   try {
-    const { autoId, numeroCuotas, montoPorCuota, fechaPrimeraCuota, permuta } = req.body;
+    const { autoId, numeroCuotas, montoPorCuota, fechaPrimeraCuota, permuta, cuotasPagadas = 0 } = req.body;
 
-    console.log('💳 Generando plan de cuotas:', { autoId, numeroCuotas, montoPorCuota, fechaPrimeraCuota });
+    console.log('💳 Generando plan de cuotas:', { autoId, numeroCuotas, montoPorCuota, fechaPrimeraCuota, cuotasPagadas });
 
     const auto = await prisma.auto.findUnique({ 
       where: { id: parseInt(autoId) },
@@ -853,20 +853,33 @@ app.post('/api/pagos/generar-cuotas', authenticateToken, requireStaff, async (re
     }
 
     const pagos = [];
+    const cuotasPagadasNum = parseInt(cuotasPagadas) || 0;
+    
     for (let i = 1; i <= numeroCuotas; i++) {
       const fechaVencimiento = new Date(fechaPrimeraCuota);
       fechaVencimiento.setMonth(fechaVencimiento.getMonth() + (i - 1));
 
-      pagos.push({
+      // Si esta cuota está dentro de las cuotas ya pagadas
+      const esCuotaPagada = i <= cuotasPagadasNum;
+      
+      const pagoData = {
         autoId: parseInt(autoId),
         numeroCuota: i,
         monto: parseFloat(montoPorCuota),
         fechaVencimiento,
-        estado: 'pendiente'
-      });
+        estado: esCuotaPagada ? 'pagado' : 'pendiente'
+      };
+
+      // Si es una cuota pagada, agregar fecha de pago
+      if (esCuotaPagada) {
+        // Usar la fecha de vencimiento como fecha de pago para cuotas históricas
+        pagoData.fechaPago = fechaVencimiento;
+      }
+
+      pagos.push(pagoData);
     }
 
-    console.log(`📝 Creando ${pagos.length} cuotas...`);
+    console.log(`📝 Creando ${pagos.length} cuotas (${cuotasPagadasNum} ya pagadas)...`);
 
     const createdPagos = await Promise.all(
       pagos.map(pago => prisma.pago.create({ data: pago }))

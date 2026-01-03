@@ -323,7 +323,8 @@ const Pagos = () => {
         autoId: generateData.autoId,
         numeroCuotas: parseInt(generateData.numeroCuotas),
         montoPorCuota: parseFloat(generateData.montoCuota),
-        fechaPrimeraCuota: generateData.fechaInicio
+        fechaPrimeraCuota: generateData.fechaInicio,
+        cuotasPagadas: generateData.esFinanciamientoEnProgreso ? parseInt(generateData.cuotasPagadas) || 0 : 0
       };
       
       // Agregar datos de permuta si existe
