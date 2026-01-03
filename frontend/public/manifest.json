@@ -1,12 +1,12 @@
 {
-  "name": "RV Gestión Automotora Demo",
-  "short_name": "RV Autos Demo",
-  "description": "Sistema de gestión de cuotas y pagos automotor - Versión Demo",
+  "name": "Nicolas Tejera Automoviles - Sistema de Gestión",
+  "short_name": "NT Autos",
+  "description": "Sistema de gestión de cuotas y pagos automotor - Nicolas Tejera Automoviles",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#1890cf",
-  "theme_color": "#1890cf",
+  "background_color": "#1e3a8a",
+  "theme_color": "#1e3a8a",
   "orientation": "portrait-primary",
   "prefer_related_applications": false,
   "icons": [

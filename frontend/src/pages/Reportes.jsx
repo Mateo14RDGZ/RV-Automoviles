@@ -227,14 +227,11 @@ const Reportes = () => {
       const pagos = await pagosService.getAll();
       const doc = new jsPDF();
       
-      // Encabezado principal
-      doc.setFontSize(18);
-      doc.setTextColor(34, 197, 94); // Verde
-      doc.text('Historial de Pagos por Cliente', 105, 20, { align: 'center' });
-      
-      doc.setFontSize(10);
-      doc.setTextColor(100, 100, 100);
-      doc.text(`Fecha de generación: ${new Date().toLocaleDateString('es-ES')}`, 105, 28, { align: 'center' });
+      // Agregar encabezado con logo
+      const startY = await addPDFHeader(
+        doc,
+        'Historial de Pagos por Cliente'
+      );
 
       // Agrupar pagos por cliente
       const pagosPorCliente = pagos.reduce((acc, pago) => {
@@ -251,7 +248,7 @@ const Reportes = () => {
         return acc;
       }, {});
 
-      let yPosition = 38;
+      let yPosition = startY;
 
       // Iterar por cada cliente
       Object.entries(pagosPorCliente).forEach(([clienteId, data], index) => {
