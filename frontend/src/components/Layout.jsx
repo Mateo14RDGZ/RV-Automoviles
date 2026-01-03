@@ -165,7 +165,7 @@ const Layout = () => {
           )}
 
           <div className="flex-shrink-0 px-4 py-4 border-t border-gray-200">
-            <div className="flex items-center px-4 py-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center px-4 py-3 bg-gray-50 rounded-lg mb-3">
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-900 truncate">
                   {user?.nombre || user?.email}
@@ -181,6 +181,18 @@ const Layout = () => {
               >
                 <LogOut className="h-5 w-5" />
               </button>
+            </div>
+            
+            {/* Powered by RF Digital Studio */}
+            <div className="text-center">
+              <a
+                href="https://www.instagram.com/rf_digitalstudio/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-gray-400 hover:text-blue-500 transition-colors duration-200 inline-flex items-center gap-1"
+              >
+                Powered by <span className="font-semibold">RF Digital Studio</span>
+              </a>
             </div>
           </div>
         </div>
@@ -275,7 +287,7 @@ const Layout = () => {
             )}
 
             <div className="flex-shrink-0 px-4 py-4 border-t border-gray-200">
-              <div className="flex items-center px-4 py-3 bg-gray-50 rounded-lg">
+              <div className="flex items-center px-4 py-3 bg-gray-50 rounded-lg mb-3">
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-900 truncate">
                     {user?.nombre || user?.email}
@@ -291,6 +303,18 @@ const Layout = () => {
                 >
                   <LogOut className="h-5 w-5" />
                 </button>
+              </div>
+              
+              {/* Powered by RF Digital Studio */}
+              <div className="text-center">
+                <a
+                  href="https://www.instagram.com/rf_digitalstudio/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-gray-400 hover:text-blue-500 transition-colors duration-200 inline-flex items-center gap-1"
+                >
+                  Powered by <span className="font-semibold">RF Digital Studio</span>
+                </a>
               </div>
             </div>
           </div>
