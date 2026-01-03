@@ -1,6 +1,6 @@
 {
-  "name": "Nicolas Tejera Automoviles - Sistema de Gestión",
-  "short_name": "NT Autos",
+  "name": "Nicolas Tejera Automoviles",
+  "short_name": "Nicolas Tejera Automoviles",
   "description": "Sistema de gestión de cuotas y pagos automotor - Nicolas Tejera Automoviles",
   "start_url": "/",
   "scope": "/",
