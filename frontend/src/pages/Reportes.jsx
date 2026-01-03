@@ -108,14 +108,12 @@ const Reportes = () => {
       const autos = await autosService.getAll();
       const doc = new jsPDF();
       
-      // Encabezado
-      doc.setFontSize(18);
-      doc.setTextColor(59, 130, 246); // Azul
-      doc.text('Reporte de Inventario de Autos', 105, 20, { align: 'center' });
-      doc.setFontSize(10);
-      doc.setTextColor(100, 100, 100);
-      doc.text(`Fecha de generación: ${new Date().toLocaleDateString('es-ES')}`, 105, 28, { align: 'center' });
-      doc.text(`Total de autos: ${autos.length}`, 105, 34, { align: 'center' });
+      // Agregar encabezado con logo
+      const startY = await addPDFHeader(
+        doc, 
+        'Reporte de Inventario de Autos',
+        `Total de autos: ${autos.length}`
+      );
       
       // Tabla de autos
       const tableData = autos.map(auto => [
@@ -130,7 +128,7 @@ const Reportes = () => {
       ]);
       
       autoTable(doc, {
-        startY: 40,
+        startY: startY,
         head: [['Marca', 'Modelo', 'Matrícula', 'Año', 'Color', 'Precio', 'Cliente', 'Estado']],
         body: tableData,
         theme: 'striped',
@@ -156,25 +154,14 @@ const Reportes = () => {
         margin: { left: 14, right: 14 }
       });
       
-      // Pie de página
-      const pageCount = doc.internal.getNumberOfPages();
-      for (let i = 1; i <= pageCount; i++) {
-        doc.setPage(i);
-        doc.setFontSize(8);
-        doc.setTextColor(150, 150, 150);
-        doc.text(
-          `Página ${i} de ${pageCount}`,
-          doc.internal.pageSize.getWidth() / 2,
-          doc.internal.pageSize.getHeight() - 10,
-          { align: 'center' }
-        );
-      }
+      // Agregar pie de página con logo
+      addPDFFooter(doc);
       
       doc.save(`autos_${new Date().toISOString().split('T')[0]}.pdf`);
-      showToast('PDF de pagos exportado exitosamente', 'success');
+      showToast('PDF de autos exportado exitosamente', 'success');
     } catch (error) {
       console.error('Error al exportar PDF:', error);
-      showToast('Error al exportar pagos a PDF', 'error');
+      showToast('Error al exportar autos a PDF', 'error');
     }
   };
 

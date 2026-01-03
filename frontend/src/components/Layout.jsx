@@ -61,10 +61,20 @@ const Layout = () => {
       <aside className="hidden md:fixed md:inset-y-0 md:flex md:w-64 md:flex-col">
         <div className="flex flex-col flex-grow bg-white border-r border-gray-200 overflow-y-auto">
           <div className="flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-primary-500 to-primary-700 py-4 px-4">
-            <div className="text-center">
-              <div className="text-4xl mb-1">🚗</div>
-              <h1 className="text-white text-lg font-bold">Gestión</h1>
-              <p className="text-white text-sm opacity-90">Automotora</p>
+            <div className="text-center w-full">
+              <img 
+                src="/logo-nicolas-tejera.png" 
+                alt="Nicolas Tejera Automoviles" 
+                className="h-16 w-auto mx-auto object-contain mb-2"
+                onError={(e) => {
+                  // Si la imagen no carga, mostrar emoji como fallback
+                  e.target.style.display = 'none';
+                  e.target.nextElementSibling.style.display = 'block';
+                }}
+              />
+              <div className="text-3xl mb-1 hidden">🚗</div>
+              <h1 className="text-white text-base font-bold">Nicolas Tejera</h1>
+              <p className="text-white text-xs opacity-90">Automoviles</p>
             </div>
           </div>
           
@@ -119,8 +129,17 @@ const Layout = () => {
             <div className="flex items-center justify-between bg-gradient-to-br from-primary-500 to-primary-700 py-4 px-4">
               <div className="flex items-center flex-1">
                 <div className="text-center flex-1">
-                  <div className="text-3xl mb-1">🚗</div>
-                  <h1 className="text-white text-base font-bold">Gestión Automotora</h1>
+                  <img 
+                    src="/logo-nicolas-tejera.png" 
+                    alt="Nicolas Tejera Automoviles" 
+                    className="h-12 w-auto mx-auto object-contain mb-1"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextElementSibling.style.display = 'block';
+                    }}
+                  />
+                  <div className="text-2xl mb-1 hidden">🚗</div>
+                  <h1 className="text-white text-sm font-bold">Nicolas Tejera Automoviles</h1>
                 </div>
               </div>
               <button

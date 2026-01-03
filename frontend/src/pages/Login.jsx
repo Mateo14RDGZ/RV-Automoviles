@@ -57,16 +57,28 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 relative animate-fadeIn">
       <div className="max-w-md w-full animate-zoomIn">
-        {/* Logo y título minimalista */}
+        {/* Logo y título */}
         <div className="text-center mb-8 animate-fadeInUp" style={{animationDelay: '0.1s'}}>
-          <div className="text-6xl mb-3">
-            🚗
+          <div className="flex justify-center mb-4">
+            <img 
+              src="/logo-nicolas-tejera.png" 
+              alt="Nicolas Tejera Automoviles" 
+              className="h-24 w-auto object-contain"
+              onError={(e) => {
+                // Si la imagen no carga, mostrar emoji como fallback
+                e.target.style.display = 'none';
+                e.target.nextElementSibling.style.display = 'block';
+              }}
+            />
+            <div className="text-6xl hidden">
+              🚗
+            </div>
           </div>
-          <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">
-            Gestión Automotora
+          <h1 className="text-2xl font-bold text-gray-800 mb-1">
+            Sistema de Gestión
           </h1>
-          <p className="text-gray-500 dark:text-gray-400 text-sm">
-            Sistema de Gestión Demo
+          <p className="text-gray-500 text-sm">
+            Nicolas Tejera Automoviles
           </p>
         </div>
 
@@ -111,7 +123,7 @@ const Login = () => {
               <button
                 type="button"
                 onClick={resetForm}
-                className="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 text-sm flex items-center gap-2 transition-all duration-200"
+                className="text-gray-600 hover:text-gray-800 text-sm flex items-center gap-2 transition-all duration-200"
               >
                 <ArrowRight className="w-4 h-4 rotate-180" />
                 <span>Volver</span>
