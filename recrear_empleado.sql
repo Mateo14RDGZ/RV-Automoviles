@@ -35,3 +35,4 @@ SELECT 'Usuario empleado recreado exitosamente. Credenciales: empleado@demo.com 
 
 
 
+

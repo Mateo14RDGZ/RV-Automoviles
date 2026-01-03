@@ -299,6 +299,18 @@ const Login = () => {
             </form>
           )}
         </div>
+
+        {/* Footer - Powered by RF Digital Studio */}
+        <div className="text-center mt-6 animate-fadeInUp" style={{animationDelay: '0.3s'}}>
+          <a
+            href="https://www.instagram.com/rf_digitalstudio/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-gray-500 hover:text-blue-400 transition-colors duration-200 inline-flex items-center gap-1"
+          >
+            Powered by <span className="font-semibold">RF Digital Studio</span>
+          </a>
+        </div>
       </div>
     </div>
   );
