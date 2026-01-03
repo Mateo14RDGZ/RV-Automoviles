@@ -60,12 +60,12 @@ const Layout = () => {
       {/* Sidebar para desktop */}
       <aside className="hidden md:fixed md:inset-y-0 md:flex md:w-64 md:flex-col">
         <div className="flex flex-col flex-grow bg-white border-r border-gray-200 overflow-y-auto">
-          <div className="flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-primary-500 to-primary-700 py-4 px-4">
+          <div className="flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-primary-500 to-primary-700 py-5 px-4">
             <div className="text-center w-full">
               <img 
                 src="/logo-nicolas-tejera.png" 
                 alt="Nicolas Tejera Automoviles" 
-                className="h-20 w-auto mx-auto object-contain mb-2"
+                className="h-28 w-auto mx-auto object-contain mb-2"
                 onError={(e) => {
                   // Si la imagen no carga, mostrar emoji como fallback
                   e.target.style.display = 'none';
@@ -132,7 +132,7 @@ const Layout = () => {
                   <img 
                     src="/logo-nicolas-tejera.png" 
                     alt="Nicolas Tejera Automoviles" 
-                    className="h-16 w-auto mx-auto object-contain mb-1"
+                    className="h-20 w-auto mx-auto object-contain mb-1"
                     onError={(e) => {
                       e.target.style.display = 'none';
                       e.target.nextElementSibling.style.display = 'block';

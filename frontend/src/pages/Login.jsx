@@ -63,7 +63,7 @@ const Login = () => {
             <img 
               src="/logo-nicolas-tejera.png" 
               alt="Nicolas Tejera Automoviles" 
-              className="h-32 w-auto object-contain"
+              className="h-40 w-auto object-contain"
               onError={(e) => {
                 // Si la imagen no carga, mostrar emoji como fallback
                 e.target.style.display = 'none';
