@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { clientesService } from '../services';
-import { Users, Plus, Search, Edit2, Trash2, Phone, Mail, MapPin, MessageCircle, Copy, ExternalLink } from 'lucide-react';
+import { Users, Plus, Search, Edit2, Trash2, Phone, Mail, MapPin, MessageCircle, Copy, ExternalLink, IdCard } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 import ConfirmDialog from '../components/ConfirmDialog';
 
@@ -80,7 +80,7 @@ const Clientes = () => {
         setNewClientCredentials({
           nombre: formData.nombre,
           telefono: formData.telefono,
-          email: response.emailUsuario,
+          cedula: formData.cedula,
           password: response.passwordTemporal,
         });
         
@@ -110,16 +110,20 @@ Bienvenido a *Nicolas Tejera Automóviles* 🚗
 
 Te compartimos tus credenciales de acceso para ver tus cuotas:
 
-🔐 *Credenciales de Acceso:*
-📧 Usuario: ${newClientCredentials.email}
-🔑 Contraseña: ${newClientCredentials.password}
+🔐 *CREDENCIALES DE ACCESO:*
+
+📱 *Usuario:* ${newClientCredentials.cedula}
+🔑 *Contraseña:* ${newClientCredentials.password}
 
 🌐 *Link de acceso:*
 ${urlWeb}
 
-Puedes iniciar sesión con tu email o cédula y la contraseña proporcionada.
+📝 *Importante:*
+- Ingresa con tu número de cédula (8 dígitos)
+- Usa la contraseña proporcionada arriba
+- Guarda esta información en un lugar seguro
 
-¡Cualquier consulta, estamos a tu disposición!`;
+¡Cualquier consulta, estamos a tu disposición! 😊`;
 
     const mensajeEncoded = encodeURIComponent(mensaje);
     const whatsappUrl = `https://wa.me/${telefono}?text=${mensajeEncoded}`;
@@ -134,7 +138,7 @@ Puedes iniciar sesión con tu email o cédula y la contraseña proporcionada.
     if (!newClientCredentials) return;
     
     const urlWeb = window.location.origin;
-    const texto = `Usuario: ${newClientCredentials.email}\nContraseña: ${newClientCredentials.password}\nLink: ${urlWeb}`;
+    const texto = `Usuario (Cédula): ${newClientCredentials.cedula}\nContraseña: ${newClientCredentials.password}\nLink: ${urlWeb}`;
     
     navigator.clipboard.writeText(texto).then(() => {
       showToast('📋 Credenciales copiadas al portapapeles', 'success');
@@ -445,11 +449,11 @@ Puedes iniciar sesión con tu email o cédula y la contraseña proporcionada.
                     </div>
                   </div>
                   <div className="flex items-start gap-2">
-                    <Mail className="w-4 h-4 text-gray-500 mt-0.5" />
+                    <IdCard className="w-4 h-4 text-gray-500 mt-0.5" />
                     <div>
-                      <span className="text-gray-600 dark:text-gray-400">Usuario:</span>
+                      <span className="text-gray-600 dark:text-gray-400">Usuario (Cédula):</span>
                       <span className="ml-2 font-medium text-gray-900 dark:text-white">
-                        {newClientCredentials.email}
+                        {newClientCredentials.cedula}
                       </span>
                     </div>
                   </div>

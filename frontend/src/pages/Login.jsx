@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Car, Lock, Mail, ArrowRight, Sparkles, ShieldCheck, CreditCard, IdCard, User } from 'lucide-react';
+import { Car, Lock, Mail, ArrowRight, Sparkles, ShieldCheck, CreditCard, IdCard } from 'lucide-react';
 
 const Login = () => {
   const [loginMode, setLoginMode] = useState(''); // '' | 'admin' | 'cliente'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [identificadorCliente, setIdentificadorCliente] = useState(''); // email o cédula
+  const [cedula, setCedula] = useState('');
   const [passwordCliente, setPasswordCliente] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -31,8 +31,8 @@ const Login = () => {
           setLoading(false);
         }
       } else {
-        // Login de cliente con identificador (email o cédula) y contraseña
-        const result = await loginCliente(identificadorCliente, passwordCliente);
+        // Login de cliente con cédula y contraseña
+        const result = await loginCliente(cedula, passwordCliente);
         if (result && result.token && result.user) {
           navigate('/', { replace: true });
         } else {
@@ -52,7 +52,7 @@ const Login = () => {
     setError('');
     setEmail('');
     setPassword('');
-    setIdentificadorCliente('');
+    setCedula('');
     setPasswordCliente('');
   };
 
@@ -218,26 +218,36 @@ const Login = () => {
                     </h4>
                     <p className="text-xs text-gray-700">
                       Al crear tu cuenta, recibirás tu contraseña por WhatsApp. 
-                      Puedes iniciar sesión con tu email o cédula.
+                      Inicia sesión con tu número de cédula.
                     </p>
                   </div>
 
                   <div className="space-y-2">
-                    <label htmlFor="identificador" className="block text-sm font-medium text-gray-700">
-                      Email o Cédula
+                    <label htmlFor="cedula" className="block text-sm font-medium text-gray-700">
+                      Número de Cédula
                     </label>
                     <div className="relative">
-                      <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                      <IdCard className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                       <input
-                        id="identificador"
+                        id="cedula"
                         type="text"
-                        value={identificadorCliente}
-                        onChange={(e) => setIdentificadorCliente(e.target.value)}
+                        value={cedula}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\D/g, '');
+                          if (value.length <= 8) {
+                            setCedula(value);
+                          }
+                        }}
                         className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all"
-                        placeholder="email@ejemplo.com o 12345678"
+                        placeholder="12345678"
+                        maxLength="8"
+                        pattern="[0-9]{8}"
                         required
                       />
                     </div>
+                    <p className="text-gray-500 text-xs mt-2">
+                      Ingresa tu cédula de 8 dígitos
+                    </p>
                   </div>
 
                   <div className="space-y-2">

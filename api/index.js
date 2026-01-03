@@ -152,9 +152,9 @@ app.post('/api/auth/login', [
   }
 });
 
-// Login cliente - requiere email/cedula y contraseña
+// Login cliente - requiere cédula y contraseña
 app.post('/api/auth/login-cliente', [
-  body('identificador').trim().notEmpty().withMessage('Se requiere email o cédula'),
+  body('cedula').trim().isLength({ min: 8, max: 8 }).isNumeric().withMessage('La cédula debe tener 8 dígitos'),
   body('password').notEmpty().withMessage('Se requiere contraseña')
 ], async (req, res) => {
   try {
@@ -164,17 +164,12 @@ app.post('/api/auth/login-cliente', [
       return res.status(400).json({ error: 'Datos inválidos', details: errors.array() });
     }
 
-    const { identificador, password } = req.body;
-    console.log('Intentando login de cliente con identificador:', identificador);
+    const { cedula, password } = req.body;
+    console.log('Intentando login de cliente con cédula:', cedula);
 
-    // Buscar cliente por email o cédula
+    // Buscar cliente por cédula
     const cliente = await prisma.cliente.findFirst({
-      where: {
-        OR: [
-          { email: identificador },
-          { cedula: identificador }
-        ]
-      },
+      where: { cedula },
       include: { 
         usuario: true,
         autos: {
