@@ -5,7 +5,7 @@ import { exportToCSV, exportToJSON, formatDataForExport } from '../utils/export'
 import { formatCurrency, formatDate } from '../utils/format';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { addPDFHeader, addPDFFooter } from '../utils/pdfHelper';
+import { addPDFHeader, addPDFFooter, getTableStyles, addSection, getPDFFileName, COLORS } from '../utils/pdfHelper';
 import { 
   FileDown, 
   FileText, 
@@ -117,60 +117,111 @@ const Reportes = () => {
       
       const doc = new jsPDF();
       
-      // Agregar encabezado con logo
+      // Agregar encabezado profesional
       const startY = await addPDFHeader(
         doc, 
-        'Reporte de Inventario de Autos',
-        `Total de autos: ${autos.length}`
+        'Inventario de Vehículos',
+        `Reporte completo del inventario de automóviles`,
+        'Inventario'
       );
       
-      // Tabla de autos
+      // Agregar sección de resumen
+      const sectionY = addSection(
+        doc,
+        startY,
+        'Resumen del Inventario',
+        `Total de vehículos: ${autos.length} | Fecha: ${new Date().toLocaleDateString('es-ES')}`
+      );
+      
+      // Calcular estadísticas
+      const disponibles = autos.filter(a => a.estado === 'disponible').length;
+      const financiados = autos.filter(a => a.estado === 'financiado').length;
+      const vendidos = autos.filter(a => a.estado === 'vendido').length;
+      
+      // Tabla de resumen
+      autoTable(doc, {
+        startY: sectionY,
+        head: [['Estado', 'Cantidad', 'Porcentaje']],
+        body: [
+          ['Disponibles', disponibles.toString(), `${((disponibles/autos.length)*100).toFixed(1)}%`],
+          ['En Financiamiento', financiados.toString(), `${((financiados/autos.length)*100).toFixed(1)}%`],
+          ['Vendidos', vendidos.toString(), `${((vendidos/autos.length)*100).toFixed(1)}%`]
+        ],
+        ...getTableStyles('success'),
+        columnStyles: {
+          0: { cellWidth: 60, fontStyle: 'bold' },
+          1: { cellWidth: 60, halign: 'center' },
+          2: { cellWidth: 60, halign: 'center' }
+        }
+      });
+      
+      // Sección de detalle
+      const detailY = addSection(
+        doc,
+        doc.lastAutoTable.finalY + 10,
+        'Detalle Completo de Vehículos'
+      );
+      
+      // Tabla detallada de autos
       const tableData = autos.map(auto => [
-        String(auto.marca || ''),
-        String(auto.modelo || ''),
-        String(auto.matricula || 'N/A'),
-        String(auto.anio || ''),
-        String(auto.color || ''),
+        String(auto.marca || '-'),
+        String(auto.modelo || '-'),
+        String(auto.matricula || '0km'),
+        String(auto.anio || '-'),
+        String(auto.color || '-'),
         formatCurrency(auto.precio || 0),
-        String(auto.cliente?.nombre || 'Sin cliente'),
-        auto.estado === 'vendido' ? 'Vendido' : auto.estado === 'financiado' ? 'Financiado' : 'Disponible'
+        String(auto.cliente?.nombre || 'Disponible'),
+        auto.estado === 'vendido' ? '✓ Vendido' : auto.estado === 'financiado' ? '⟳ Financiado' : '● Disponible'
       ]);
       
       autoTable(doc, {
-        startY: startY,
-        head: [['Marca', 'Modelo', 'Matrícula', 'Año', 'Color', 'Precio', 'Cliente', 'Estado']],
+        startY: detailY,
+        head: [['Marca', 'Modelo', 'Matrícula', 'Año', 'Color', 'Precio', 'Cliente/Estado', 'Estado']],
         body: tableData,
-        theme: 'striped',
-        headStyles: { 
-          fillColor: [59, 130, 246], 
-          textColor: 255,
-          fontSize: 9,
-          fontStyle: 'bold',
-          halign: 'center'
-        },
-        bodyStyles: { fontSize: 8, cellPadding: 2.5 },
-        alternateRowStyles: { fillColor: [248, 250, 252] },
+        ...getTableStyles('primary'),
         columnStyles: {
-          0: { cellWidth: 25 },
-          1: { cellWidth: 25 },
-          2: { cellWidth: 22 },
+          0: { cellWidth: 22, fontStyle: 'bold' },
+          1: { cellWidth: 24 },
+          2: { cellWidth: 20, halign: 'center', fontSize: 7 },
           3: { cellWidth: 15, halign: 'center' },
-          4: { cellWidth: 20 },
-          5: { cellWidth: 25, halign: 'right' },
-          6: { cellWidth: 28 },
-          7: { cellWidth: 22, halign: 'center' }
+          4: { cellWidth: 18 },
+          5: { cellWidth: 26, halign: 'right', fontStyle: 'bold', textColor: COLORS.success },
+          6: { cellWidth: 30, fontSize: 7 },
+          7: { cellWidth: 27, halign: 'center', fontSize: 7 }
         },
-        margin: { left: 14, right: 14 }
+        didParseCell: function(data) {
+          // Colorear estados
+          if (data.column.index === 7 && data.section === 'body') {
+            if (data.cell.text[0].includes('Vendido')) {
+              data.cell.styles.textColor = COLORS.success;
+              data.cell.styles.fontStyle = 'bold';
+            } else if (data.cell.text[0].includes('Financiado')) {
+              data.cell.styles.textColor = COLORS.warning;
+              data.cell.styles.fontStyle = 'bold';
+            } else {
+              data.cell.styles.textColor = COLORS.secondary;
+              data.cell.styles.fontStyle = 'bold';
+            }
+          }
+        }
       });
       
-      // Agregar pie de página con logo
-      addPDFFooter(doc);
+      // Agregar pie de página profesional
+      addPDFFooter(doc, {
+        showContact: true,
+        contactInfo: {
+          telefono: '+598 XX XXX XXX',
+          email: 'ventas@nicolastejera.com',
+          web: 'www.nicolastejera.com'
+        }
+      });
       
-      doc.save(`autos_${new Date().toISOString().split('T')[0]}.pdf`);
-      showToast('PDF de autos exportado exitosamente', 'success');
+      // Guardar con nombre profesional
+      doc.save(getPDFFileName('Inventario', 'Vehiculos'));
+      showToast('PDF de inventario generado exitosamente', 'success');
     } catch (error) {
       console.error('Error al exportar PDF:', error);
-      showToast('Error al exportar autos a PDF', 'error');
+      showToast('Error al exportar inventario a PDF', 'error');
     }
   };
 
@@ -179,51 +230,67 @@ const Reportes = () => {
       const clientes = await clientesService.getAll();
       const doc = new jsPDF();
       
-      // Agregar encabezado con logo
+      // Agregar encabezado profesional
       const startY = await addPDFHeader(
         doc,
-        'Reporte de Base de Clientes',
-        `Total de clientes: ${clientes.length}`
+        'Base de Datos de Clientes',
+        `Registro completo de clientes activos`,
+        'Base de Clientes'
+      );
+      
+      // Agregar sección de resumen
+      const sectionY = addSection(
+        doc,
+        startY,
+        'Información General',
+        `Total de clientes registrados: ${clientes.length} | Fecha: ${new Date().toLocaleDateString('es-ES')}`
       );
       
       // Tabla de clientes
       const tableData = clientes.map(cliente => [
-        String(cliente.nombre || ''),
-        String(cliente.cedula || ''),
-        String(cliente.telefono || 'N/A'),
-        String(cliente.email || 'N/A'),
-        String(cliente.direccion || 'N/A')
+        String(cliente.nombre || '-'),
+        String(cliente.cedula || '-'),
+        String(cliente.telefono || '-'),
+        String(cliente.email || 'Sin email'),
+        String(cliente.direccion || 'Sin dirección')
       ]);
       
       autoTable(doc, {
-        startY: startY,
-        head: [['Nombre', 'Cédula', 'Teléfono', 'Email', 'Dirección']],
+        startY: sectionY,
+        head: [['Nombre Completo', 'Cédula', 'Teléfono', 'Correo Electrónico', 'Dirección']],
         body: tableData,
-        theme: 'striped',
-        headStyles: { 
-          fillColor: [147, 51, 234], 
-          textColor: 255,
-          fontSize: 9,
-          fontStyle: 'bold',
-          halign: 'center'
-        },
-        bodyStyles: { fontSize: 8, cellPadding: 2.5 },
-        alternateRowStyles: { fillColor: [250, 245, 255] },
+        ...getTableStyles('secondary'),
         columnStyles: {
-          0: { cellWidth: 40 },
-          1: { cellWidth: 25 },
-          2: { cellWidth: 25 },
-          3: { cellWidth: 38 },
-          4: { cellWidth: 54 }
+          0: { cellWidth: 42, fontStyle: 'bold' },
+          1: { cellWidth: 24, halign: 'center' },
+          2: { cellWidth: 26, halign: 'center' },
+          3: { cellWidth: 42, fontSize: 7 },
+          4: { cellWidth: 48, fontSize: 7 }
         },
-        margin: { left: 14, right: 14 }
+        didParseCell: function(data) {
+          // Resaltar filas sin email
+          if (data.column.index === 3 && data.section === 'body') {
+            if (data.cell.text[0] === 'Sin email') {
+              data.cell.styles.textColor = COLORS.gray[400];
+              data.cell.styles.fontStyle = 'italic';
+            }
+          }
+        }
       });
       
       // Agregar pie de página
-      addPDFFooter(doc);
+      addPDFFooter(doc, {
+        showContact: true,
+        contactInfo: {
+          telefono: '+598 XX XXX XXX',
+          email: 'info@nicolastejera.com',
+          web: 'www.nicolastejera.com'
+        }
+      });
       
-      doc.save(`clientes_${new Date().toISOString().split('T')[0]}.pdf`);
-      showToast('PDF de clientes exportado exitosamente', 'success');
+      // Guardar con nombre profesional
+      doc.save(getPDFFileName('Clientes', 'Base'));
+      showToast('PDF de clientes generado exitosamente', 'success');
     } catch (error) {
       console.error('Error al exportar PDF:', error);
       showToast('Error al exportar clientes a PDF', 'error');
