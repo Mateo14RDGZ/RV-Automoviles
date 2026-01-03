@@ -249,9 +249,9 @@ const Dashboard = () => {
         {/* Total Recaudado */}
         <div className="card p-4 md:p-6 dark:bg-gray-800 dark:border-gray-700 hover-lift animate-fadeInUp" style={{animationDelay: '0.5s'}}>
           <div className="flex items-center justify-between">
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0 pr-2">
               <p className="text-xs md:text-sm font-medium text-gray-600 dark:text-gray-400">Total Recaudado</p>
-              <p className="text-lg md:text-2xl font-bold text-gray-900 dark:text-white mt-1 md:mt-2 break-words">
+              <p className="text-base md:text-2xl lg:text-2xl font-bold text-gray-900 dark:text-white mt-1 md:mt-2 break-words">
                 {formatCurrency(stats.pagos.totalRecaudado)}
               </p>
               <p className="text-[10px] md:text-xs text-gray-500 dark:text-gray-400 mt-0.5 md:mt-1">{stats.pagos.pagados} cuotas pagadas</p>
@@ -267,7 +267,7 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-6 px-2 md:px-0">
         <div className="card p-4 md:p-6 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-900 hover-lift animate-fadeInUp" style={{animationDelay: '0.6s'}}>
           <div className="flex items-center justify-between">
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0 pr-2">
               <p className="text-xs md:text-sm font-medium text-yellow-800 dark:text-yellow-400">Cuotas Pendientes</p>
               <p className="text-xl md:text-2xl font-bold text-yellow-900 dark:text-yellow-300 mt-1 md:mt-2">{stats.pagos.pendientes}</p>
               <p className="text-xs md:text-sm text-yellow-700 dark:text-yellow-500 mt-0.5 md:mt-1 break-words">
@@ -291,7 +291,7 @@ const Dashboard = () => {
 
         <div className="card p-4 md:p-6 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-900 hover-lift animate-fadeInUp" style={{animationDelay: '0.8s'}}>
           <div className="flex items-center justify-between">
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0 pr-2">
               <p className="text-xs md:text-sm font-medium text-green-800 dark:text-green-400">Cuotas Pagadas</p>
               <p className="text-xl md:text-2xl font-bold text-green-900 dark:text-green-300 mt-1 md:mt-2">{stats.pagos.pagados}</p>
               <p className="text-xs md:text-sm text-green-700 dark:text-green-500 mt-0.5 md:mt-1 break-words">

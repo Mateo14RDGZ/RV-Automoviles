@@ -1159,7 +1159,7 @@ const Pagos = () => {
                         <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
                           Cuota #{pago.numeroCuota}
                         </td>
-                        <td className="px-6 py-4 text-sm font-semibold text-gray-900 dark:text-white">
+                        <td className="px-6 py-4 text-sm font-semibold text-gray-900 dark:text-white whitespace-nowrap">
                           {formatCurrency(pago.monto)}
                         </td>
                         <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">

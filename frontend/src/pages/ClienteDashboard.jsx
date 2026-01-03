@@ -144,35 +144,35 @@ const ClienteDashboard = () => {
         {/* Total del Crédito */}
         <div className="card bg-gradient-to-br from-blue-500 to-blue-600 text-white hover-lift animate-fadeInUp" style={{animationDelay: '0.2s'}}>
           <div className="flex items-center justify-between">
-            <div>
+            <div className="flex-1 min-w-0 pr-2">
               <p className="text-blue-100 text-sm font-medium">Total del Crédito</p>
-              <p className="text-2xl font-bold mt-1">{formatCurrency(stats.totalCredito)}</p>
+              <p className="text-xl md:text-2xl font-bold mt-1 break-words">{formatCurrency(stats.totalCredito)}</p>
             </div>
-            <DollarSign className="w-12 h-12 text-blue-200 opacity-80" />
+            <DollarSign className="w-12 h-12 text-blue-200 opacity-80 flex-shrink-0" />
           </div>
         </div>
 
         {/* Total Pagado */}
         <div className="card bg-gradient-to-br from-green-500 to-green-600 text-white hover-lift animate-fadeInUp" style={{animationDelay: '0.3s'}}>
           <div className="flex items-center justify-between">
-            <div>
+            <div className="flex-1 min-w-0 pr-2">
               <p className="text-green-100 text-sm font-medium">Total Pagado</p>
-              <p className="text-2xl font-bold mt-1">{formatCurrency(stats.totalPagado)}</p>
+              <p className="text-xl md:text-2xl font-bold mt-1 break-words">{formatCurrency(stats.totalPagado)}</p>
               <p className="text-green-100 text-xs mt-1">{stats.cuotasPagadas} de {stats.totalCuotas} cuotas</p>
             </div>
-            <CheckCircle className="w-12 h-12 text-green-200 opacity-80" />
+            <CheckCircle className="w-12 h-12 text-green-200 opacity-80 flex-shrink-0" />
           </div>
         </div>
 
         {/* Saldo Pendiente */}
         <div className="card bg-gradient-to-br from-yellow-500 to-yellow-600 text-white hover-lift animate-fadeInUp" style={{animationDelay: '0.4s'}}>
           <div className="flex items-center justify-between">
-            <div>
+            <div className="flex-1 min-w-0 pr-2">
               <p className="text-yellow-100 text-sm font-medium">Saldo Pendiente</p>
-              <p className="text-2xl font-bold mt-1">{formatCurrency(stats.totalPendiente)}</p>
+              <p className="text-xl md:text-2xl font-bold mt-1 break-words">{formatCurrency(stats.totalPendiente)}</p>
               <p className="text-yellow-100 text-xs mt-1">{stats.cuotasPendientes} cuotas</p>
             </div>
-            <Clock className="w-12 h-12 text-yellow-200 opacity-80" />
+            <Clock className="w-12 h-12 text-yellow-200 opacity-80 flex-shrink-0" />
           </div>
         </div>
 

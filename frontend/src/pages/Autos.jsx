@@ -346,7 +346,7 @@ const Autos = () => {
                       ) : auto.matricula}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-300">{auto.anio}</td>
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white whitespace-nowrap">
                       {formatCurrency(auto.precio)}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
