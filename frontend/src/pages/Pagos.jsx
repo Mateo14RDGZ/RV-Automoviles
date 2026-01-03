@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { pagosService, autosService, clientesService } from '../services';
 import { useAuth } from '../context/AuthContext';
-import { CreditCard, Plus, AlertCircle, CheckCircle, Calendar, DollarSign, User, ChevronDown, ChevronUp, Car, RefreshCw } from 'lucide-react';
+import { useToast } from '../context/ToastContext';
+import { CreditCard, Plus, AlertCircle, CheckCircle, Calendar, DollarSign, User, ChevronDown, ChevronUp, Car, RefreshCw, MessageSquare, Save, X } from 'lucide-react';
 
 const Pagos = () => {
   const { user } = useAuth();
@@ -20,6 +21,10 @@ const Pagos = () => {
   const [filter, setFilter] = useState('pendientes');
   const [lastUpdate, setLastUpdate] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  // Estados para comentarios en cuotas vencidas
+  const [comentariosExpandidos, setComentariosExpandidos] = useState({});
+  const [comentariosTemp, setComentariosTemp] = useState({});
+  const [guardandoComentario, setGuardandoComentario] = useState({});
   const [showGenerateModal, setShowGenerateModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showEmailModal, setShowEmailModal] = useState(false);
@@ -354,6 +359,64 @@ const Pagos = () => {
   const handleMarcarPagado = async (pagoId) => {
     setPagoSeleccionado(pagoId);
     setShowConfirmModal(true);
+  };
+
+  // Funciones para manejar comentarios en cuotas vencidas
+  const toggleComentario = (pagoId, comentarioActual) => {
+    setComentariosExpandidos(prev => ({
+      ...prev,
+      [pagoId]: !prev[pagoId]
+    }));
+    
+    // Inicializar el comentario temporal con el valor actual si existe
+    if (!comentariosExpandidos[pagoId]) {
+      setComentariosTemp(prev => ({
+        ...prev,
+        [pagoId]: comentarioActual || ''
+      }));
+    }
+  };
+
+  const handleComentarioChange = (pagoId, valor) => {
+    setComentariosTemp(prev => ({
+      ...prev,
+      [pagoId]: valor
+    }));
+  };
+
+  const guardarComentario = async (pagoId) => {
+    try {
+      setGuardandoComentario(prev => ({ ...prev, [pagoId]: true }));
+      
+      const comentario = comentariosTemp[pagoId] || '';
+      
+      await pagosService.update(pagoId, { comentario });
+      
+      // Actualizar el estado local de pagos
+      setPagos(prev => prev.map(p => 
+        p.id === pagoId ? { ...p, comentario } : p
+      ));
+      
+      // Actualizar clientesConPagos si existe
+      setClientesConPagos(prev => prev.map(cliente => ({
+        ...cliente,
+        pagos: cliente.pagos.map(p => 
+          p.id === pagoId ? { ...p, comentario } : p
+        )
+      })));
+      
+      showToast('Comentario guardado exitosamente', 'success');
+      
+      // Colapsar el comentario
+      setComentariosExpandidos(prev => ({
+        ...prev,
+        [pagoId]: false
+      }));
+    } catch (error) {
+      showToast('Error al guardar comentario', 'error');
+    } finally {
+      setGuardandoComentario(prev => ({ ...prev, [pagoId]: false }));
+    }
   };
 
   const confirmarMarcarPagado = async () => {
@@ -858,6 +921,55 @@ const Pagos = () => {
                                         </button>
                                       )}
                                     </div>
+
+                                    {/* Sección de comentarios para cuotas vencidas */}
+                                    {esVencido && (
+                                      <div className="mt-3 pt-3 border-t border-red-300 dark:border-red-800">
+                                        <button
+                                          onClick={() => toggleComentario(pago.id, pago.comentario)}
+                                          className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 hover:text-red-700 dark:hover:text-red-400 transition-colors"
+                                        >
+                                          <MessageSquare className="w-4 h-4" />
+                                          {pago.comentario ? 'Ver/Editar Comentario' : 'Agregar Comentario'}
+                                          {comentariosExpandidos[pago.id] ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                                        </button>
+
+                                        {comentariosExpandidos[pago.id] && (
+                                          <div className="mt-2 space-y-2">
+                                            <textarea
+                                              value={comentariosTemp[pago.id] || ''}
+                                              onChange={(e) => handleComentarioChange(pago.id, e.target.value)}
+                                              placeholder="Ej: Cliente con dificultades financieras temporales..."
+                                              className="w-full px-3 py-2 text-sm border border-red-300 dark:border-red-700 rounded-lg focus:ring-2 focus:ring-red-500 dark:bg-gray-800 dark:text-white resize-none"
+                                              rows="3"
+                                            />
+                                            <div className="flex gap-2">
+                                              <button
+                                                onClick={() => guardarComentario(pago.id)}
+                                                disabled={guardandoComentario[pago.id]}
+                                                className="btn btn-sm btn-primary flex items-center gap-1"
+                                              >
+                                                <Save className="w-3 h-3" />
+                                                {guardandoComentario[pago.id] ? 'Guardando...' : 'Guardar'}
+                                              </button>
+                                              <button
+                                                onClick={() => setComentariosExpandidos(prev => ({ ...prev, [pago.id]: false }))}
+                                                className="btn btn-sm btn-secondary flex items-center gap-1"
+                                              >
+                                                <X className="w-3 h-3" />
+                                                Cancelar
+                                              </button>
+                                            </div>
+                                          </div>
+                                        )}
+
+                                        {!comentariosExpandidos[pago.id] && pago.comentario && (
+                                          <div className="mt-2 p-2 bg-red-100 dark:bg-red-900/30 rounded text-xs text-gray-700 dark:text-gray-300">
+                                            <strong>Motivo:</strong> {pago.comentario}
+                                          </div>
+                                        )}
+                                      </div>
+                                    )}
                                   </div>
                                 </div>
                               );
@@ -1004,6 +1116,55 @@ const Pagos = () => {
                         </div>
                       )}
                     </div>
+
+                    {/* Sección de comentarios para cuotas vencidas - Vista Mobile */}
+                    {isVencido(pago) && (
+                      <div className="mt-3 pt-3 border-t border-red-300 dark:border-red-800">
+                        <button
+                          onClick={() => toggleComentario(pago.id, pago.comentario)}
+                          className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 hover:text-red-700 dark:hover:text-red-400 transition-colors w-full"
+                        >
+                          <MessageSquare className="w-4 h-4" />
+                          {pago.comentario ? 'Ver/Editar Comentario' : 'Agregar Comentario'}
+                          {comentariosExpandidos[pago.id] ? <ChevronUp className="w-4 h-4 ml-auto" /> : <ChevronDown className="w-4 h-4 ml-auto" />}
+                        </button>
+
+                        {comentariosExpandidos[pago.id] && (
+                          <div className="mt-2 space-y-2">
+                            <textarea
+                              value={comentariosTemp[pago.id] || ''}
+                              onChange={(e) => handleComentarioChange(pago.id, e.target.value)}
+                              placeholder="Ej: Cliente con dificultades financieras temporales..."
+                              className="w-full px-3 py-2 text-sm border border-red-300 dark:border-red-700 rounded-lg focus:ring-2 focus:ring-red-500 dark:bg-gray-800 dark:text-white resize-none"
+                              rows="3"
+                            />
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => guardarComentario(pago.id)}
+                                disabled={guardandoComentario[pago.id]}
+                                className="btn btn-sm btn-primary flex items-center gap-1 flex-1"
+                              >
+                                <Save className="w-3 h-3" />
+                                {guardandoComentario[pago.id] ? 'Guardando...' : 'Guardar'}
+                              </button>
+                              <button
+                                onClick={() => setComentariosExpandidos(prev => ({ ...prev, [pago.id]: false }))}
+                                className="btn btn-sm btn-secondary flex items-center gap-1"
+                              >
+                                <X className="w-3 h-3" />
+                                Cancelar
+                              </button>
+                            </div>
+                          </div>
+                        )}
+
+                        {!comentariosExpandidos[pago.id] && pago.comentario && (
+                          <div className="mt-2 p-2 bg-red-100 dark:bg-red-900/30 rounded text-xs text-gray-700 dark:text-gray-300">
+                            <strong>Motivo:</strong> {pago.comentario}
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
