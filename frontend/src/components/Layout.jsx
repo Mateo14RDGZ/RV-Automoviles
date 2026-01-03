@@ -65,7 +65,7 @@ const Layout = () => {
               <img 
                 src="/logo-nicolas-tejera.png" 
                 alt="Nicolas Tejera Automoviles" 
-                className="h-16 w-auto mx-auto object-contain mb-2"
+                className="h-20 w-auto mx-auto object-contain mb-2"
                 onError={(e) => {
                   // Si la imagen no carga, mostrar emoji como fallback
                   e.target.style.display = 'none';
@@ -132,7 +132,7 @@ const Layout = () => {
                   <img 
                     src="/logo-nicolas-tejera.png" 
                     alt="Nicolas Tejera Automoviles" 
-                    className="h-12 w-auto mx-auto object-contain mb-1"
+                    className="h-16 w-auto mx-auto object-contain mb-1"
                     onError={(e) => {
                       e.target.style.display = 'none';
                       e.target.nextElementSibling.style.display = 'block';
