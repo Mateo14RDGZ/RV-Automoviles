@@ -1135,6 +1135,9 @@ const Pagos = () => {
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                         Estado
                       </th>
+                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                        Acción
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -1167,6 +1170,17 @@ const Pagos = () => {
                         </td>
                         <td className="px-6 py-4">
                           {getEstadoBadge(pago)}
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          {pago.estado !== 'pagado' && (
+                            <button
+                              onClick={() => abrirModalComprobante(pago)}
+                              className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
+                            >
+                              <Upload className="w-4 h-4" />
+                              Pagar
+                            </button>
+                          )}
                         </td>
                       </tr>
                     ))}
@@ -1236,8 +1250,21 @@ const Pagos = () => {
                       )}
                     </div>
 
-                    {/* Sección de comentarios para cuotas vencidas - Vista Mobile */}
-                    {isVencido(pago) && (
+                    {/* Botón de pagar - Solo si no está pagado */}
+                    {pago.estado !== 'pagado' && (
+                      <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                        <button
+                          onClick={() => abrirModalComprobante(pago)}
+                          className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-lg transition-all duration-200 shadow-sm hover:shadow-md active:scale-95"
+                        >
+                          <Upload className="w-5 h-5" />
+                          Pagar con Transferencia
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Sección de comentarios para cuotas vencidas - Solo Staff */}
+                    {isStaff && isVencido(pago) && (
                       <div className="mt-3 pt-3 border-t border-red-300 dark:border-red-800">
                         <button
                           onClick={() => toggleComentario(pago.id, pago.comentario)}
