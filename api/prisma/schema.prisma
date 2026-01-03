@@ -37,20 +37,27 @@ model Cliente {
 }
 
 model Auto {
-  id         Int       @id @default(autoincrement())
-  marca      String
-  modelo     String
-  anio       Int
-  matricula  String    // Removido @unique para permitir múltiples autos 0km
-  precio     Float
-  estado     String    @default("disponible") // disponible, vendido, reservado
-  activo     Boolean   @default(true) // true: activo, false: archivado/completado
-  clienteId  Int?
-  cliente    Cliente?  @relation(fields: [clienteId], references: [id])
-  pagos      Pago[]
-  permutas   Permuta[] // Permutas recibidas al vender este auto
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  id            Int       @id @default(autoincrement())
+  marca         String
+  modelo        String
+  anio          Int
+  matricula     String    // Removido @unique para permitir múltiples autos 0km
+  precio        Float
+  estado        String    @default("disponible") // disponible, vendido, reservado
+  activo        Boolean   @default(true) // true: activo, false: archivado/completado
+  // Nuevos campos
+  kilometraje   Int?      // Kilometraje del vehículo
+  departamento  String?   // Departamento de procedencia
+  tipoDocumento String?   // Tipo de documentación del vehículo
+  valorPatente  Float?    // Valor de la patente
+  color         String?   // Color del vehículo
+  // Relaciones
+  clienteId     Int?
+  cliente       Cliente?  @relation(fields: [clienteId], references: [id])
+  pagos         Pago[]
+  permutas      Permuta[] // Permutas recibidas al vender este auto
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }
 
 model Pago {
@@ -62,6 +69,7 @@ model Pago {
   fechaVencimiento  DateTime
   fechaPago         DateTime?
   estado            String    @default("pendiente") // pendiente, pagado, vencido
+  comentario        String?   // Comentario del empleado/admin sobre el motivo de no pago
   comprobantes      ComprobantePago[]
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { autosService, clientesService } from '../services';
-import { Car, Plus, Search, Edit2, Trash2, Eye } from 'lucide-react';
+import { Car, Plus, Search, Edit2, Trash2, Eye, DollarSign, X } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 import ConfirmDialog from '../components/ConfirmDialog';
 import { formatCurrency } from '../utils/format';
@@ -18,6 +18,9 @@ const Autos = () => {
   const [showAsignarCliente, setShowAsignarCliente] = useState(false);
   const [autoAsignarCliente, setAutoAsignarCliente] = useState(null);
   const [clienteAsignar, setClienteAsignar] = useState('');
+  // Modal para ver detalles del auto
+  const [showDetalles, setShowDetalles] = useState(false);
+  const [autoDetalles, setAutoDetalles] = useState(null);
 
   const abrirAsignarCliente = (auto) => {
     setAutoAsignarCliente(auto);
@@ -56,6 +59,11 @@ const Autos = () => {
     matricula: '',
     precio: '',
     clienteId: '',
+    kilometraje: '',
+    departamento: '',
+    tipoDocumento: '',
+    valorPatente: '',
+    color: '',
   });
 
   useEffect(() => {
@@ -186,6 +194,11 @@ const Autos = () => {
       matricula: auto.matricula,
       precio: auto.precio,
       clienteId: auto.clienteId || '',
+      kilometraje: auto.kilometraje || '',
+      departamento: auto.departamento || '',
+      tipoDocumento: auto.tipoDocumento || '',
+      valorPatente: auto.valorPatente || '',
+      color: auto.color || '',
     });
     setShowModal(true);
   };
@@ -199,6 +212,11 @@ const Autos = () => {
       matricula: '',
       precio: '',
       clienteId: '',
+      kilometraje: '',
+      departamento: '',
+      tipoDocumento: '',
+      valorPatente: '',
+      color: '',
     });
   };
 
@@ -336,6 +354,16 @@ const Autos = () => {
                     <td className="px-6 py-4 text-right text-sm font-medium">
                       <div className="flex justify-end gap-2" style={{position: 'relative'}}>
                         <button
+                          onClick={() => {
+                            setAutoDetalles(auto);
+                            setShowDetalles(true);
+                          }}
+                          title="Ver detalles"
+                          className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
+                        <button
                           onClick={() => handleEdit(auto)}
                           className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
                         >
@@ -467,6 +495,16 @@ const Autos = () => {
               </div>
 
               <div className="flex gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <button
+                  onClick={() => {
+                    setAutoDetalles(auto);
+                    setShowDetalles(true);
+                  }}
+                  className="flex-1 btn btn-secondary text-sm py-2 flex items-center justify-center gap-2"
+                >
+                  <Eye className="w-4 h-4" />
+                  Ver Detalles
+                </button>
                 <button
                   onClick={() => handleEdit(auto)}
                   className="flex-1 btn btn-secondary text-sm py-2 flex items-center justify-center gap-2"
@@ -620,6 +658,106 @@ const Autos = () => {
                       </>
                     )}
                   </div>
+
+                  {/* Nuevos campos adicionales */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Color
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.color}
+                      onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+                      placeholder="Ej: Blanco, Negro, Rojo"
+                      className="input"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Kilometraje
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={formData.kilometraje}
+                      onChange={(e) => setFormData({ ...formData, kilometraje: e.target.value })}
+                      placeholder="Ej: 50000"
+                      className="input"
+                    />
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      Dejar vacío si es 0km
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Departamento
+                    </label>
+                    <select
+                      value={formData.departamento}
+                      onChange={(e) => setFormData({ ...formData, departamento: e.target.value })}
+                      className="input"
+                    >
+                      <option value="">Seleccionar departamento</option>
+                      <option value="Montevideo">Montevideo</option>
+                      <option value="Canelones">Canelones</option>
+                      <option value="Maldonado">Maldonado</option>
+                      <option value="Rocha">Rocha</option>
+                      <option value="Treinta y Tres">Treinta y Tres</option>
+                      <option value="Cerro Largo">Cerro Largo</option>
+                      <option value="Rivera">Rivera</option>
+                      <option value="Artigas">Artigas</option>
+                      <option value="Salto">Salto</option>
+                      <option value="Paysandú">Paysandú</option>
+                      <option value="Río Negro">Río Negro</option>
+                      <option value="Soriano">Soriano</option>
+                      <option value="Colonia">Colonia</option>
+                      <option value="San José">San José</option>
+                      <option value="Flores">Flores</option>
+                      <option value="Florida">Florida</option>
+                      <option value="Lavalleja">Lavalleja</option>
+                      <option value="Durazno">Durazno</option>
+                      <option value="Tacuarembó">Tacuarembó</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Tipo de Documentación
+                    </label>
+                    <select
+                      value={formData.tipoDocumento}
+                      onChange={(e) => setFormData({ ...formData, tipoDocumento: e.target.value })}
+                      className="input"
+                    >
+                      <option value="">Seleccionar tipo</option>
+                      <option value="Titulo Original">Título Original</option>
+                      <option value="Titulo Duplicado">Título Duplicado</option>
+                      <option value="Titulo en Tramite">Título en Trámite</option>
+                      <option value="Factura DICOSE">Factura DICOSE</option>
+                      <option value="Importado">Importado</option>
+                      <option value="Sin Documentos">Sin Documentos</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Valor de Patente
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={formData.valorPatente}
+                      onChange={(e) => setFormData({ ...formData, valorPatente: e.target.value })}
+                      placeholder="Ej: 15000"
+                      className="input"
+                    />
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      Costo anual de la patente
+                    </p>
+                  </div>
                 </div>
 
                 <div className="flex gap-3 pt-4">
@@ -690,6 +828,166 @@ const Autos = () => {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Detalles del Auto */}
+      {showDetalles && autoDetalles && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto border border-gray-300 dark:border-gray-700">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  Detalles del Vehículo
+                </h2>
+                <button
+                  onClick={() => {
+                    setShowDetalles(false);
+                    setAutoDetalles(null);
+                  }}
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                {/* Información Principal */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 p-4 rounded-lg">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                      <Car className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                      Información del Vehículo
+                    </h3>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 dark:text-gray-400">Marca:</span>
+                        <span className="font-semibold text-gray-900 dark:text-white">{autoDetalles.marca}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 dark:text-gray-400">Modelo:</span>
+                        <span className="font-semibold text-gray-900 dark:text-white">{autoDetalles.modelo}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 dark:text-gray-400">Año:</span>
+                        <span className="font-semibold text-gray-900 dark:text-white">{autoDetalles.anio}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 dark:text-gray-400">Matrícula:</span>
+                        <span className="font-semibold text-gray-900 dark:text-white">
+                          {autoDetalles.matricula === '0km' || !autoDetalles.matricula ? (
+                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">
+                              0km
+                            </span>
+                          ) : autoDetalles.matricula}
+                        </span>
+                      </div>
+                      {autoDetalles.color && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600 dark:text-gray-400">Color:</span>
+                          <span className="font-semibold text-gray-900 dark:text-white">{autoDetalles.color}</span>
+                        </div>
+                      )}
+                      {autoDetalles.kilometraje && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600 dark:text-gray-400">Kilometraje:</span>
+                          <span className="font-semibold text-gray-900 dark:text-white">{parseInt(autoDetalles.kilometraje).toLocaleString()} km</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 p-4 rounded-lg">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                      <DollarSign className="w-5 h-5 text-green-600 dark:text-green-400" />
+                      Información Comercial
+                    </h3>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 dark:text-gray-400">Precio:</span>
+                        <span className="font-bold text-green-700 dark:text-green-400 text-lg">{formatCurrency(autoDetalles.precio)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 dark:text-gray-400">Estado:</span>
+                        <span className={getEstadoBadge(autoDetalles.estado)}>
+                          {autoDetalles.estado}
+                        </span>
+                      </div>
+                      {autoDetalles.valorPatente && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600 dark:text-gray-400">Valor Patente:</span>
+                          <span className="font-semibold text-gray-900 dark:text-white">{formatCurrency(autoDetalles.valorPatente)}</span>
+                        </div>
+                      )}
+                      {autoDetalles.cliente && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600 dark:text-gray-400">Cliente:</span>
+                          <span className="font-semibold text-gray-900 dark:text-white">{autoDetalles.cliente.nombre}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Procedencia y Documentación */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {autoDetalles.departamento && (
+                    <div className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg">
+                      <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Procedencia</h3>
+                      <p className="text-lg font-medium text-gray-900 dark:text-white">{autoDetalles.departamento}</p>
+                    </div>
+                  )}
+                  {autoDetalles.tipoDocumento && (
+                    <div className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg">
+                      <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Documentación</h3>
+                      <p className="text-lg font-medium text-gray-900 dark:text-white">{autoDetalles.tipoDocumento}</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Fechas */}
+                <div className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg">
+                  <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Información del Sistema</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                    <div>
+                      <span className="text-gray-600 dark:text-gray-400">Fecha de registro:</span>
+                      <span className="ml-2 font-medium text-gray-900 dark:text-white">
+                        {new Date(autoDetalles.createdAt).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-gray-600 dark:text-gray-400">Última actualización:</span>
+                      <span className="ml-2 font-medium text-gray-900 dark:text-white">
+                        {new Date(autoDetalles.updatedAt).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={() => {
+                    setShowDetalles(false);
+                    handleEdit(autoDetalles);
+                  }}
+                  className="btn btn-primary flex-1"
+                >
+                  <Edit2 className="w-4 h-4 inline mr-2" />
+                  Editar Auto
+                </button>
+                <button
+                  onClick={() => {
+                    setShowDetalles(false);
+                    setAutoDetalles(null);
+                  }}
+                  className="btn btn-secondary flex-1"
+                >
+                  Cerrar
+                </button>
+              </div>
             </div>
           </div>
         </div>
