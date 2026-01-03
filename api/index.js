@@ -692,14 +692,84 @@ app.put('/api/clientes/:id', authenticateToken, requireStaff, async (req, res) =
 
 app.delete('/api/clientes/:id', authenticateToken, requireStaff, async (req, res) => {
   try {
-    await prisma.cliente.delete({
-      where: { id: parseInt(req.params.id) }
+    const clienteId = parseInt(req.params.id);
+    
+    // 1. Obtener el cliente con todos sus autos
+    const cliente = await prisma.cliente.findUnique({
+      where: { id: clienteId },
+      include: {
+        autos: true,
+        permutas: true,
+        usuario: true
+      }
     });
 
-    res.json({ message: 'Cliente eliminado correctamente' });
+    if (!cliente) {
+      return res.status(404).json({ error: 'Cliente no encontrado' });
+    }
+
+    console.log(`🗑️ Eliminando cliente ${cliente.nombre} (ID: ${clienteId})...`);
+
+    // 2. Para cada auto del cliente, eliminar todos los pagos y sus comprobantes
+    for (const auto of cliente.autos) {
+      console.log(`  📋 Eliminando pagos del auto ${auto.marca} ${auto.modelo} (ID: ${auto.id})...`);
+      
+      // Obtener todos los pagos del auto
+      const pagos = await prisma.pago.findMany({
+        where: { autoId: auto.id },
+        include: { comprobantes: true }
+      });
+
+      // Eliminar todos los comprobantes de pago
+      for (const pago of pagos) {
+        if (pago.comprobantes && pago.comprobantes.length > 0) {
+          await prisma.comprobantePago.deleteMany({
+            where: { pagoId: pago.id }
+          });
+          console.log(`    ✅ Eliminados ${pago.comprobantes.length} comprobantes del pago ${pago.id}`);
+        }
+      }
+
+      // Eliminar todos los pagos del auto
+      const pagosEliminados = await prisma.pago.deleteMany({
+        where: { autoId: auto.id }
+      });
+      console.log(`    ✅ Eliminados ${pagosEliminados.count} pagos del auto ${auto.id}`);
+
+      // 3. Limpiar la relación del auto (poner clienteId a null) para que pueda eliminarse después
+      await prisma.auto.update({
+        where: { id: auto.id },
+        data: { clienteId: null, estado: 'disponible' }
+      });
+      console.log(`    ✅ Auto ${auto.id} desvinculado del cliente y marcado como disponible`);
+    }
+
+    // 4. Eliminar todas las permutas del cliente
+    if (cliente.permutas && cliente.permutas.length > 0) {
+      const permutasEliminadas = await prisma.permuta.deleteMany({
+        where: { clienteId: clienteId }
+      });
+      console.log(`  ✅ Eliminadas ${permutasEliminadas.count} permutas del cliente`);
+    }
+
+    // 5. Eliminar el usuario asociado si existe
+    if (cliente.usuario) {
+      await prisma.usuario.delete({
+        where: { id: cliente.usuario.id }
+      });
+      console.log(`  ✅ Usuario ${cliente.usuario.email} eliminado`);
+    }
+
+    // 6. Finalmente, eliminar el cliente
+    await prisma.cliente.delete({
+      where: { id: clienteId }
+    });
+
+    console.log(`✅ Cliente ${cliente.nombre} eliminado correctamente`);
+    res.json({ message: 'Cliente eliminado correctamente. Todos los pagos y relaciones han sido limpiados.' });
   } catch (error) {
-    console.error('Error eliminando cliente:', error);
-    res.status(500).json({ error: 'Error al eliminar cliente' });
+    console.error('❌ Error eliminando cliente:', error);
+    res.status(500).json({ error: 'Error al eliminar cliente', details: error.message });
   }
 });
 
