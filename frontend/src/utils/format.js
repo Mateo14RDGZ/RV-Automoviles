@@ -1,12 +1,12 @@
 // Utilidades de formato
 export const formatCurrency = (value) => {
-  // Formatear con separadores uruguayos (punto para miles, coma para decimales)
+  // Formatear con punto para miles y coma para decimales (formato uruguayo)
   const formatted = new Intl.NumberFormat('es-UY', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(value);
   
-  // Agregar símbolo U$S delante
+  // Agregar símbolo U$S delante (dólares estadounidenses)
   return `U$S ${formatted}`;
 };
 
