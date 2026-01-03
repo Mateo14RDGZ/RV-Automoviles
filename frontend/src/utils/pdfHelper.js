@@ -199,9 +199,9 @@ export const addPDFFooter = (doc, options = {}) => {
       doc.setFont(undefined, 'normal');
       
       const centerX = pageWidth / 2;
-      doc.text(`📞 ${contactInfo.telefono}`, centerX - 45, pageHeight - 15);
-      doc.text(`✉ ${contactInfo.email}`, centerX - 45, pageHeight - 10);
-      doc.text(`🌐 ${contactInfo.web}`, centerX - 45, pageHeight - 5);
+      doc.text(`Tel: ${contactInfo.telefono}`, centerX - 45, pageHeight - 15);
+      doc.text(`Email: ${contactInfo.email}`, centerX - 45, pageHeight - 10);
+      doc.text(`Web: ${contactInfo.web}`, centerX - 45, pageHeight - 5);
     }
     
     // Número de página con diseño profesional
