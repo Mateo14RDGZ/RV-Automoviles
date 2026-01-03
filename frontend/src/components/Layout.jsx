@@ -12,18 +12,51 @@ import {
   X,
   TrendingUp,
   History,
-  MessageCircle
+  MessageCircle,
+  AlertCircle
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import api from '../services/api';
 
 const Layout = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [cuotasVencidas, setCuotasVencidas] = useState(0);
+  const isStaff = user?.rol === 'admin' || user?.rol === 'empleado';
+
+  // Cargar cuotas vencidas para staff
+  useEffect(() => {
+    if (isStaff) {
+      loadCuotasVencidas();
+      
+      // Actualizar cada 30 segundos
+      const interval = setInterval(() => {
+        loadCuotasVencidas();
+      }, 30000);
+
+      return () => clearInterval(interval);
+    }
+  }, [isStaff]);
+
+  const loadCuotasVencidas = async () => {
+    try {
+      const response = await api.get('/pagos', {
+        params: { vencidos: 'true' }
+      });
+      setCuotasVencidas(response.data.length);
+    } catch (error) {
+      console.error('Error al cargar cuotas vencidas:', error);
+    }
+  };
 
   const handleLogout = () => {
     logout();
     navigate('/login');
+  };
+
+  const handleCuotasVencidasClick = () => {
+    navigate('/pagos', { state: { filterVencidos: true } });
   };
 
   // Items del menú según el rol
@@ -96,6 +129,24 @@ const Layout = () => {
                 {item.label}
               </NavLink>
             ))}
+
+            {/* Cuotas Vencidas - Solo para staff */}
+            {isStaff && (
+              <button
+                onClick={handleCuotasVencidasClick}
+                className="flex items-center justify-between w-full px-4 py-3 text-sm font-medium rounded-lg transition-colors text-gray-700 hover:bg-red-50 hover:text-red-700 group"
+              >
+                <div className="flex items-center">
+                  <AlertCircle className="h-5 w-5 mr-3 text-red-600 group-hover:text-red-700" />
+                  <span>Cuotas Vencidas</span>
+                </div>
+                {cuotasVencidas > 0 && (
+                  <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full animate-pulse">
+                    {cuotasVencidas}
+                  </span>
+                )}
+              </button>
+            )}
           </nav>
 
           {/* Botón de soporte - Solo para admin y empleado */}
@@ -184,6 +235,27 @@ const Layout = () => {
                   {item.label}
                 </NavLink>
               ))}
+
+              {/* Cuotas Vencidas - Solo para staff (Mobile) */}
+              {isStaff && (
+                <button
+                  onClick={() => {
+                    handleCuotasVencidasClick();
+                    setSidebarOpen(false);
+                  }}
+                  className="flex items-center justify-between w-full px-4 py-3 text-sm font-medium rounded-lg transition-colors text-gray-700 hover:bg-red-50 hover:text-red-700 group"
+                >
+                  <div className="flex items-center">
+                    <AlertCircle className="h-5 w-5 mr-3 text-red-600 group-hover:text-red-700" />
+                    <span>Cuotas Vencidas</span>
+                  </div>
+                  {cuotasVencidas > 0 && (
+                    <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full animate-pulse">
+                      {cuotasVencidas}
+                    </span>
+                  )}
+                </button>
+              )}
             </nav>
 
             {/* Botón de soporte mobile - Solo para admin y empleado */}

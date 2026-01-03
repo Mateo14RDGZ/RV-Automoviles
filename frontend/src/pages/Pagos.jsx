@@ -83,7 +83,7 @@ const Pagos = () => {
 
   useEffect(() => {
     // Detectar si viene con un filtro específico desde navegación
-    const initialFilter = location.state?.filterType || 'pendientes';
+    const initialFilter = location.state?.filterType || location.state?.filterVencidos ? 'vencidos' : 'pendientes';
     console.log('🎯 Filtro inicial:', initialFilter);
     loadInitialData(initialFilter);
   }, []);
