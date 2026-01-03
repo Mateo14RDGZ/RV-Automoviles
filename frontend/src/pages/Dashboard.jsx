@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import { dashboardService, comprobantesService } from '../services';
 import { 
   Car, 
@@ -297,10 +298,52 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Próximos Vencimientos y Pagos Recientes */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Gráfico de Distribución de Dinero */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-1 card dark:bg-gray-800 dark:border-gray-700 animate-fadeInUp" style={{animationDelay: '0.85s'}}>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Distribución de Dinero</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={[
+                  { name: 'Recaudado', value: stats.pagos.totalRecaudado, color: '#10b981' },
+                  { name: 'Pendiente', value: stats.pagos.totalPendiente, color: '#f59e0b' }
+                ]}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                outerRadius={100}
+                fill="#8884d8"
+                dataKey="value"
+              >
+                <Cell fill="#10b981" />
+                <Cell fill="#f59e0b" />
+              </Pie>
+              <Tooltip formatter={(value) => formatCurrency(value)} />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm text-gray-600 dark:text-gray-400">Total en Financiamientos:</span>
+              <span className="font-bold text-gray-900 dark:text-white">
+                {formatCurrency(stats.pagos.totalRecaudado + stats.pagos.totalPendiente)}
+              </span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-gray-600 dark:text-gray-400">Tasa de Recuperación:</span>
+              <span className="font-bold text-green-600 dark:text-green-400">
+                {stats.pagos.totalRecaudado + stats.pagos.totalPendiente > 0 
+                  ? ((stats.pagos.totalRecaudado / (stats.pagos.totalRecaudado + stats.pagos.totalPendiente)) * 100).toFixed(1) 
+                  : 0}%
+              </span>
+            </div>
+          </div>
+        </div>
+
         {/* Próximos Vencimientos */}
-        <div className="card dark:bg-gray-800 dark:border-gray-700 animate-fadeInUp" style={{animationDelay: '0.9s'}}>
+        <div className="lg:col-span-2 card dark:bg-gray-800 dark:border-gray-700 animate-fadeInUp" style={{animationDelay: '0.9s'}}>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
             Próximos Vencimientos (7 días)
           </h3>
@@ -330,8 +373,10 @@ const Dashboard = () => {
             </div>
           )}
         </div>
+      </div>
 
-        {/* Pagos Recientes */}
+      {/* Pagos Recientes */}
+      <div className="grid grid-cols-1 gap-6">
         <div className="card dark:bg-gray-800 dark:border-gray-700 animate-fadeInUp" style={{animationDelay: '1s'}}>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
             Pagos Recientes
@@ -339,7 +384,7 @@ const Dashboard = () => {
           {stats.pagosRecientes.length === 0 ? (
             <p className="text-gray-500 dark:text-gray-400 text-center py-4">No hay pagos recientes</p>
           ) : (
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {stats.pagosRecientes.map((pago) => (
                 <div
                   key={pago.id}
