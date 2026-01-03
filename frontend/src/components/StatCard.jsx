@@ -38,10 +38,10 @@ const StatCard = ({
   return (
     <div className="card hover:shadow-xl transition-shadow duration-300">
       <div className="flex items-center justify-between">
-        <div className="flex-1">
-          <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{title}</p>
-          <div className="flex items-baseline gap-2 mt-2">
-            <p className="text-3xl font-bold text-gray-900 dark:text-white">{value}</p>
+        <div className="flex-1 min-w-0 pr-2">
+          <p className="text-xs md:text-sm font-medium text-gray-600 dark:text-gray-400">{title}</p>
+          <div className="flex items-baseline gap-2 mt-1 md:mt-2">
+            <p className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white break-words">{value}</p>
             {trend && (
               <span className={`text-sm font-medium ${trend === 'up' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                 {trend === 'up' ? '↑' : '↓'} {trendValue}
@@ -49,11 +49,11 @@ const StatCard = ({
             )}
           </div>
           {subtitle && (
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{subtitle}</p>
+            <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mt-0.5 md:mt-1">{subtitle}</p>
           )}
         </div>
-        <div className={`p-3 ${bgColor} ${getDarkBgColor(bgColor)} rounded-full`}>
-          <Icon className={`w-8 h-8 ${iconColor} ${getDarkIconColor(iconColor)}`} />
+        <div className={`p-2.5 md:p-3 ${bgColor} ${getDarkBgColor(bgColor)} rounded-full flex-shrink-0`}>
+          <Icon className={`w-6 h-6 md:w-8 md:h-8 ${iconColor} ${getDarkIconColor(iconColor)}`} />
         </div>
       </div>
     </div>
