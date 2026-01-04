@@ -381,12 +381,13 @@ app.post('/api/autos', authenticateToken, requireStaff, async (req, res) => {
       color,
       departamento,
       tipoDocumento,
-      valorPatente
+      valorPatente,
+      escribana
     } = req.body;
 
     console.log('🚗 Creando auto:', { 
       marca, modelo, anio, matricula, precio, estado, clienteId,
-      kilometraje, color, departamento, tipoDocumento, valorPatente
+      kilometraje, color, departamento, tipoDocumento, valorPatente, escribana
     });
     console.log('📊 DATABASE_URL configurada:', process.env.DATABASE_URL ? 'SÍ' : 'NO');
 
@@ -425,7 +426,8 @@ app.post('/api/autos', authenticateToken, requireStaff, async (req, res) => {
         color: color || null,
         departamento: departamento || null,
         tipoDocumento: tipoDocumento || null,
-        valorPatente: valorPatente ? parseFloat(valorPatente) : null
+        valorPatente: valorPatente ? parseFloat(valorPatente) : null,
+        escribana: escribana || null
       },
       include: { cliente: true }
     });
@@ -488,7 +490,8 @@ app.put('/api/autos/:id', authenticateToken, requireStaff, async (req, res) => {
       color,
       departamento,
       tipoDocumento,
-      valorPatente
+      valorPatente,
+      escribana
     } = req.body;
 
     // Si no hay matrícula o está vacía, usar "0km"
@@ -523,7 +526,8 @@ app.put('/api/autos/:id', authenticateToken, requireStaff, async (req, res) => {
         color: color || null,
         departamento: departamento || null,
         tipoDocumento: tipoDocumento || null,
-        valorPatente: valorPatente ? parseFloat(valorPatente) : null
+        valorPatente: valorPatente ? parseFloat(valorPatente) : null,
+        escribana: escribana || null
       },
       include: { cliente: true }
     });

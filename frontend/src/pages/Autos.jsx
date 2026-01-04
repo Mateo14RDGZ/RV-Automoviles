@@ -64,6 +64,7 @@ const Autos = () => {
     tipoDocumento: '',
     valorPatente: '',
     color: '',
+    escribana: '',
   });
 
   useEffect(() => {
@@ -149,7 +150,8 @@ const Autos = () => {
         color: formData.color || null,
         departamento: formData.departamento || null,
         tipoDocumento: formData.tipoDocumento || null,
-        valorPatente: formData.valorPatente ? parseFloat(formData.valorPatente) : null
+        valorPatente: formData.valorPatente ? parseFloat(formData.valorPatente) : null,
+        escribana: formData.escribana || null
       };
       
       // Solo incluir estado si estamos editando
@@ -205,6 +207,7 @@ const Autos = () => {
       tipoDocumento: auto.tipoDocumento || '',
       valorPatente: auto.valorPatente || '',
       color: auto.color || '',
+      escribana: auto.escribana || '',
     });
     setShowModal(true);
   };
@@ -223,6 +226,7 @@ const Autos = () => {
       tipoDocumento: '',
       valorPatente: '',
       color: '',
+      escribana: '',
     });
   };
 
@@ -763,6 +767,22 @@ const Autos = () => {
                     />
                     <p className="text-[10px] md:text-xs text-gray-500 dark:text-gray-400 mt-1">
                       Costo anual de la patente en pesos uruguayos
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 md:mb-2">
+                      Escribana
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.escribana}
+                      onChange={(e) => setFormData({ ...formData, escribana: e.target.value })}
+                      placeholder="Nombre de la escribana"
+                      className="input text-sm md:text-base"
+                    />
+                    <p className="text-[10px] md:text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      Nombre de la escribana encargada
                     </p>
                   </div>
                 </div>

@@ -51,6 +51,7 @@ model Auto {
   tipoDocumento String?   // Tipo de documentación del vehículo
   valorPatente  Float?    // Valor de la patente
   color         String?   // Color del vehículo
+  escribana     String?   // Nombre de la escribana encargada
   // Relaciones
   clienteId     Int?
   cliente       Cliente?  @relation(fields: [clienteId], references: [id])
