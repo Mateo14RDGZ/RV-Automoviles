@@ -412,25 +412,56 @@ app.post('/api/autos', authenticateToken, requireStaff, async (req, res) => {
       console.log('✅ Auto 0km - permitiendo múltiples');
     }
 
-    const auto = await prisma.auto.create({
-      data: {
-        marca,
-        modelo,
-        anio: parseInt(anio),
-        matricula: matriculaFinal,
-        precio: parseFloat(precio),
-        estado: estado || 'disponible',
-        clienteId: clienteId ? parseInt(clienteId) : null,
-        // Nuevos campos adicionales
-        kilometraje: kilometraje ? parseInt(kilometraje) : null,
-        color: color || null,
-        departamento: departamento || null,
-        tipoDocumento: tipoDocumento || null,
-        valorPatente: valorPatente ? parseFloat(valorPatente) : null,
-        escribana: escribana || null
-      },
-      include: { cliente: true }
-    });
+    // Intentar crear el auto con todos los campos
+    let auto;
+    try {
+      auto = await prisma.auto.create({
+        data: {
+          marca,
+          modelo,
+          anio: parseInt(anio),
+          matricula: matriculaFinal,
+          precio: parseFloat(precio),
+          estado: estado || 'disponible',
+          clienteId: clienteId ? parseInt(clienteId) : null,
+          // Nuevos campos adicionales
+          kilometraje: kilometraje ? parseInt(kilometraje) : null,
+          color: color || null,
+          departamento: departamento || null,
+          tipoDocumento: tipoDocumento || null,
+          valorPatente: valorPatente ? parseFloat(valorPatente) : null,
+          escribana: escribana || null
+        },
+        include: { cliente: true }
+      });
+    } catch (createError) {
+      // Si falla por el campo escribana (columna no existe), intentar sin ese campo
+      if (createError.message && createError.message.includes('escribana')) {
+        console.log('⚠️ Campo escribana no disponible, creando auto sin ese campo');
+        auto = await prisma.auto.create({
+          data: {
+            marca,
+            modelo,
+            anio: parseInt(anio),
+            matricula: matriculaFinal,
+            precio: parseFloat(precio),
+            estado: estado || 'disponible',
+            clienteId: clienteId ? parseInt(clienteId) : null,
+            // Nuevos campos adicionales
+            kilometraje: kilometraje ? parseInt(kilometraje) : null,
+            color: color || null,
+            departamento: departamento || null,
+            tipoDocumento: tipoDocumento || null,
+            valorPatente: valorPatente ? parseFloat(valorPatente) : null
+            // escribana omitido si la columna no existe
+          },
+          include: { cliente: true }
+        });
+      } else {
+        // Si es otro error, relanzarlo
+        throw createError;
+      }
+    }
 
     console.log('✅ Auto creado exitosamente en DB:', { 
       id: auto.id, 
@@ -511,26 +542,58 @@ app.put('/api/autos/:id', authenticateToken, requireStaff, async (req, res) => {
       }
     }
 
-    const auto = await prisma.auto.update({
-      where: { id: parseInt(req.params.id) },
-      data: {
-        marca,
-        modelo,
-        anio: parseInt(anio),
-        matricula: matriculaFinal,
-        precio: parseFloat(precio),
-        estado,
-        clienteId: clienteId ? parseInt(clienteId) : null,
-        // Nuevos campos adicionales
-        kilometraje: kilometraje ? parseInt(kilometraje) : null,
-        color: color || null,
-        departamento: departamento || null,
-        tipoDocumento: tipoDocumento || null,
-        valorPatente: valorPatente ? parseFloat(valorPatente) : null,
-        escribana: escribana || null
-      },
-      include: { cliente: true }
-    });
+    // Intentar actualizar el auto con todos los campos
+    let auto;
+    try {
+      auto = await prisma.auto.update({
+        where: { id: parseInt(req.params.id) },
+        data: {
+          marca,
+          modelo,
+          anio: parseInt(anio),
+          matricula: matriculaFinal,
+          precio: parseFloat(precio),
+          estado,
+          clienteId: clienteId ? parseInt(clienteId) : null,
+          // Nuevos campos adicionales
+          kilometraje: kilometraje ? parseInt(kilometraje) : null,
+          color: color || null,
+          departamento: departamento || null,
+          tipoDocumento: tipoDocumento || null,
+          valorPatente: valorPatente ? parseFloat(valorPatente) : null,
+          escribana: escribana || null
+        },
+        include: { cliente: true }
+      });
+    } catch (updateError) {
+      // Si falla por el campo escribana (columna no existe), intentar sin ese campo
+      if (updateError.message && updateError.message.includes('escribana')) {
+        console.log('⚠️ Campo escribana no disponible, actualizando auto sin ese campo');
+        auto = await prisma.auto.update({
+          where: { id: parseInt(req.params.id) },
+          data: {
+            marca,
+            modelo,
+            anio: parseInt(anio),
+            matricula: matriculaFinal,
+            precio: parseFloat(precio),
+            estado,
+            clienteId: clienteId ? parseInt(clienteId) : null,
+            // Nuevos campos adicionales
+            kilometraje: kilometraje ? parseInt(kilometraje) : null,
+            color: color || null,
+            departamento: departamento || null,
+            tipoDocumento: tipoDocumento || null,
+            valorPatente: valorPatente ? parseFloat(valorPatente) : null
+            // escribana omitido si la columna no existe
+          },
+          include: { cliente: true }
+        });
+      } else {
+        // Si es otro error, relanzarlo
+        throw updateError;
+      }
+    }
 
     res.json(auto);
   } catch (error) {
