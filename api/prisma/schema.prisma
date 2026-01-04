@@ -22,18 +22,19 @@ model Usuario {
 }
 
 model Cliente {
-  id        Int       @id @default(autoincrement())
-  nombre    String
-  cedula    String
-  telefono  String
-  direccion String?
-  email     String?
-  activo    Boolean   @default(true) // true: activo, false: archivado/completado
-  usuario   Usuario?
-  autos     Auto[]
-  permutas  Permuta[] // Permutas entregadas por este cliente
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id               Int       @id @default(autoincrement())
+  nombre           String
+  cedula           String
+  telefono         String
+  direccion        String?
+  email            String?
+  passwordTemporal String?   // Contraseña en texto plano para enviar por WhatsApp
+  activo           Boolean   @default(true) // true: activo, false: archivado/completado
+  usuario          Usuario?
+  autos            Auto[]
+  permutas         Permuta[] // Permutas entregadas por este cliente
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 }
 
 model Auto {

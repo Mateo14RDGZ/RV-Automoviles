@@ -548,7 +548,7 @@ const Pagos = () => {
         `Puede consultar el estado de todas sus cuotas ingresando a:\n` +
         `${window.location.origin}\n\n` +
         `Usuario (Cédula): ${cliente.cedula}\n` +
-        `Contraseña: ${cliente.cedula}\n\n` +
+        `Contraseña: ${cliente.passwordTemporal || 'Consulte su contraseña original'}\n\n` +
         `Saludos cordiales,\n` +
         `*Nicolas Tejera Automóviles*`;
       
