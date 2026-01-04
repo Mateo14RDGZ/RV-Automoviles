@@ -182,11 +182,14 @@ const Comprobantes = () => {
 
       {/* Filtros */}
       <div className="card p-4 md:p-6 animate-fadeInUp" style={{animationDelay: '0.2s'}}>
-        <div className="flex flex-wrap items-center gap-3">
-          <Filter className="w-5 h-5 text-gray-500" />
+        <div className="flex flex-col md:flex-row md:flex-wrap items-stretch md:items-center gap-2 md:gap-3">
+          <div className="flex items-center gap-2 mb-2 md:mb-0">
+            <Filter className="w-5 h-5 text-gray-500" />
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300 md:hidden">Filtros:</span>
+          </div>
           <button
             onClick={() => setFilter('todos')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+            className={`px-3 md:px-4 py-2 rounded-lg font-medium transition-colors text-sm ${
               filter === 'todos'
                 ? 'bg-primary-600 text-white'
                 : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
@@ -196,7 +199,7 @@ const Comprobantes = () => {
           </button>
           <button
             onClick={() => setFilter('pendiente')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
+            className={`px-3 md:px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 text-sm ${
               filter === 'pendiente'
                 ? 'bg-yellow-600 text-white'
                 : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
@@ -207,7 +210,7 @@ const Comprobantes = () => {
           </button>
           <button
             onClick={() => setFilter('aprobado')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
+            className={`px-3 md:px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 text-sm ${
               filter === 'aprobado'
                 ? 'bg-green-600 text-white'
                 : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
@@ -218,7 +221,7 @@ const Comprobantes = () => {
           </button>
           <button
             onClick={() => setFilter('rechazado')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
+            className={`px-3 md:px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 text-sm ${
               filter === 'rechazado'
                 ? 'bg-red-600 text-white'
                 : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
@@ -229,7 +232,7 @@ const Comprobantes = () => {
           </button>
           <button
             onClick={loadComprobantes}
-            className="ml-auto px-4 py-2 rounded-lg font-medium bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors flex items-center gap-2"
+            className="md:ml-auto px-3 md:px-4 py-2 rounded-lg font-medium bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors flex items-center justify-center gap-2 text-sm"
           >
             <RefreshCw className="w-4 h-4" />
             Actualizar
@@ -238,7 +241,7 @@ const Comprobantes = () => {
       </div>
 
       {/* Lista de comprobantes */}
-      <div className="card animate-fadeInUp" style={{animationDelay: '0.3s'}}>
+      <div className="card animate-fadeInUp overflow-hidden" style={{animationDelay: '0.3s'}}>
         {comprobantesFiltrados.length === 0 ? (
           <div className="text-center py-12">
             <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
@@ -250,96 +253,174 @@ const Comprobantes = () => {
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-              <thead className="bg-gray-50 dark:bg-gray-800">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Cliente
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Vehículo
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Cuota
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Monto
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Estado
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Fecha
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Acción
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                {comprobantesFiltrados.map((comprobante) => (
-                  <tr 
-                    key={comprobante.id}
-                    className={`hover:bg-gray-50 dark:hover:bg-gray-700 ${
-                      !comprobante.visto ? 'bg-yellow-50 dark:bg-yellow-900/20' : ''
-                    }`}
-                  >
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900 dark:text-white">
-                        {comprobante.pago.auto.cliente.nombre}
-                      </div>
-                      <div className="text-sm text-gray-500 dark:text-gray-400">
-                        {comprobante.pago.auto.cliente.cedula}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900 dark:text-white">
-                        {comprobante.pago.auto.marca} {comprobante.pago.auto.modelo}
-                      </div>
-                      <div className="text-sm text-gray-500 dark:text-gray-400">
-                        {comprobante.pago.auto.matricula}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                      Cuota #{comprobante.pago.numeroCuota}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 dark:text-white">
-                      {formatCurrency(comprobante.pago.monto)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center gap-2">
-                        {getEstadoIcon(comprobante.estado)}
-                        {getEstadoBadge(comprobante.estado)}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                      {formatDate(comprobante.createdAt)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button
-                        onClick={() => verComprobante(comprobante)}
-                        className="btn btn-primary btn-sm flex items-center gap-2"
-                      >
-                        <Eye className="w-4 h-4" />
-                        Ver
-                      </button>
-                    </td>
+          <>
+            {/* Vista Desktop - Tabla */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead className="bg-gray-50 dark:bg-gray-800">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Cliente
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Vehículo
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Cuota
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Monto
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Estado
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Fecha
+                    </th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Acción
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                  {comprobantesFiltrados.map((comprobante) => (
+                    <tr 
+                      key={comprobante.id}
+                      className={`hover:bg-gray-50 dark:hover:bg-gray-700 ${
+                        !comprobante.visto ? 'bg-yellow-50 dark:bg-yellow-900/20' : ''
+                      }`}
+                    >
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900 dark:text-white">
+                          {comprobante.pago.auto.cliente.nombre}
+                        </div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400">
+                          {comprobante.pago.auto.cliente.cedula}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900 dark:text-white">
+                          {comprobante.pago.auto.marca} {comprobante.pago.auto.modelo}
+                        </div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400">
+                          {comprobante.pago.auto.matricula}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                        Cuota #{comprobante.pago.numeroCuota}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 dark:text-white">
+                        {formatCurrency(comprobante.pago.monto)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center gap-2">
+                          {getEstadoIcon(comprobante.estado)}
+                          {getEstadoBadge(comprobante.estado)}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        {formatDate(comprobante.createdAt)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button
+                          onClick={() => verComprobante(comprobante)}
+                          className="btn btn-primary btn-sm flex items-center gap-2"
+                        >
+                          <Eye className="w-4 h-4" />
+                          Ver
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Vista Mobile - Cards */}
+            <div className="md:hidden space-y-3 p-4">
+              {comprobantesFiltrados.map((comprobante) => (
+                <div
+                  key={comprobante.id}
+                  className={`rounded-lg p-4 border-2 transition-all ${
+                    !comprobante.visto
+                      ? 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-300 dark:border-yellow-800'
+                      : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'
+                  }`}
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+                          {comprobante.pago.auto.cliente.nombre}
+                        </h3>
+                        {!comprobante.visto && (
+                          <span className="badge badge-warning text-xs">Nuevo</span>
+                        )}
+                      </div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        Cédula: {comprobante.pago.auto.cliente.cedula}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {getEstadoIcon(comprobante.estado)}
+                      {getEstadoBadge(comprobante.estado)}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 mb-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-600 dark:text-gray-400">Vehículo:</span>
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">
+                        {comprobante.pago.auto.marca} {comprobante.pago.auto.modelo}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-600 dark:text-gray-400">Matrícula:</span>
+                      <span className="text-sm text-gray-900 dark:text-white">
+                        {comprobante.pago.auto.matricula}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-600 dark:text-gray-400">Cuota:</span>
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">
+                        #{comprobante.pago.numeroCuota}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-600 dark:text-gray-400">Monto:</span>
+                      <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                        {formatCurrency(comprobante.pago.monto)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-600 dark:text-gray-400">Fecha:</span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        {formatDate(comprobante.createdAt)}
+                      </span>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => verComprobante(comprobante)}
+                    className="w-full btn btn-primary btn-sm flex items-center justify-center gap-2"
+                  >
+                    <Eye className="w-4 h-4" />
+                    Ver Comprobante
+                  </button>
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </div>
 
       {/* Modal para ver comprobante */}
       {mostrarComprobante && comprobanteSeleccionado && (
-        <div className="fixed inset-0 bg-black dark:bg-black bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center p-4 z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto border border-gray-300 dark:border-gray-700">
-            <div className="p-6">
+        <div className="fixed inset-0 bg-black dark:bg-black bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center p-2 md:p-4 z-50 overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-3xl w-full max-h-[95vh] my-4 overflow-y-auto border border-gray-300 dark:border-gray-700">
+            <div className="p-4 md:p-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                <h2 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white">
                   Comprobante de Pago
                 </h2>
                 <button
@@ -347,16 +428,16 @@ const Comprobantes = () => {
                     setMostrarComprobante(false);
                     setComprobanteSeleccionado(null);
                   }}
-                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
               <div className="space-y-4 mb-4">
-                <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Información del Cliente</h3>
-                  <div className="grid grid-cols-2 gap-2 text-sm">
+                <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 md:p-4">
+                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2 text-sm md:text-base">Información del Cliente</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-2 text-xs md:text-sm">
                     <div>
                       <span className="text-gray-600 dark:text-gray-400">Cliente:</span>
                       <p className="font-medium text-gray-900 dark:text-white">
@@ -384,9 +465,9 @@ const Comprobantes = () => {
                   </div>
                 </div>
 
-                <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Información del Pago</h3>
-                  <div className="grid grid-cols-2 gap-2 text-sm">
+                <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 md:p-4">
+                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2 text-sm md:text-base">Información del Pago</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-2 text-xs md:text-sm">
                     <div>
                       <span className="text-gray-600 dark:text-gray-400">Vehículo:</span>
                       <p className="font-medium text-gray-900 dark:text-white">
@@ -415,8 +496,8 @@ const Comprobantes = () => {
                 </div>
 
                 <div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Comprobante</h3>
-                  <div className="border border-gray-300 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-900/50">
+                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2 text-sm md:text-base">Comprobante</h3>
+                  <div className="border border-gray-300 dark:border-gray-700 rounded-lg p-2 md:p-4 bg-gray-50 dark:bg-gray-900/50">
                     {comprobanteSeleccionado.archivoUrl.startsWith('data:image') ? (
                       <img
                         src={comprobanteSeleccionado.archivoUrl}
@@ -426,7 +507,7 @@ const Comprobantes = () => {
                     ) : (
                       <iframe
                         src={comprobanteSeleccionado.archivoUrl}
-                        className="w-full h-96 rounded"
+                        className="w-full h-64 md:h-96 rounded"
                         title="Comprobante PDF"
                       />
                     )}
@@ -435,17 +516,17 @@ const Comprobantes = () => {
               </div>
 
               {comprobanteSeleccionado.estado === 'pendiente' && (
-                <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex flex-col md:flex-row gap-2 md:gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
                   <button
                     onClick={() => aprobarComprobante(comprobanteSeleccionado.id)}
-                    className="btn btn-success flex-1 flex items-center justify-center gap-2"
+                    className="btn btn-success flex-1 flex items-center justify-center gap-2 text-sm md:text-base py-2.5"
                   >
                     <Check className="w-4 h-4" />
                     Aprobar
                   </button>
                   <button
                     onClick={() => rechazarComprobante(comprobanteSeleccionado.id)}
-                    className="btn btn-danger flex-1 flex items-center justify-center gap-2"
+                    className="btn btn-danger flex-1 flex items-center justify-center gap-2 text-sm md:text-base py-2.5"
                   >
                     <X className="w-4 h-4" />
                     Rechazar
@@ -459,25 +540,25 @@ const Comprobantes = () => {
 
       {/* Modal de WhatsApp después de aprobar comprobante */}
       {mostrarModalWhatsApp && pagoAprobado && (
-        <div className="fixed inset-0 bg-black dark:bg-black bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center p-4 z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full border border-gray-300 dark:border-gray-700">
-            <div className="p-6">
+        <div className="fixed inset-0 bg-black dark:bg-black bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center p-2 md:p-4 z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full border border-gray-300 dark:border-gray-700 mx-4">
+            <div className="p-4 md:p-6">
               <div className="flex items-center justify-center mb-4">
                 <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
                   <CheckCircle className="w-10 h-10 text-green-600 dark:text-green-400" />
                 </div>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 text-center">
+              <h3 className="text-base md:text-lg font-semibold text-gray-900 dark:text-white mb-2 text-center">
                 ✅ ¡Pago Confirmado!
               </h3>
-              <p className="text-gray-600 dark:text-gray-300 mb-6 text-center">
+              <p className="text-sm md:text-base text-gray-600 dark:text-gray-300 mb-4 md:mb-6 text-center">
                 La cuota #{pagoAprobado.numeroCuota} de {pagoAprobado.auto?.cliente?.nombre || 'cliente'} ha sido marcada como pagada.
               </p>
               
-              <div className="space-y-3">
+              <div className="space-y-2 md:space-y-3">
                 <button
                   onClick={enviarWhatsAppConfirmacion}
-                  className="w-full bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white py-3 px-4 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-105"
+                  className="w-full bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white py-2.5 md:py-3 px-4 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-105 text-sm md:text-base"
                 >
                   <span className="text-xl">💬</span> Enviar WhatsApp
                 </button>
@@ -487,7 +568,7 @@ const Comprobantes = () => {
                     setMostrarModalWhatsApp(false);
                     setPagoAprobado(null);
                   }}
-                  className="w-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 rounded-lg font-semibold transition-all duration-200"
+                  className="w-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 py-2.5 md:py-3 px-4 rounded-lg font-semibold transition-all duration-200 text-sm md:text-base"
                 >
                   Cerrar
                 </button>
