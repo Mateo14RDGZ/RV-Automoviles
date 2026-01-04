@@ -958,8 +958,8 @@ const Autos = () => {
                   </div>
                 </div>
 
-                {/* Procedencia y Documentación */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-6">
+                {/* Procedencia, Documentación y Escribana */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
                   <div className="bg-gray-50 dark:bg-gray-700/50 p-3 md:p-4 rounded-lg">
                     <h3 className="text-xs md:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5 md:mb-2">Procedencia</h3>
                     <p className="text-sm md:text-lg font-medium text-gray-900 dark:text-white">
@@ -970,6 +970,12 @@ const Autos = () => {
                     <h3 className="text-xs md:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5 md:mb-2">Documentación</h3>
                     <p className="text-sm md:text-lg font-medium text-gray-900 dark:text-white">
                       {autoDetalles.tipoDocumento || <span className="text-gray-400 italic text-xs">No especificado</span>}
+                    </p>
+                  </div>
+                  <div className="bg-gray-50 dark:bg-gray-700/50 p-3 md:p-4 rounded-lg">
+                    <h3 className="text-xs md:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5 md:mb-2">Escribana</h3>
+                    <p className="text-sm md:text-lg font-medium text-gray-900 dark:text-white">
+                      {autoDetalles.escribana || <span className="text-gray-400 italic text-xs">No especificado</span>}
                     </p>
                   </div>
                 </div>
