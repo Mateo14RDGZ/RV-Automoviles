@@ -547,8 +547,8 @@ const Pagos = () => {
         `*CONSULTA DE CUOTAS EN LÍNEA*\n\n` +
         `Puede consultar el estado de todas sus cuotas ingresando a:\n` +
         `${window.location.origin}\n\n` +
-        `Usuario: ${cliente.cedula}\n` +
-        `Contraseña: (la recibida por WhatsApp)\n\n` +
+        `Usuario (Cédula): ${cliente.cedula}\n` +
+        `Contraseña: ${cliente.cedula}\n\n` +
         `Saludos cordiales,\n` +
         `*Nicolas Tejera Automóviles*`;
       
