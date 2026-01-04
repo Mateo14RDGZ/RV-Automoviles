@@ -920,7 +920,7 @@ const Autos = () => {
                       <div className="flex justify-between text-xs md:text-sm">
                         <span className="text-gray-600 dark:text-gray-400">Kilometraje:</span>
                         <span className="font-semibold text-gray-900 dark:text-white">
-                          {autoDetalles.kilometraje ? `${parseInt(autoDetalles.kilometraje).toLocaleString()} km` : <span className="text-gray-400 italic text-xs">No especificado</span>}
+                          {autoDetalles.kilometraje ? `${parseInt(autoDetalles.kilometraje).toLocaleString()} km` : <span className="inline-flex items-center px-1.5 py-0.5 md:px-2 md:py-1 rounded-full text-[10px] md:text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">0km</span>}
                         </span>
                       </div>
                     </div>

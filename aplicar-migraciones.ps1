@@ -40,7 +40,8 @@ if ($LASTEXITCODE -eq 0) {
     Write-Host "✅ Migraciones aplicadas exitosamente!" -ForegroundColor Green
     Write-Host ""
     Write-Host "La columna 'escribana' ahora está disponible en la base de datos." -ForegroundColor Cyan
-} else {
+}
+else {
     Write-Host ""
     Write-Host "❌ Error al aplicar migraciones" -ForegroundColor Red
     Write-Host "Revisa los mensajes de error arriba" -ForegroundColor Yellow
