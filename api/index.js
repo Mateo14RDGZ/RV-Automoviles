@@ -1619,7 +1619,12 @@ app.get('/api/dashboard/stats', authenticateToken, requireAdmin, async (req, res
       },
       include: {
         auto: {
-          include: {
+          select: {
+            id: true,
+            marca: true,
+            modelo: true,
+            matricula: true,
+            anio: true,
             cliente: true
           }
         }
@@ -1636,7 +1641,12 @@ app.get('/api/dashboard/stats', authenticateToken, requireAdmin, async (req, res
       },
       include: {
         auto: {
-          include: {
+          select: {
+            id: true,
+            marca: true,
+            modelo: true,
+            matricula: true,
+            anio: true,
             cliente: true
           }
         }
@@ -1667,7 +1677,15 @@ app.get('/api/dashboard/stats', authenticateToken, requireAdmin, async (req, res
     });
   } catch (error) {
     console.error('Error obteniendo estadísticas:', error);
-    res.status(500).json({ error: 'Error al obtener estadísticas' });
+    console.error('Error details:', {
+      message: error.message,
+      code: error.code,
+      meta: error.meta
+    });
+    res.status(500).json({ 
+      error: 'Error al obtener estadísticas',
+      details: error.message 
+    });
   }
 });
 
