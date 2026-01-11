@@ -101,13 +101,21 @@ const Clientes = () => {
   const handleSendWhatsApp = () => {
     if (!newClientCredentials) return;
     
-    const telefono = newClientCredentials.telefono.replace(/\D/g, '');
+    // Limpiar el número de teléfono (quitar espacios, guiones, etc.)
+    let telefono = newClientCredentials.telefono.replace(/[^0-9]/g, '');
+    
+    // Si el número empieza con 0, quitarlo (ej: 0998765432 → 998765432)
+    if (telefono.startsWith('0')) {
+      telefono = telefono.substring(1);
+    }
+    
     const urlWeb = window.location.origin;
     
     const mensaje = `Usuario (Cédula): ${newClientCredentials.cedula}\nContraseña: ${newClientCredentials.password}\nLink: ${urlWeb}`;
 
     const mensajeEncoded = encodeURIComponent(mensaje);
-    const whatsappUrl = `https://wa.me/${telefono}?text=${mensajeEncoded}`;
+    // Formatear para WhatsApp con código de país de Uruguay (598)
+    const whatsappUrl = `https://wa.me/598${telefono}?text=${mensajeEncoded}`;
     
     window.open(whatsappUrl, '_blank');
     setShowCredentialsModal(false);
