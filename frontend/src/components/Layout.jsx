@@ -97,7 +97,7 @@ const Layout = () => {
       {/* Sidebar para desktop */}
       <aside className="hidden md:fixed md:inset-y-0 md:flex md:w-64 md:flex-col">
         <div className="flex flex-col flex-grow bg-white border-r border-gray-200 overflow-y-auto">
-          <div className="flex items-center justify-center flex-shrink-0 bg-black py-5 px-4">
+          <div className="flex items-center justify-center flex-shrink-0 bg-primary-600 py-5 px-4">
             <div className="text-center w-full">
               <img 
                 src="/nico-cars-logo.png" 
@@ -113,6 +113,7 @@ const Layout = () => {
                   }
                 }}
               />
+              <p className="text-white text-sm font-semibold mt-2">Nicolas Tejera Automoviles</p>
               <div className="text-3xl mb-1 hidden">🚗</div>
             </div>
           </div>
@@ -210,9 +211,9 @@ const Layout = () => {
             onClick={() => setSidebarOpen(false)}
           />
           <div className="fixed inset-y-0 left-0 flex flex-col w-64 bg-white">
-            <div className="flex items-center justify-center bg-black py-3 px-3">
+            <div className="flex items-center justify-center bg-primary-600 py-3 px-3">
               <div className="flex items-center justify-between w-full">
-                <div className="flex items-center justify-center flex-1">
+                <div className="flex flex-col items-center justify-center flex-1">
                   <img 
                     src="/nico-cars-logo.png" 
                     alt="NICO CARS" 
@@ -227,6 +228,7 @@ const Layout = () => {
                       }
                     }}
                   />
+                  <p className="text-white text-xs font-semibold mt-1">Nicolas Tejera Automoviles</p>
                   <div className="text-2xl hidden">🚗</div>
                 </div>
                 <button
