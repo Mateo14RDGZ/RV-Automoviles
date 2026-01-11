@@ -4,6 +4,14 @@
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
 
+// Verificar que DATABASE_URL esté configurada
+if (!process.env.DATABASE_URL && !process.env.POSTGRES_PRISMA_URL) {
+  console.error('❌ ERROR: No hay URL de base de datos configurada');
+  console.error('   Configura DATABASE_URL o POSTGRES_PRISMA_URL como variable de entorno');
+  console.error('   Ejemplo: $env:DATABASE_URL="postgresql://..."');
+  process.exit(1);
+}
+
 const prisma = new PrismaClient();
 
 async function regenerarPasswordsClientes() {

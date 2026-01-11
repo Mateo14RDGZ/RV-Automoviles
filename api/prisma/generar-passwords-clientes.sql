@@ -14,13 +14,15 @@
 -- Para ver qué clientes no tienen contraseña:
 SELECT id, nombre, cedula, telefono, "passwordTemporal"
 FROM "Cliente"
-WHERE "passwordTemporal" IS NULL;
+WHERE
+    "passwordTemporal" IS NULL;
 
 -- Para asignar la cédula como contraseña temporal a todos los clientes sin contraseña:
-UPDATE "Cliente" 
-SET "passwordTemporal" = "cedula" 
-WHERE "passwordTemporal" IS NULL;
+UPDATE "Cliente"
+SET
+    "passwordTemporal" = "cedula"
+WHERE
+    "passwordTemporal" IS NULL;
 
 -- Verificar que se aplicó correctamente:
-SELECT id, nombre, cedula, "passwordTemporal"
-FROM "Cliente";
+SELECT id, nombre, cedula, "passwordTemporal" FROM "Cliente";
