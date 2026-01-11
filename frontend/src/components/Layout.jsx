@@ -97,7 +97,7 @@ const Layout = () => {
       {/* Sidebar para desktop */}
       <aside className="hidden md:fixed md:inset-y-0 md:flex md:w-64 md:flex-col">
         <div className="flex flex-col flex-grow bg-white border-r border-gray-200 overflow-y-auto">
-          <div className="flex items-center justify-center flex-shrink-0 bg-primary-600 py-5 px-4">
+          <div className="flex items-center justify-center flex-shrink-0 bg-blue-900 py-5 px-4">
             <div className="text-center w-full">
               <img 
                 src="/nico-cars-logo.png" 
@@ -211,7 +211,7 @@ const Layout = () => {
             onClick={() => setSidebarOpen(false)}
           />
           <div className="fixed inset-y-0 left-0 flex flex-col w-64 bg-white">
-            <div className="flex items-center justify-center bg-primary-600 py-3 px-3">
+            <div className="flex items-center justify-center bg-blue-900 py-3 px-3">
               <div className="flex items-center justify-between w-full">
                 <div className="flex flex-col items-center justify-center flex-1">
                   <img 
