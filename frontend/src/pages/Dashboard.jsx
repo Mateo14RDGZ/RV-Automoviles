@@ -177,16 +177,6 @@ const Dashboard = () => {
     );
   }
 
-  const formatCurrency = (value) => {
-    // Formatear con punto para miles y coma para decimales (formato uruguayo)
-    const formatted = new Intl.NumberFormat('es-UY', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(value);
-    
-    // Agregar símbolo U$S delante (dólares estadounidenses)
-    return `U$S ${formatted}`;
-  };
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('es-UY', {

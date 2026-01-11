@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { pagosService, autosService, clientesService, comprobantesService } from '../services';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import { formatCurrency } from '../utils/format';
 import { CreditCard, Plus, AlertCircle, CheckCircle, Calendar, DollarSign, User, ChevronDown, ChevronUp, Car, RefreshCw, MessageSquare, Save, X, Upload, FileText } from 'lucide-react';
 
 const Pagos = () => {
@@ -742,16 +743,6 @@ const Pagos = () => {
     }
   };
 
-  const formatCurrency = (value) => {
-    // Formatear con punto para miles y coma para decimales (formato uruguayo)
-    const formatted = new Intl.NumberFormat('es-UY', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(value);
-    
-    // Agregar símbolo U$S delante (dólares estadounidenses)
-    return `U$S ${formatted}`;
-  };
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('es-UY', {
