@@ -743,12 +743,8 @@ const Autos = () => {
                       className="input text-sm md:text-base"
                     >
                       <option value="">Seleccionar tipo</option>
-                      <option value="Titulo Original">Título Original</option>
-                      <option value="Titulo Duplicado">Título Duplicado</option>
-                      <option value="Titulo en Tramite">Título en Trámite</option>
-                      <option value="Factura DICOSE">Factura DICOSE</option>
-                      <option value="Importado">Importado</option>
-                      <option value="Sin Documentos">Sin Documentos</option>
+                      <option value="Vehiculo a transferir titulo y libreta">Vehículo a transferir título y libreta</option>
+                      <option value="Vehiculo sin titulo solo libreta">Vehículo sin título solo libreta</option>
                     </select>
                   </div>
 
