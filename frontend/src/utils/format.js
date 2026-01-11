@@ -6,8 +6,8 @@ export const formatCurrency = (value) => {
     maximumFractionDigits: 2,
   }).format(value);
   
-  // Agregar símbolo U$S delante (dólares estadounidenses)
-  return `U$S ${formatted}`;
+  // Agregar símbolo U$D delante (dólares estadounidenses)
+  return `U$D ${formatted}`;
 };
 
 export const formatPesos = (value) => {

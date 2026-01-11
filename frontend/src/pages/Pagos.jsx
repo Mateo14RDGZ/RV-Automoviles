@@ -743,10 +743,14 @@ const Pagos = () => {
   };
 
   const formatCurrency = (value) => {
-    return new Intl.NumberFormat('es-UY', {
-      style: 'currency',
-      currency: 'UYU',
+    // Formatear con punto para miles y coma para decimales (formato uruguayo)
+    const formatted = new Intl.NumberFormat('es-UY', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
     }).format(value);
+    
+    // Agregar símbolo U$D delante (dólares estadounidenses)
+    return `U$D ${formatted}`;
   };
 
   const formatDate = (dateString) => {
