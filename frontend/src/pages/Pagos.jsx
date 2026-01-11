@@ -749,8 +749,8 @@ const Pagos = () => {
       maximumFractionDigits: 2,
     }).format(value);
     
-    // Agregar símbolo U$D delante (dólares estadounidenses)
-    return `U$D ${formatted}`;
+    // Agregar símbolo U$S delante (dólares estadounidenses)
+    return `U$S ${formatted}`;
   };
 
   const formatDate = (dateString) => {
@@ -1556,7 +1556,7 @@ const Pagos = () => {
                         <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-600">
                           <span className="text-sm text-gray-600 dark:text-gray-400">Saldo a Financiar:</span>
                           <span className="font-semibold text-gray-900 dark:text-white">
-                            ${((parseFloat(generateData.precioTotal) || 0) - (parseFloat(generateData.entregaInicial) || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            {formatCurrency((parseFloat(generateData.precioTotal) || 0) - (parseFloat(generateData.entregaInicial) || 0))}
                           </span>
                         </div>
                         
@@ -1567,7 +1567,7 @@ const Pagos = () => {
                                 Interés ({generateData.porcentajeInteres}%):
                               </span>
                               <span className="font-semibold text-gray-900 dark:text-white">
-                                +${(((parseFloat(generateData.precioTotal) || 0) - (parseFloat(generateData.entregaInicial) || 0)) * (parseFloat(generateData.porcentajeInteres) / 100)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                +{formatCurrency(((parseFloat(generateData.precioTotal) || 0) - (parseFloat(generateData.entregaInicial) || 0)) * (parseFloat(generateData.porcentajeInteres) / 100))}
                               </span>
                             </div>
                             <div className="flex justify-between items-center py-2 bg-gray-100 dark:bg-gray-700 rounded px-2">
@@ -1575,7 +1575,7 @@ const Pagos = () => {
                                 TOTAL A PAGAR:
                               </span>
                               <span className="font-bold text-gray-900 dark:text-white text-lg">
-                                ${(((parseFloat(generateData.precioTotal) || 0) - (parseFloat(generateData.entregaInicial) || 0)) * (1 + parseFloat(generateData.porcentajeInteres) / 100)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                {formatCurrency(((parseFloat(generateData.precioTotal) || 0) - (parseFloat(generateData.entregaInicial) || 0)) * (1 + parseFloat(generateData.porcentajeInteres) / 100))}
                               </span>
                             </div>
                           </>
@@ -1587,7 +1587,7 @@ const Pagos = () => {
                               TOTAL A PAGAR:
                             </span>
                             <span className="font-bold text-gray-900 dark:text-white text-lg">
-                              ${((parseFloat(generateData.precioTotal) || 0) - (parseFloat(generateData.entregaInicial) || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                              {formatCurrency((parseFloat(generateData.precioTotal) || 0) - (parseFloat(generateData.entregaInicial) || 0))}
                             </span>
                           </div>
                         )}
@@ -2038,7 +2038,7 @@ const Pagos = () => {
                       <div className="bg-blue-50 dark:bg-blue-900/30 rounded p-2 border border-blue-200 dark:border-blue-900">
                         <div className="text-blue-700 dark:text-blue-400 text-xs">Monto Pendiente</div>
                         <div className="font-bold text-blue-700 dark:text-blue-400 text-lg">
-                          ${((parseInt(generateData.numeroCuotas) - parseInt(generateData.cuotasPagadas)) * parseFloat(generateData.montoCuota || 0)).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                          {formatCurrency((parseInt(generateData.numeroCuotas) - parseInt(generateData.cuotasPagadas)) * parseFloat(generateData.montoCuota || 0))}
                         </div>
                       </div>
                     </div>

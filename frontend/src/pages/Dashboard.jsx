@@ -184,8 +184,8 @@ const Dashboard = () => {
       maximumFractionDigits: 2,
     }).format(value);
     
-    // Agregar símbolo U$D delante (dólares estadounidenses)
-    return `U$D ${formatted}`;
+    // Agregar símbolo U$S delante (dólares estadounidenses)
+    return `U$S ${formatted}`;
   };
 
   const formatDate = (dateString) => {
