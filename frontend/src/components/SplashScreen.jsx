@@ -4,28 +4,30 @@ function SplashScreen({ onFinish }) {
   const [stage, setStage] = useState('entering'); // entering, visible, exiting
 
   useEffect(() => {
-    // Forzar un render inicial antes de las animaciones
+    // Doble requestAnimationFrame para asegurar que el DOM está completamente pintado
     requestAnimationFrame(() => {
-      // Pasar a visible después de que el navegador pinte el estado inicial
-      const visibleTimer = setTimeout(() => {
-        setStage('visible');
-      }, 100);
-      
-      // Iniciar animación de salida - dar tiempo suficiente para ver las letras en centro
-      const exitTimer = setTimeout(() => {
-        setStage('exiting');
-      }, 3600);
-      
-      // Cerrar splash después de la salida completa
-      const finishTimer = setTimeout(() => {
-        onFinish();
-      }, 6600);
+      requestAnimationFrame(() => {
+        // Pasar a visible después de que el navegador pinte el estado inicial
+        const visibleTimer = setTimeout(() => {
+          setStage('visible');
+        }, 200);
+        
+        // Iniciar animación de salida - dar tiempo suficiente para ver las letras en centro
+        const exitTimer = setTimeout(() => {
+          setStage('exiting');
+        }, 3700);
+        
+        // Cerrar splash después de la salida completa
+        const finishTimer = setTimeout(() => {
+          onFinish();
+        }, 6700);
 
-      return () => {
-        clearTimeout(visibleTimer);
-        clearTimeout(exitTimer);
-        clearTimeout(finishTimer);
-      };
+        return () => {
+          clearTimeout(visibleTimer);
+          clearTimeout(exitTimer);
+          clearTimeout(finishTimer);
+        };
+      });
     });
   }, [onFinish]);
 
