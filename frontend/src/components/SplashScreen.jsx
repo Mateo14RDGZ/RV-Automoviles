@@ -77,13 +77,11 @@ function SplashScreen({ onFinish }) {
           </h2>
         </div>
 
-        {/* Spinner de carga - solo aparece con fade, sin movimiento */}
+        {/* Spinner de carga - siempre visible, sin animaciones de entrada/salida */}
         <div 
           className="mt-10 flex justify-center"
           style={{
-            opacity: isVisible ? (animate ? 1 : 0) : 0,
-            transition: 'opacity 0.7s ease-in-out',
-            transitionDelay: animate ? '0.4s' : '0s'
+            opacity: 1
           }}
         >
           <div className="relative w-11 h-11">
