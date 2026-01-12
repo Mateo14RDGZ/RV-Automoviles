@@ -29,8 +29,9 @@ function SplashScreen({ onFinish }) {
         
         @keyframes slideFromBottom {
           0% { transform: translate3d(0, 200px, 0); opacity: 0; }
-          40% { transform: translate3d(0, 0, 0); opacity: 1; }
-          100% { transform: translate3d(0, 0, 0); opacity: 1; }
+          30% { transform: translate3d(0, 0, 0); opacity: 1; }
+          70% { transform: translate3d(0, 0, 0); opacity: 1; }
+          100% { transform: translate3d(0, 200px, 0); opacity: 0; }
         }
         
         .slide-left {
@@ -42,7 +43,7 @@ function SplashScreen({ onFinish }) {
         }
         
         .slide-bottom {
-          animation: slideFromBottom 1.2s ease-out forwards;
+          animation: slideFromBottom 3s ease-in-out forwards;
         }
       `}</style>
       <div
