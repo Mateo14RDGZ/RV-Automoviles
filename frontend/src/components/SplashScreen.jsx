@@ -5,16 +5,24 @@ function SplashScreen({ onFinish }) {
   const [animate, setAnimate] = useState(false);
 
   useEffect(() => {
-    // Iniciar animaciones de entrada después de un breve delay
-    setTimeout(() => setAnimate(true), 200);
+    // Iniciar animaciones de entrada con delay suficiente
+    const animateTimer = setTimeout(() => setAnimate(true), 100);
     
     // Iniciar animación de salida después de 2 segundos
-    const timer = setTimeout(() => {
+    const exitTimer = setTimeout(() => {
       setIsVisible(false);
-      setTimeout(onFinish, 900);
     }, 2000);
+    
+    // Cerrar splash después de que termine la animación de salida
+    const finishTimer = setTimeout(() => {
+      onFinish();
+    }, 3000);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(animateTimer);
+      clearTimeout(exitTimer);
+      clearTimeout(finishTimer);
+    };
   }, [onFinish]);
 
   return (
@@ -38,13 +46,11 @@ function SplashScreen({ onFinish }) {
         {/* "Powered by" - entra desde la izquierda, sale a la derecha */}
         <div 
           style={{
-            opacity: !isVisible ? 0 : animate ? 1 : 0,
-            transform: !isVisible 
-              ? 'translate3d(300px, 0, 0)' 
-              : animate 
-                ? 'translate3d(0, 0, 0)' 
-                : 'translate3d(-300px, 0, 0)',
-            transition: 'all 1s ease-out',
+            opacity: isVisible ? (animate ? 1 : 0) : 0,
+            transform: isVisible 
+              ? (animate ? 'translate3d(0, 0, 0)' : 'translate3d(-400px, 0, 0)')
+              : 'translate3d(400px, 0, 0)',
+            transition: 'all 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
             willChange: 'transform, opacity'
           }}
         >
@@ -56,13 +62,11 @@ function SplashScreen({ onFinish }) {
         {/* "RF Digital Studio" - entra desde la derecha, sale a la izquierda */}
         <div 
           style={{
-            opacity: !isVisible ? 0 : animate ? 1 : 0,
-            transform: !isVisible 
-              ? 'translate3d(-300px, 0, 0)' 
-              : animate 
-                ? 'translate3d(0, 0, 0)' 
-                : 'translate3d(300px, 0, 0)',
-            transition: 'all 1s ease-out',
+            opacity: isVisible ? (animate ? 1 : 0) : 0,
+            transform: isVisible 
+              ? (animate ? 'translate3d(0, 0, 0)' : 'translate3d(400px, 0, 0)')
+              : 'translate3d(-400px, 0, 0)',
+            transition: 'all 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
             willChange: 'transform, opacity'
           }}
         >
@@ -77,8 +81,9 @@ function SplashScreen({ onFinish }) {
         <div 
           className="mt-10 flex justify-center"
           style={{
-            opacity: !isVisible ? 0 : animate ? 1 : 0,
-            transition: 'opacity 0.8s ease-out 0.3s'
+            opacity: isVisible ? (animate ? 1 : 0) : 0,
+            transition: 'opacity 0.7s ease-in-out',
+            transitionDelay: animate ? '0.4s' : '0s'
           }}
         >
           <div className="relative w-11 h-11">
