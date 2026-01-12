@@ -10,8 +10,8 @@ function SplashScreen({ onFinish }) {
     
     const timer = setTimeout(() => {
       setIsVisible(false);
-      setTimeout(onFinish, 500); // Espera a que termine la animación
-    }, 2500); // Muestra el splash por 2.5 segundos
+      setTimeout(onFinish, 500);
+    }, 2500);
 
     return () => clearTimeout(timer);
   }, [onFinish]);
@@ -26,57 +26,59 @@ function SplashScreen({ onFinish }) {
       <div className="absolute inset-0 overflow-hidden">
         <div className={`absolute top-1/4 left-1/4 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl transition-all duration-1000 ${animate ? 'scale-150 opacity-100' : 'scale-0 opacity-0'}`}></div>
         <div className={`absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-400/10 rounded-full blur-3xl transition-all duration-1000 delay-300 ${animate ? 'scale-150 opacity-100' : 'scale-0 opacity-0'}`}></div>
+        <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-3xl transition-all duration-1000 delay-150 ${animate ? 'scale-125 opacity-100' : 'scale-0 opacity-0'}`}></div>
       </div>
 
       {/* Contenido principal */}
       <div className="relative text-center px-8">
-        {/* Logo RF con animación */}
-        <div className={`mb-8 transition-all duration-700 ${animate ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-8'}`}>
-          <div className="relative inline-block">
-            {/* Anillo exterior giratorio */}
-            <div className="absolute inset-0 -m-4">
-              <div className="w-32 h-32 border-2 border-white/20 rounded-full animate-spin" style={{ animationDuration: '3s' }}></div>
-            </div>
-            
-            {/* Círculo principal con letras RF */}
-            <div className="relative w-24 h-24 mx-auto bg-gradient-to-br from-white/20 to-white/5 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/30 shadow-2xl">
-              <span className="text-5xl font-black text-white tracking-tighter">RF</span>
-            </div>
-            
-            {/* Puntos decorativos */}
-            <div className="absolute -top-2 -right-2 w-3 h-3 bg-cyan-400 rounded-full animate-pulse"></div>
-            <div className="absolute -bottom-2 -left-2 w-3 h-3 bg-blue-300 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }}></div>
-          </div>
+        {/* Texto principal animado con efecto de escritura */}
+        <div className={`transition-all duration-700 ${animate ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <h1 className="text-5xl md:text-6xl font-black text-white tracking-tight">
+            <span className="inline-block animate-pulse">
+              <span className="bg-gradient-to-r from-white via-blue-100 to-cyan-200 bg-clip-text text-transparent">
+                Powered by
+              </span>
+            </span>
+          </h1>
+          
+          <h2 className={`text-6xl md:text-7xl font-black mt-4 tracking-tight transition-all duration-700 delay-300 ${animate ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-8 scale-95'}`}>
+            <span className="bg-gradient-to-r from-cyan-300 via-blue-200 to-white bg-clip-text text-transparent animate-pulse">
+              RF Digital Studio
+            </span>
+          </h2>
         </div>
 
-        {/* Título principal */}
-        <h1 className={`text-4xl md:text-5xl font-black text-white mb-3 tracking-tight transition-all duration-700 delay-200 ${animate ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          <span className="bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent">
-            RF Digital Studio
-          </span>
-        </h1>
-
-        {/* Subtítulo */}
-        <div className={`transition-all duration-700 delay-400 ${animate ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <div className="h-px w-8 bg-gradient-to-r from-transparent to-blue-300"></div>
-            <p className="text-blue-100 text-sm font-light tracking-[0.2em] uppercase">
-              Powered by
-            </p>
-            <div className="h-px w-8 bg-gradient-to-l from-transparent to-blue-300"></div>
-          </div>
-          <p className="text-white/80 text-xs tracking-wider">
-            Soluciones Web Profesionales
-          </p>
+        {/* Líneas decorativas animadas */}
+        <div className={`mt-8 flex items-center justify-center gap-4 transition-all duration-700 delay-500 ${animate ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0'}`}>
+          <div className="h-px w-20 bg-gradient-to-r from-transparent via-cyan-400 to-transparent animate-pulse"></div>
+          <div className="w-2 h-2 bg-cyan-400 rounded-full animate-ping"></div>
+          <div className="h-px w-20 bg-gradient-to-r from-transparent via-cyan-400 to-transparent animate-pulse"></div>
         </div>
 
-        {/* Barra de carga */}
-        <div className={`mt-8 transition-all duration-700 delay-500 ${animate ? 'opacity-100' : 'opacity-0'}`}>
-          <div className="w-48 h-1 mx-auto bg-white/10 rounded-full overflow-hidden">
-            <div className="h-full bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full animate-pulse" style={{ width: '60%' }}></div>
+        {/* Barra de progreso animada */}
+        <div className={`mt-12 transition-all duration-700 delay-700 ${animate ? 'opacity-100' : 'opacity-0'}`}>
+          <div className="w-64 h-1 mx-auto bg-white/10 rounded-full overflow-hidden backdrop-blur-sm">
+            <div className="h-full bg-gradient-to-r from-cyan-400 via-blue-400 to-blue-500 rounded-full animate-[loading_1.5s_ease-in-out_infinite]"></div>
           </div>
         </div>
       </div>
+
+      <style jsx>{`
+        @keyframes loading {
+          0% {
+            width: 0%;
+            transform: translateX(0);
+          }
+          50% {
+            width: 70%;
+            transform: translateX(0);
+          }
+          100% {
+            width: 0%;
+            transform: translateX(100%);
+          }
+        }
+      `}</style>
     </div>
   );
 }
