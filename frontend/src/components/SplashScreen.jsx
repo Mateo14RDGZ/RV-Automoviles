@@ -5,22 +5,22 @@ function SplashScreen({ onFinish }) {
   const [animate, setAnimate] = useState(false);
 
   useEffect(() => {
-    // Iniciar animaciones de entrada
-    setTimeout(() => setAnimate(true), 50);
+    // Iniciar animaciones de entrada rápidamente
+    setTimeout(() => setAnimate(true), 100);
     
-    // Iniciar animación de salida después de 1.5 segundos
+    // Iniciar animación de salida después de 2 segundos
     const timer = setTimeout(() => {
       setIsVisible(false);
-      setTimeout(onFinish, 400);
-    }, 1500);
+      setTimeout(onFinish, 600);
+    }, 2000);
 
     return () => clearTimeout(timer);
   }, [onFinish]);
 
   return (
     <div
-      className={`fixed inset-0 z-[9999] flex items-center justify-center bg-gradient-to-br from-[#0A1929] via-[#1565C0] to-[#0D47A1] transition-all duration-400 ${
-        isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-110'
+      className={`fixed inset-0 z-[9999] flex items-center justify-center bg-gradient-to-br from-[#0A1929] via-[#1565C0] to-[#0D47A1] transition-all duration-600 ${
+        isVisible ? 'opacity-100' : 'opacity-0'
       }`}
     >
       {/* Efectos de fondo animados */}
@@ -32,25 +32,25 @@ function SplashScreen({ onFinish }) {
 
       {/* Contenido principal */}
       <div className="relative text-center px-8">
-        {/* Texto principal animado minimalista */}
-        <div className={`transition-all duration-500 ${animate ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}>
+        {/* Texto principal - entra desde arriba */}
+        <div className={`transition-all duration-700 ease-out ${animate ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-32'} ${!isVisible ? 'opacity-0 -translate-y-20' : ''}`}>
           <p className="text-sm md:text-base font-light text-white/60 tracking-[0.3em] uppercase mb-3">
             Powered by
           </p>
           
-          <h2 className={`text-2xl md:text-3xl font-medium tracking-wide transition-all duration-500 delay-100 ${animate ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}>
+          <h2 className="text-2xl md:text-3xl font-medium tracking-wide">
             <span className="bg-gradient-to-r from-white/90 via-blue-100 to-white/90 bg-clip-text text-transparent">
               RF Digital Studio
             </span>
           </h2>
         </div>
 
-        {/* Spinner de carga */}
-        <div className={`mt-8 flex justify-center transition-all duration-500 delay-200 ${animate ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
+        {/* Spinner de carga - entra desde abajo */}
+        <div className={`mt-8 flex justify-center transition-all duration-700 ease-out ${animate ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-32'} ${!isVisible ? 'opacity-0 translate-y-20' : ''}`}>
           <div className="relative w-8 h-8">
-            {/* Círculo exterior giratorio */}
+            {/* Círculo exterior */}
             <div className="absolute inset-0 border-2 border-white/20 rounded-full"></div>
-            {/* Arco animado */}
+            {/* Arco animado giratorio */}
             <div className="absolute inset-0 border-2 border-transparent border-t-white/80 border-r-white/60 rounded-full animate-spin"></div>
           </div>
         </div>
