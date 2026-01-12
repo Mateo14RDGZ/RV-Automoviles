@@ -9,17 +9,17 @@ function SplashScreen({ onFinish }) {
       // Pasar a visible después de que el navegador pinte el estado inicial
       const visibleTimer = setTimeout(() => {
         setStage('visible');
-      }, 100);
+      }, 50);
       
-      // Iniciar animación de salida
+      // Iniciar animación de salida - dar tiempo suficiente para ver las letras en centro
       const exitTimer = setTimeout(() => {
         setStage('exiting');
-      }, 2600);
+      }, 2550);
       
-      // Cerrar splash después de la salida
+      // Cerrar splash después de la salida completa
       const finishTimer = setTimeout(() => {
         onFinish();
-      }, 4600);
+      }, 4550);
 
       return () => {
         clearTimeout(visibleTimer);
@@ -51,11 +51,11 @@ function SplashScreen({ onFinish }) {
         <div 
           style={{
             transform: stage === 'entering' 
-              ? 'translate3d(-800px, 0, 0)' 
+              ? 'translate3d(-1000px, 0, 0)' 
               : stage === 'visible'
                 ? 'translate3d(0, 0, 0)'
-                : 'translate3d(-800px, 0, 0)',
-            transition: 'transform 1.5s ease-in-out',
+                : 'translate3d(-1000px, 0, 0)',
+            transition: 'transform 2s ease-in-out',
             willChange: 'transform'
           }}
         >
@@ -68,11 +68,11 @@ function SplashScreen({ onFinish }) {
         <div 
           style={{
             transform: stage === 'entering' 
-              ? 'translate3d(800px, 0, 0)' 
+              ? 'translate3d(1000px, 0, 0)' 
               : stage === 'visible'
                 ? 'translate3d(0, 0, 0)'
-                : 'translate3d(800px, 0, 0)',
-            transition: 'transform 1.5s ease-in-out',
+                : 'translate3d(1000px, 0, 0)',
+            transition: 'transform 2s ease-in-out',
             willChange: 'transform'
           }}
         >
