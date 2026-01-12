@@ -5,10 +5,10 @@ function SplashScreen({ onFinish }) {
   const [animate, setAnimate] = useState(false);
 
   useEffect(() => {
-    // Iniciar animaciones de entrada con delay mínimo
+    // Iniciar animaciones de entrada
     const animateTimer = setTimeout(() => {
       setAnimate(true);
-    }, 50);
+    }, 100);
     
     // Iniciar animación de salida después de 2 segundos
     const exitTimer = setTimeout(() => {
@@ -18,7 +18,7 @@ function SplashScreen({ onFinish }) {
     // Cerrar splash después de que termine la animación de salida
     const finishTimer = setTimeout(() => {
       onFinish();
-    }, 3200);
+    }, 3300);
 
     return () => {
       clearTimeout(animateTimer);
@@ -26,19 +26,6 @@ function SplashScreen({ onFinish }) {
       clearTimeout(finishTimer);
     };
   }, [onFinish]);
-
-  // Calcular estados de transformación
-  const getPoweredByTransform = () => {
-    if (!isVisible) return 'translate3d(500px, 0, 0)'; // Sale a la derecha
-    if (animate) return 'translate3d(0, 0, 0)'; // Posición central
-    return 'translate3d(-500px, 0, 0)'; // Entra desde la izquierda
-  };
-
-  const getRFTransform = () => {
-    if (!isVisible) return 'translate3d(-500px, 0, 0)'; // Sale a la izquierda
-    if (animate) return 'translate3d(0, 0, 0)'; // Posición central
-    return 'translate3d(500px, 0, 0)'; // Entra desde la derecha
-  };
 
   return (
     <div
@@ -61,9 +48,13 @@ function SplashScreen({ onFinish }) {
         {/* "Powered by" - entra desde la izquierda, sale a la derecha */}
         <div 
           style={{
-            opacity: (animate && isVisible) ? 1 : 0,
-            transform: getPoweredByTransform(),
-            transition: 'transform 1.1s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 1.1s ease-out',
+            opacity: isVisible ? 1 : 0,
+            transform: !isVisible 
+              ? 'translate3d(600px, 0, 0)' 
+              : animate 
+                ? 'translate3d(0, 0, 0)' 
+                : 'translate3d(-600px, 0, 0)',
+            transition: 'transform 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55), opacity 1s ease',
             willChange: 'transform, opacity'
           }}
         >
@@ -75,9 +66,13 @@ function SplashScreen({ onFinish }) {
         {/* "RF Digital Studio" - entra desde la derecha, sale a la izquierda */}
         <div 
           style={{
-            opacity: (animate && isVisible) ? 1 : 0,
-            transform: getRFTransform(),
-            transition: 'transform 1.1s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 1.1s ease-out',
+            opacity: isVisible ? 1 : 0,
+            transform: !isVisible 
+              ? 'translate3d(-600px, 0, 0)' 
+              : animate 
+                ? 'translate3d(0, 0, 0)' 
+                : 'translate3d(600px, 0, 0)',
+            transition: 'transform 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55), opacity 1s ease',
             willChange: 'transform, opacity'
           }}
         >
