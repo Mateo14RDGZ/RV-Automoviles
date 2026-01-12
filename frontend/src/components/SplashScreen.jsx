@@ -31,35 +31,22 @@ function SplashScreen({ onFinish }) {
 
       {/* Contenido principal */}
       <div className="relative text-center px-8">
-        {/* Texto principal animado con efecto de escritura */}
+        {/* Texto principal animado minimalista */}
         <div className={`transition-all duration-700 ${animate ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          <h1 className="text-5xl md:text-6xl font-black text-white tracking-tight">
-            <span className="inline-block animate-pulse">
-              <span className="bg-gradient-to-r from-white via-blue-100 to-cyan-200 bg-clip-text text-transparent">
-                Powered by
-              </span>
-            </span>
-          </h1>
+          <p className="text-sm md:text-base font-light text-white/60 tracking-[0.3em] uppercase mb-3">
+            Powered by
+          </p>
           
-          <h2 className={`text-6xl md:text-7xl font-black mt-4 tracking-tight transition-all duration-700 delay-300 ${animate ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-8 scale-95'}`}>
-            <span className="bg-gradient-to-r from-cyan-300 via-blue-200 to-white bg-clip-text text-transparent animate-pulse">
+          <h2 className={`text-2xl md:text-3xl font-medium tracking-wide transition-all duration-700 delay-200 ${animate ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+            <span className="bg-gradient-to-r from-white/90 via-blue-100 to-white/90 bg-clip-text text-transparent">
               RF Digital Studio
             </span>
           </h2>
         </div>
 
-        {/* Líneas decorativas animadas */}
-        <div className={`mt-8 flex items-center justify-center gap-4 transition-all duration-700 delay-500 ${animate ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0'}`}>
-          <div className="h-px w-20 bg-gradient-to-r from-transparent via-cyan-400 to-transparent animate-pulse"></div>
-          <div className="w-2 h-2 bg-cyan-400 rounded-full animate-ping"></div>
-          <div className="h-px w-20 bg-gradient-to-r from-transparent via-cyan-400 to-transparent animate-pulse"></div>
-        </div>
-
-        {/* Barra de progreso animada */}
-        <div className={`mt-12 transition-all duration-700 delay-700 ${animate ? 'opacity-100' : 'opacity-0'}`}>
-          <div className="w-64 h-1 mx-auto bg-white/10 rounded-full overflow-hidden backdrop-blur-sm">
-            <div className="h-full bg-gradient-to-r from-cyan-400 via-blue-400 to-blue-500 rounded-full animate-[loading_1.5s_ease-in-out_infinite]"></div>
-          </div>
+        {/* Línea decorativa sutil */}
+        <div className={`mt-8 transition-all duration-700 delay-400 ${animate ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0'}`}>
+          <div className="h-px w-32 mx-auto bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
         </div>
       </div>
 
