@@ -4,26 +4,29 @@ function SplashScreen({ onFinish }) {
   const [stage, setStage] = useState('entering'); // entering, visible, exiting
 
   useEffect(() => {
-    // Pasar a visible después de la entrada
-    const visibleTimer = setTimeout(() => {
-      setStage('visible');
-    }, 1800);
-    
-    // Iniciar animación de salida
-    const exitTimer = setTimeout(() => {
-      setStage('exiting');
-    }, 3800);
-    
-    // Cerrar splash después de la salida
-    const finishTimer = setTimeout(() => {
-      onFinish();
-    }, 5800);
+    // Forzar un render inicial antes de las animaciones
+    requestAnimationFrame(() => {
+      // Pasar a visible después de que el navegador pinte el estado inicial
+      const visibleTimer = setTimeout(() => {
+        setStage('visible');
+      }, 100);
+      
+      // Iniciar animación de salida
+      const exitTimer = setTimeout(() => {
+        setStage('exiting');
+      }, 2600);
+      
+      // Cerrar splash después de la salida
+      const finishTimer = setTimeout(() => {
+        onFinish();
+      }, 4600);
 
-    return () => {
-      clearTimeout(visibleTimer);
-      clearTimeout(exitTimer);
-      clearTimeout(finishTimer);
-    };
+      return () => {
+        clearTimeout(visibleTimer);
+        clearTimeout(exitTimer);
+        clearTimeout(finishTimer);
+      };
+    });
   }, [onFinish]);
 
   return (
@@ -52,7 +55,7 @@ function SplashScreen({ onFinish }) {
               : stage === 'visible'
                 ? 'translate3d(0, 0, 0)'
                 : 'translate3d(-800px, 0, 0)',
-            transition: 'transform 1.8s cubic-bezier(0.4, 0, 0.2, 1)',
+            transition: 'transform 1.5s ease-in-out',
             willChange: 'transform'
           }}
         >
@@ -69,7 +72,7 @@ function SplashScreen({ onFinish }) {
               : stage === 'visible'
                 ? 'translate3d(0, 0, 0)'
                 : 'translate3d(800px, 0, 0)',
-            transition: 'transform 1.8s cubic-bezier(0.4, 0, 0.2, 1)',
+            transition: 'transform 1.5s ease-in-out',
             willChange: 'transform'
           }}
         >
