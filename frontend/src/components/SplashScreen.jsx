@@ -9,17 +9,17 @@ function SplashScreen({ onFinish }) {
       // Pasar a visible después de que el navegador pinte el estado inicial
       const visibleTimer = setTimeout(() => {
         setStage('visible');
-      }, 50);
+      }, 100);
       
       // Iniciar animación de salida - dar tiempo suficiente para ver las letras en centro
       const exitTimer = setTimeout(() => {
         setStage('exiting');
-      }, 2550);
+      }, 3600);
       
       // Cerrar splash después de la salida completa
       const finishTimer = setTimeout(() => {
         onFinish();
-      }, 4550);
+      }, 6600);
 
       return () => {
         clearTimeout(visibleTimer);
@@ -55,7 +55,7 @@ function SplashScreen({ onFinish }) {
               : stage === 'visible'
                 ? 'translate3d(0, 0, 0)'
                 : 'translate3d(-1000px, 0, 0)',
-            transition: 'transform 2s ease-in-out',
+            transition: 'transform 3s ease-in-out',
             willChange: 'transform'
           }}
         >
@@ -72,7 +72,7 @@ function SplashScreen({ onFinish }) {
               : stage === 'visible'
                 ? 'translate3d(0, 0, 0)'
                 : 'translate3d(1000px, 0, 0)',
-            transition: 'transform 2s ease-in-out',
+            transition: 'transform 3s ease-in-out',
             willChange: 'transform'
           }}
         >
