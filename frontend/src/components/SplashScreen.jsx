@@ -5,7 +5,7 @@ function SplashScreen({ onFinish }) {
     // Cerrar splash después de que terminen todas las animaciones
     const timer = setTimeout(() => {
       onFinish();
-    }, 7000); // 2s entrada + 2s pausa + 2s salida + 1s margen
+    }, 2000);
 
     return () => clearTimeout(timer);
   }, [onFinish]);
@@ -15,24 +15,24 @@ function SplashScreen({ onFinish }) {
       <style>{`
         @keyframes slideFromLeft {
           0% { transform: translate3d(-1200px, 0, 0); opacity: 1; }
-          30% { transform: translate3d(0, 0, 0); opacity: 1; }
-          70% { transform: translate3d(0, 0, 0); opacity: 1; }
+          35% { transform: translate3d(0, 0, 0); opacity: 1; }
+          65% { transform: translate3d(0, 0, 0); opacity: 1; }
           100% { transform: translate3d(-1200px, 0, 0); opacity: 1; }
         }
         
         @keyframes slideFromRight {
           0% { transform: translate3d(1200px, 0, 0); opacity: 1; }
-          30% { transform: translate3d(0, 0, 0); opacity: 1; }
-          70% { transform: translate3d(0, 0, 0); opacity: 1; }
+          35% { transform: translate3d(0, 0, 0); opacity: 1; }
+          65% { transform: translate3d(0, 0, 0); opacity: 1; }
           100% { transform: translate3d(1200px, 0, 0); opacity: 1; }
         }
         
         .slide-left {
-          animation: slideFromLeft 7s ease-in-out forwards;
+          animation: slideFromLeft 2s ease-in-out forwards;
         }
         
         .slide-right {
-          animation: slideFromRight 7s ease-in-out forwards;
+          animation: slideFromRight 2s ease-in-out forwards;
         }
       `}</style>
       <div
