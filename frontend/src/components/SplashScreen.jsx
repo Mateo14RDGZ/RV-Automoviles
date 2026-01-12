@@ -6,7 +6,7 @@ function SplashScreen({ onFinish }) {
 
   useEffect(() => {
     // Iniciar animaciones de entrada después de un breve delay
-    setTimeout(() => setAnimate(true), 300);
+    setTimeout(() => setAnimate(true), 200);
     
     // Iniciar animación de salida después de 2 segundos
     const timer = setTimeout(() => {
@@ -35,23 +35,37 @@ function SplashScreen({ onFinish }) {
 
       {/* Contenido principal */}
       <div className="relative z-10 text-center px-8 w-full">
-        {/* Texto principal - entra desde arriba más lento */}
+        {/* "Powered by" - entra desde la izquierda, sale a la derecha */}
         <div 
           style={{
             opacity: !isVisible ? 0 : animate ? 1 : 0,
             transform: !isVisible 
-              ? 'translate3d(0, -150px, 0)' 
+              ? 'translate3d(300px, 0, 0)' 
               : animate 
                 ? 'translate3d(0, 0, 0)' 
-                : 'translate3d(0, -200px, 0)',
-            transition: 'all 1.2s ease-out',
+                : 'translate3d(-300px, 0, 0)',
+            transition: 'all 1s ease-out',
             willChange: 'transform, opacity'
           }}
         >
           <p className="text-sm md:text-base font-light text-white/70 tracking-[0.3em] uppercase mb-3">
             Powered by
           </p>
-          
+        </div>
+
+        {/* "RF Digital Studio" - entra desde la derecha, sale a la izquierda */}
+        <div 
+          style={{
+            opacity: !isVisible ? 0 : animate ? 1 : 0,
+            transform: !isVisible 
+              ? 'translate3d(-300px, 0, 0)' 
+              : animate 
+                ? 'translate3d(0, 0, 0)' 
+                : 'translate3d(300px, 0, 0)',
+            transition: 'all 1s ease-out',
+            willChange: 'transform, opacity'
+          }}
+        >
           <h2 className="text-2xl md:text-3xl font-medium tracking-wide">
             <span className="bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent">
               RF Digital Studio
@@ -59,21 +73,15 @@ function SplashScreen({ onFinish }) {
           </h2>
         </div>
 
-        {/* Spinner de carga - entra desde abajo más lento y visible */}
+        {/* Spinner de carga - solo aparece con fade, sin movimiento */}
         <div 
           className="mt-10 flex justify-center"
           style={{
             opacity: !isVisible ? 0 : animate ? 1 : 0,
-            transform: !isVisible 
-              ? 'translate3d(0, 150px, 0)' 
-              : animate 
-                ? 'translate3d(0, 0, 0)' 
-                : 'translate3d(0, 200px, 0)',
-            transition: 'all 1.2s ease-out',
-            willChange: 'transform, opacity'
+            transition: 'opacity 0.8s ease-out 0.3s'
           }}
         >
-          <div className="relative w-14 h-14">
+          <div className="relative w-11 h-11">
             {/* Círculo exterior */}
             <div 
               className="absolute inset-0 rounded-full"
