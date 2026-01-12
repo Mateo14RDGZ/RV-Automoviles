@@ -1,27 +1,26 @@
 import { useEffect, useState } from 'react';
 
 function SplashScreen({ onFinish }) {
-  const [isVisible, setIsVisible] = useState(true);
-  const [animate, setAnimate] = useState(false);
+  const [stage, setStage] = useState('entering'); // entering, visible, exiting
 
   useEffect(() => {
-    // Iniciar animaciones de entrada con delay adecuado
-    const animateTimer = setTimeout(() => {
-      setAnimate(true);
-    }, 300);
+    // Pasar a visible después de la entrada
+    const visibleTimer = setTimeout(() => {
+      setStage('visible');
+    }, 1800);
     
-    // Iniciar animación de salida después de 2 segundos
+    // Iniciar animación de salida
     const exitTimer = setTimeout(() => {
-      setIsVisible(false);
-    }, 2300);
+      setStage('exiting');
+    }, 3800);
     
-    // Cerrar splash después de que termine la animación de salida (dar tiempo suficiente)
+    // Cerrar splash después de la salida
     const finishTimer = setTimeout(() => {
       onFinish();
-    }, 4500);
+    }, 5800);
 
     return () => {
-      clearTimeout(animateTimer);
+      clearTimeout(visibleTimer);
       clearTimeout(exitTimer);
       clearTimeout(finishTimer);
     };
@@ -39,8 +38,8 @@ function SplashScreen({ onFinish }) {
     >
       {/* Efectos de fondo animados */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className={`absolute top-1/4 left-1/4 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl transition-all duration-1000 ${animate ? 'scale-150 opacity-100' : 'scale-0 opacity-0'}`}></div>
-        <div className={`absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-400/10 rounded-full blur-3xl transition-all duration-1000 delay-150 ${animate ? 'scale-150 opacity-100' : 'scale-0 opacity-0'}`}></div>
+        <div className={`absolute top-1/4 left-1/4 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl transition-all duration-1000 ${stage !== 'entering' ? 'scale-150 opacity-100' : 'scale-0 opacity-0'}`}></div>
+        <div className={`absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-400/10 rounded-full blur-3xl transition-all duration-1000 delay-150 ${stage !== 'entering' ? 'scale-150 opacity-100' : 'scale-0 opacity-0'}`}></div>
       </div>
 
       {/* Contenido principal */}
@@ -48,14 +47,13 @@ function SplashScreen({ onFinish }) {
         {/* "Powered by" - entra y sale por la izquierda */}
         <div 
           style={{
-            opacity: isVisible ? (animate ? 1 : 0) : 0,
-            transform: !isVisible 
-              ? 'translate3d(-700px, 0, 0)' 
-              : animate 
-                ? 'translate3d(0, 0, 0)' 
-                : 'translate3d(-700px, 0, 0)',
-            transition: 'transform 2s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 2s cubic-bezier(0.25, 0.1, 0.25, 1)',
-            willChange: 'transform, opacity'
+            transform: stage === 'entering' 
+              ? 'translate3d(-800px, 0, 0)' 
+              : stage === 'visible'
+                ? 'translate3d(0, 0, 0)'
+                : 'translate3d(-800px, 0, 0)',
+            transition: 'transform 1.8s cubic-bezier(0.4, 0, 0.2, 1)',
+            willChange: 'transform'
           }}
         >
           <p className="text-sm md:text-base font-light text-white/70 tracking-[0.3em] uppercase mb-3">
@@ -66,14 +64,13 @@ function SplashScreen({ onFinish }) {
         {/* "RF Digital Studio" - entra y sale por la derecha */}
         <div 
           style={{
-            opacity: isVisible ? (animate ? 1 : 0) : 0,
-            transform: !isVisible 
-              ? 'translate3d(700px, 0, 0)' 
-              : animate 
-                ? 'translate3d(0, 0, 0)' 
-                : 'translate3d(700px, 0, 0)',
-            transition: 'transform 2s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 2s cubic-bezier(0.25, 0.1, 0.25, 1)',
-            willChange: 'transform, opacity'
+            transform: stage === 'entering' 
+              ? 'translate3d(800px, 0, 0)' 
+              : stage === 'visible'
+                ? 'translate3d(0, 0, 0)'
+                : 'translate3d(800px, 0, 0)',
+            transition: 'transform 1.8s cubic-bezier(0.4, 0, 0.2, 1)',
+            willChange: 'transform'
           }}
         >
           <h2 className="text-2xl md:text-3xl font-medium tracking-wide">
