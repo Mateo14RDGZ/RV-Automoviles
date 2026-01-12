@@ -5,7 +5,7 @@ function SplashScreen({ onFinish }) {
     // Cerrar splash después de que terminen todas las animaciones
     const timer = setTimeout(() => {
       onFinish();
-    }, 2000);
+    }, 3000);
 
     return () => clearTimeout(timer);
   }, [onFinish]);
@@ -15,24 +15,34 @@ function SplashScreen({ onFinish }) {
       <style>{`
         @keyframes slideFromLeft {
           0% { transform: translate3d(-1200px, 0, 0); opacity: 1; }
-          35% { transform: translate3d(0, 0, 0); opacity: 1; }
-          65% { transform: translate3d(0, 0, 0); opacity: 1; }
+          30% { transform: translate3d(0, 0, 0); opacity: 1; }
+          70% { transform: translate3d(0, 0, 0); opacity: 1; }
           100% { transform: translate3d(-1200px, 0, 0); opacity: 1; }
         }
         
         @keyframes slideFromRight {
           0% { transform: translate3d(1200px, 0, 0); opacity: 1; }
-          35% { transform: translate3d(0, 0, 0); opacity: 1; }
-          65% { transform: translate3d(0, 0, 0); opacity: 1; }
+          30% { transform: translate3d(0, 0, 0); opacity: 1; }
+          70% { transform: translate3d(0, 0, 0); opacity: 1; }
           100% { transform: translate3d(1200px, 0, 0); opacity: 1; }
         }
         
+        @keyframes slideFromBottom {
+          0% { transform: translate3d(0, 200px, 0); opacity: 0; }
+          40% { transform: translate3d(0, 0, 0); opacity: 1; }
+          100% { transform: translate3d(0, 0, 0); opacity: 1; }
+        }
+        
         .slide-left {
-          animation: slideFromLeft 2s ease-in-out forwards;
+          animation: slideFromLeft 3s ease-in-out forwards;
         }
         
         .slide-right {
-          animation: slideFromRight 2s ease-in-out forwards;
+          animation: slideFromRight 3s ease-in-out forwards;
+        }
+        
+        .slide-bottom {
+          animation: slideFromBottom 1.2s ease-out forwards;
         }
       `}</style>
       <div
@@ -70,10 +80,7 @@ function SplashScreen({ onFinish }) {
 
         {/* Spinner de carga - siempre visible, sin animaciones de entrada/salida */}
         <div 
-          className="mt-10 flex justify-center"
-          style={{
-            opacity: 1
-          }}
+          className="mt-10 flex justify-center slide-bottom"
         >
           <div className="relative w-11 h-11">
             {/* Círculo exterior */}
