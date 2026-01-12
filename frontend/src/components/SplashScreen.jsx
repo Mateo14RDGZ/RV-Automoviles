@@ -18,7 +18,7 @@ function SplashScreen({ onFinish }) {
     // Cerrar splash después de que termine la animación de salida
     const finishTimer = setTimeout(() => {
       onFinish();
-    }, 3300);
+    }, 3600);
 
     return () => {
       clearTimeout(animateTimer);
@@ -45,16 +45,16 @@ function SplashScreen({ onFinish }) {
 
       {/* Contenido principal */}
       <div className="relative z-10 text-center px-8 w-full">
-        {/* "Powered by" - entra desde la izquierda, sale a la derecha */}
+        {/* "Powered by" - entra y sale por la izquierda */}
         <div 
           style={{
             opacity: isVisible ? 1 : 0,
             transform: !isVisible 
-              ? 'translate3d(600px, 0, 0)' 
+              ? 'translate3d(-500px, 0, 0)' 
               : animate 
                 ? 'translate3d(0, 0, 0)' 
-                : 'translate3d(-600px, 0, 0)',
-            transition: 'transform 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55), opacity 1s ease',
+                : 'translate3d(-500px, 0, 0)',
+            transition: 'all 1.4s ease-in-out',
             willChange: 'transform, opacity'
           }}
         >
@@ -63,16 +63,16 @@ function SplashScreen({ onFinish }) {
           </p>
         </div>
 
-        {/* "RF Digital Studio" - entra desde la derecha, sale a la izquierda */}
+        {/* "RF Digital Studio" - entra y sale por la derecha */}
         <div 
           style={{
             opacity: isVisible ? 1 : 0,
             transform: !isVisible 
-              ? 'translate3d(-600px, 0, 0)' 
+              ? 'translate3d(500px, 0, 0)' 
               : animate 
                 ? 'translate3d(0, 0, 0)' 
-                : 'translate3d(600px, 0, 0)',
-            transition: 'transform 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55), opacity 1s ease',
+                : 'translate3d(500px, 0, 0)',
+            transition: 'all 1.4s ease-in-out',
             willChange: 'transform, opacity'
           }}
         >
