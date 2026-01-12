@@ -5,20 +5,20 @@ function SplashScreen({ onFinish }) {
   const [animate, setAnimate] = useState(false);
 
   useEffect(() => {
-    // Iniciar animaciones de entrada
+    // Iniciar animaciones de entrada con delay adecuado
     const animateTimer = setTimeout(() => {
       setAnimate(true);
-    }, 100);
+    }, 300);
     
     // Iniciar animación de salida después de 2 segundos
     const exitTimer = setTimeout(() => {
       setIsVisible(false);
-    }, 2000);
+    }, 2300);
     
-    // Cerrar splash después de que termine la animación de salida
+    // Cerrar splash después de que termine la animación de salida (dar tiempo suficiente)
     const finishTimer = setTimeout(() => {
       onFinish();
-    }, 3600);
+    }, 4500);
 
     return () => {
       clearTimeout(animateTimer);
@@ -48,13 +48,13 @@ function SplashScreen({ onFinish }) {
         {/* "Powered by" - entra y sale por la izquierda */}
         <div 
           style={{
-            opacity: isVisible ? 1 : 0,
+            opacity: isVisible ? (animate ? 1 : 0) : 0,
             transform: !isVisible 
-              ? 'translate3d(-500px, 0, 0)' 
+              ? 'translate3d(-700px, 0, 0)' 
               : animate 
                 ? 'translate3d(0, 0, 0)' 
-                : 'translate3d(-500px, 0, 0)',
-            transition: 'all 1.4s ease-in-out',
+                : 'translate3d(-700px, 0, 0)',
+            transition: 'transform 2s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 2s cubic-bezier(0.25, 0.1, 0.25, 1)',
             willChange: 'transform, opacity'
           }}
         >
@@ -66,13 +66,13 @@ function SplashScreen({ onFinish }) {
         {/* "RF Digital Studio" - entra y sale por la derecha */}
         <div 
           style={{
-            opacity: isVisible ? 1 : 0,
+            opacity: isVisible ? (animate ? 1 : 0) : 0,
             transform: !isVisible 
-              ? 'translate3d(500px, 0, 0)' 
+              ? 'translate3d(700px, 0, 0)' 
               : animate 
                 ? 'translate3d(0, 0, 0)' 
-                : 'translate3d(500px, 0, 0)',
-            transition: 'all 1.4s ease-in-out',
+                : 'translate3d(700px, 0, 0)',
+            transition: 'transform 2s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 2s cubic-bezier(0.25, 0.1, 0.25, 1)',
             willChange: 'transform, opacity'
           }}
         >
