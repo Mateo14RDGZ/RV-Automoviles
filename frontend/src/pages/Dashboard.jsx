@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
-import { dashboardService, comprobantesService } from '../services';
+import { dashboardService, comprobantesService } from '../services/apiServices';
 import { formatCurrency } from '../utils/format';
 import { 
   Car, 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Car, Users, CreditCard, AlertCircle, CheckCircle, Clock, TrendingUp, Bell, FileText, Eye, Check, X } from 'lucide-react';
 import api from '../services/api';
-import { comprobantesService } from '../services';
+import { comprobantesService } from '../services/apiServices';
 import { useToast } from '../context/ToastContext';
 import { formatCurrency } from '../utils/format';
 

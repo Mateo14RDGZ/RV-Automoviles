@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { comprobantesService } from '../services';
+import { comprobantesService } from '../services/apiServices';
 import { formatCurrency, formatDate } from '../utils/format';
 import { 
   FileText, 

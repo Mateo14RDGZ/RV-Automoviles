@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { CheckCircle, AlertCircle, Clock, Search, Download, Calendar } from 'lucide-react';
-import { pagosService } from '../services';
+import { pagosService } from '../services/apiServices';
 import { formatCurrency, formatDate } from '../utils/format';
 import jsPDF from 'jspdf';
 

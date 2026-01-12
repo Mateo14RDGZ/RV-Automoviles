@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { autosService, clientesService, pagosService, dashboardService } from '../services';
+import { autosService, clientesService, pagosService, dashboardService } from '../services/apiServices';
 import { exportToCSV, exportToJSON, formatDataForExport } from '../utils/export';
 import { formatCurrency, formatDate } from '../utils/format';
 import jsPDF from 'jspdf';

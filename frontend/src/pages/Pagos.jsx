@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { pagosService, autosService, clientesService, comprobantesService } from '../services';
+import { pagosService, autosService, clientesService, comprobantesService } from '../services/apiServices';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { formatCurrency } from '../utils/format';

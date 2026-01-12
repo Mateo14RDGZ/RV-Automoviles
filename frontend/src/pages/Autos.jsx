@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { autosService, clientesService } from '../services';
+import { autosService, clientesService } from '../services/apiServices';
 import { Car, Plus, Search, Edit2, Trash2, Eye, DollarSign, X } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 import ConfirmDialog from '../components/ConfirmDialog';

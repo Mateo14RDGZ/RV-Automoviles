@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { clientesService } from '../services';
+import { clientesService } from '../services/apiServices';
 import { Users, Plus, Search, Edit2, Trash2, Phone, Mail, MapPin, MessageCircle, Copy, ExternalLink, IdCard } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 import ConfirmDialog from '../components/ConfirmDialog';

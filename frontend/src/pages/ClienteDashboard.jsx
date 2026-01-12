@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import { TrendingUp, Calendar, DollarSign, CheckCircle, AlertCircle, Clock } from 'lucide-react';
-import { pagosService } from '../services';
+import { pagosService } from '../services/apiServices';
 import { formatCurrency, formatDate } from '../utils/format';
 
 const ClienteDashboard = () => {
