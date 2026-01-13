@@ -394,114 +394,122 @@ const Reportes = () => {
     try {
       const doc = new jsPDF();
       
-      // Encabezado
-      doc.setFontSize(18);
-      doc.setTextColor(59, 130, 246); // Azul
-      doc.text('Reporte General del Sistema', 105, 20, { align: 'center' });
-      doc.setFontSize(10);
-      doc.setTextColor(100, 100, 100);
-      doc.text(`Fecha: ${new Date().toLocaleDateString('es-ES')}`, 105, 28, { align: 'center' });
-      doc.text(`Rango: ${new Date(dateRange.start).toLocaleDateString('es-ES')} - ${new Date(dateRange.end).toLocaleDateString('es-ES')}`, 105, 34, { align: 'center' });
+      // Agregar encabezado profesional
+      const startY = await addPDFHeader(
+        doc,
+        'Reporte General del Sistema',
+        `Periodo: ${new Date(dateRange.start).toLocaleDateString('es-ES')} - ${new Date(dateRange.end).toLocaleDateString('es-ES')}`,
+        'Reporte General'
+      );
       
       // Sección de Autos
-      doc.setFontSize(14);
-      doc.setTextColor(59, 130, 246); // Azul
-      doc.text('Inventario de Autos', 14, 45);
-      doc.setFontSize(10);
-      doc.setTextColor(0, 0, 0);
+      let currentY = addSection(doc, startY, 'Inventario de Autos', 'Resumen del estado actual de vehículos');
       
       const autosData = [
         ['Total de Autos', String(stats?.autos?.total || 0)],
-        ['Disponibles', String(stats?.autos?.disponibles || 0)],
+        ['Disponibles para Venta', String(stats?.autos?.disponibles || 0)],
         ['Vendidos', String(stats?.autos?.vendidos || 0)],
-        ['Financiados', String(stats?.autos?.financiados || 0)]
+        ['En Financiamiento', String(stats?.autos?.financiados || 0)]
       ];
       
       autoTable(doc, {
-        startY: 50,
+        startY: currentY,
         body: autosData,
-        theme: 'plain',
-        styles: { fontSize: 10, cellPadding: 2 },
+        ...getTableStyles('primary'),
         columnStyles: {
-          0: { fontStyle: 'bold', cellWidth: 80 },
-          1: { halign: 'right' }
+          0: { fontStyle: 'bold', cellWidth: 100 },
+          1: { halign: 'right', cellWidth: 82, fontStyle: 'bold' }
         }
       });
       
       // Sección de Clientes
-      let currentY = doc.lastAutoTable.finalY + 10;
-      doc.setFontSize(14);
-      doc.setTextColor(147, 51, 234); // Morado
-      doc.text('Base de Clientes', 14, currentY);
-      doc.setFontSize(10);
-      doc.setTextColor(0, 0, 0);
+      currentY = doc.lastAutoTable.finalY + 12;
+      currentY = addSection(doc, currentY, 'Base de Clientes', 'Total de clientes registrados en el sistema');
       
       const clientesData = [
-        ['Total de Clientes', String(stats?.clientes?.total || 0)]
+        ['Total de Clientes Activos', String(stats?.clientes?.total || 0)]
       ];
       
       autoTable(doc, {
-        startY: currentY + 4,
+        startY: currentY,
         body: clientesData,
-        theme: 'plain',
-        styles: { fontSize: 10, cellPadding: 2 },
+        ...getTableStyles('secondary'),
         columnStyles: {
-          0: { fontStyle: 'bold', cellWidth: 80 },
-          1: { halign: 'right' }
+          0: { fontStyle: 'bold', cellWidth: 100 },
+          1: { halign: 'right', cellWidth: 82, fontStyle: 'bold' }
         }
       });
       
       // Sección de Pagos
-      currentY = doc.lastAutoTable.finalY + 10;
-      doc.setFontSize(14);
-      doc.setTextColor(34, 197, 94); // Verde
-      doc.text('Estado de Pagos', 14, currentY);
-      doc.setFontSize(10);
-      doc.setTextColor(0, 0, 0);
+      currentY = doc.lastAutoTable.finalY + 12;
+      currentY = addSection(doc, currentY, 'Estado Financiero', 'Resumen de cobros y financiamientos');
       
       const pagosData = [
         ['Total Recaudado', formatCurrency(stats?.pagos?.totalRecaudado || 0)],
-        ['Total Pendiente', formatCurrency(stats?.pagos?.totalPendiente || 0)],
-        ['Pagos Realizados', String(stats?.pagos?.pagados || 0)],
+        ['Total Pendiente de Cobro', formatCurrency(stats?.pagos?.totalPendiente || 0)],
+        ['Cuotas Pagadas', String(stats?.pagos?.pagados || 0)],
         ['Cuotas Pendientes', String(stats?.pagos?.pendientes || 0)],
         ['Cuotas Vencidas', String(stats?.pagos?.vencidos || 0)]
       ];
       
       autoTable(doc, {
-        startY: currentY + 4,
+        startY: currentY,
         body: pagosData,
-        theme: 'plain',
-        styles: { fontSize: 10, cellPadding: 2 },
+        ...getTableStyles('success'),
         columnStyles: {
-          0: { fontStyle: 'bold', cellWidth: 80 },
-          1: { halign: 'right' }
+          0: { fontStyle: 'bold', cellWidth: 100 },
+          1: { halign: 'right', cellWidth: 82, fontStyle: 'bold' }
+        },
+        didParseCell: function(data) {
+          if (data.section === 'body' && data.row.index === 4) {
+            // Resaltar cuotas vencidas en rojo
+            data.cell.styles.textColor = COLORS.danger;
+          }
         }
       });
       
-      // Resumen final
+      // Resumen Financiero Final
       currentY = doc.lastAutoTable.finalY + 15;
-      doc.setFillColor(96, 165, 250);
-      doc.rect(14, currentY, 182, 30, 'F');
-      doc.setFontSize(12);
+      
+      // Caja de resumen con diseño profesional
+      doc.setFillColor(...COLORS.primary);
+      doc.roundedRect(14, currentY, 182, 40, 3, 3, 'F');
+      
+      // Borde decorativo
+      doc.setDrawColor(...COLORS.accent);
+      doc.setLineWidth(1);
+      doc.roundedRect(14, currentY, 182, 40, 3, 3);
+      
+      doc.setFontSize(14);
+      doc.setFont(undefined, 'bold');
       doc.setTextColor(255, 255, 255);
-      doc.text('Resumen Financiero', 20, currentY + 8);
-      doc.setFontSize(10);
+      doc.text('RESUMEN FINANCIERO', 105, currentY + 10, { align: 'center' });
+      
       const totalActivo = (stats?.pagos?.totalRecaudado || 0) + (stats?.pagos?.totalPendiente || 0);
-      doc.text(`Total en Financiamientos: ${formatCurrency(totalActivo)}`, 20, currentY + 16);
       const tasaRecuperacion = totalActivo > 0 ? ((stats?.pagos?.totalRecaudado || 0) / totalActivo) * 100 : 0;
-      doc.text(`Tasa de Recuperación: ${tasaRecuperacion.toFixed(1)}%`, 20, currentY + 23);
       
-      // Pie de página
-      doc.setFontSize(8);
-      doc.setTextColor(150, 150, 150);
-      doc.text(
-        `Página 1 de 1`,
-        doc.internal.pageSize.getWidth() / 2,
-        doc.internal.pageSize.getHeight() - 10,
-        { align: 'center' }
-      );
+      doc.setFontSize(11);
+      doc.setFont(undefined, 'normal');
+      doc.text(`Total en Financiamientos Activos: ${formatCurrency(totalActivo)}`, 105, currentY + 20, { align: 'center' });
+      doc.text(`Tasa de Recuperación: ${tasaRecuperacion.toFixed(1)}%`, 105, currentY + 28, { align: 'center' });
       
-      doc.save(`reporte_general_${new Date().toISOString().split('T')[0]}.pdf`);
+      const estadoFinanciero = tasaRecuperacion >= 80 ? 'Excelente' : tasaRecuperacion >= 60 ? 'Bueno' : 'Requiere Atención';
+      doc.setFontSize(9);
+      doc.setFont(undefined, 'italic');
+      doc.text(`Estado: ${estadoFinanciero}`, 105, currentY + 35, { align: 'center' });
+      
+      // Agregar pie de página profesional
+      addPDFFooter(doc, {
+        showContact: true,
+        contactInfo: {
+          telefono: '+598 XX XXX XXX',
+          email: 'info@nicolastejera.com',
+          web: 'www.nicolastejera.com'
+        }
+      });
+      
+      // Guardar con nombre profesional
+      doc.save(getPDFFileName('ReporteGeneral', 'Sistema'));
       showToast('PDF de reporte general exportado exitosamente', 'success');
     } catch (error) {
       console.error('Error al exportar PDF:', error);
@@ -520,80 +528,99 @@ const Reportes = () => {
       
       const doc = new jsPDF();
       
-      // Encabezado
-      doc.setFontSize(18);
-      doc.setTextColor(59, 130, 246);
-      doc.text('Reporte de Permutas', 105, 20, { align: 'center' });
-      doc.setFontSize(10);
-      doc.setTextColor(100, 100, 100);
-      doc.text(`Fecha: ${new Date().toLocaleDateString('es-ES')}`, 105, 28, { align: 'center' });
+      // Agregar encabezado profesional
+      const startY = await addPDFHeader(
+        doc,
+        'Reporte de Permutas',
+        `Total de operaciones: ${permutas.length}`,
+        'Permutas'
+      );
       
-      // Estadísticas
+      // Estadísticas Generales
       if (permutasStats) {
-        doc.setFontSize(12);
-        doc.setTextColor(0, 0, 0);
-        doc.text('Estadísticas Generales', 14, 40);
+        const statsY = addSection(doc, startY, 'Estadísticas Generales', 'Resumen de permutas por tipo y valor');
         
         const statsData = [
-          ['Total de Permutas', String(permutasStats.total || 0)],
-          ['Permutas de Autos', String(permutasStats.porTipo?.find(t => t.tipo === 'auto')?._count || 0)],
-          ['Permutas de Motos', String(permutasStats.porTipo?.find(t => t.tipo === 'moto')?._count || 0)],
+          ['Total de Permutas Registradas', String(permutasStats.total || 0)],
+          ['Permutas de Automóviles', String(permutasStats.porTipo?.find(t => t.tipo === 'auto')?._count || 0)],
+          ['Permutas de Motocicletas', String(permutasStats.porTipo?.find(t => t.tipo === 'moto')?._count || 0)],
           ['Otras Permutas', String(permutasStats.porTipo?.find(t => t.tipo === 'otros')?._count || 0)],
           ['Valor Total Estimado', formatCurrency(permutasStats.valorTotal || 0)]
         ];
         
         autoTable(doc, {
-          startY: 45,
+          startY: statsY,
           body: statsData,
-          theme: 'plain',
-          styles: { fontSize: 10, cellPadding: 2 },
+          ...getTableStyles('warning'),
           columnStyles: {
-            0: { fontStyle: 'bold', cellWidth: 80 },
-            1: { halign: 'right' }
+            0: { fontStyle: 'bold', cellWidth: 100 },
+            1: { halign: 'right', cellWidth: 82, fontStyle: 'bold' }
+          },
+          didParseCell: function(data) {
+            if (data.section === 'body' && data.row.index === 4) {
+              // Resaltar valor total
+              data.cell.styles.fillColor = COLORS.gray[50];
+              data.cell.styles.textColor = COLORS.warning;
+              data.cell.styles.fontSize = 10;
+            }
           }
         });
       }
       
-      // Lista de permutas
-      let currentY = doc.lastAutoTable?.finalY + 15 || 90;
-      doc.setFontSize(12);
-      doc.setTextColor(0, 0, 0);
-      doc.text('Detalle de Permutas', 14, currentY);
+      // Detalle de Permutas
+      let currentY = doc.lastAutoTable?.finalY + 15 || 100;
+      currentY = addSection(doc, currentY, 'Detalle de Permutas', 'Lista completa de todas las permutas registradas');
       
       const permutasTableData = permutas.map(p => [
-        p.tipo.toUpperCase(),
+        p.tipo === 'auto' ? 'AUTO' : p.tipo === 'moto' ? 'MOTO' : 'OTROS',
         p.descripcion || '-',
         formatCurrency(p.valorEstimado || 0),
-        p.cliente?.nombre || '-',
-        new Date(p.createdAt).toLocaleDateString('es-ES')
+        p.cliente?.nombre || 'Sin asignar',
+        new Date(p.createdAt).toLocaleDateString('es-ES', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        })
       ]);
       
       autoTable(doc, {
-        startY: currentY + 5,
-        head: [['Tipo', 'Descripción', 'Valor', 'Cliente', 'Fecha']],
+        startY: currentY,
+        head: [['Tipo', 'Descripción', 'Valor Estimado', 'Cliente', 'Fecha']],
         body: permutasTableData,
-        styles: { fontSize: 8, cellPadding: 2 },
-        headStyles: {
-          fillColor: [59, 130, 246],
-          textColor: 255,
-          fontStyle: 'bold'
+        ...getTableStyles('warning'),
+        columnStyles: {
+          0: { cellWidth: 20, halign: 'center', fontStyle: 'bold' },
+          1: { cellWidth: 60 },
+          2: { cellWidth: 32, halign: 'right', fontStyle: 'bold' },
+          3: { cellWidth: 42 },
+          4: { cellWidth: 28, halign: 'center' }
         },
-        alternateRowStyles: {
-          fillColor: [245, 247, 250]
+        didParseCell: function(data) {
+          if (data.section === 'body' && data.column.index === 0) {
+            const tipo = data.cell.text[0];
+            if (tipo === 'AUTO') {
+              data.cell.styles.fillColor = [37, 99, 235, 0.1];
+              data.cell.styles.textColor = COLORS.accent;
+            } else if (tipo === 'MOTO') {
+              data.cell.styles.fillColor = [245, 158, 11, 0.1];
+              data.cell.styles.textColor = COLORS.warning;
+            }
+          }
         }
       });
       
-      // Pie de página
-      doc.setFontSize(8);
-      doc.setTextColor(150, 150, 150);
-      doc.text(
-        `Página 1 de 1`,
-        doc.internal.pageSize.getWidth() / 2,
-        doc.internal.pageSize.getHeight() - 10,
-        { align: 'center' }
-      );
+      // Agregar pie de página profesional
+      addPDFFooter(doc, {
+        showContact: true,
+        contactInfo: {
+          telefono: '+598 XX XXX XXX',
+          email: 'info@nicolastejera.com',
+          web: 'www.nicolastejera.com'
+        }
+      });
       
-      doc.save(`reporte_permutas_${new Date().toISOString().split('T')[0]}.pdf`);
+      // Guardar con nombre profesional
+      doc.save(getPDFFileName('Permutas', 'Reporte'));
       showToast('PDF de permutas exportado exitosamente', 'success');
     } catch (error) {
       console.error('Error al exportar PDF de permutas:', error);

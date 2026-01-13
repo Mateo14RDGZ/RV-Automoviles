@@ -3,6 +3,8 @@ import { CheckCircle, AlertCircle, Clock, Search, Download, Calendar } from 'luc
 import { pagosService } from '../services/apiServices';
 import { formatCurrency, formatDate } from '../utils/format';
 import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import { addPDFHeader, addPDFFooter, COLORS, getPDFFileName } from '../utils/pdfHelper';
 import { SkeletonTable } from '../components/SkeletonLoader';
 import { EmptyFilter } from '../components/EmptyStateIllustrated';
 
@@ -69,123 +71,202 @@ const HistorialPagos = () => {
     setFilteredPagos(filtered);
   };
 
-  const descargarComprobante = (pago) => {
+  const descargarComprobante = async (pago) => {
     const doc = new jsPDF();
     
-    // Logo o título
-    doc.setFontSize(20);
-    doc.setTextColor(41, 128, 185);
-    doc.text('RV Automóviles', 105, 20, { align: 'center' });
+    // Agregar encabezado profesional con logo
+    const startY = await addPDFHeader(
+      doc,
+      'Comprobante de Pago',
+      `Cuota #${pago.numeroCuota} - ${pago.estado === 'pagado' ? 'PAGADO' : 'PENDIENTE'}`,
+      'Comprobante'
+    );
     
-    doc.setFontSize(16);
-    doc.setTextColor(0, 0, 0);
-    doc.text('Comprobante de Pago', 105, 35, { align: 'center' });
+    let currentY = startY;
     
-    // Línea separadora
-    doc.setDrawColor(200, 200, 200);
-    doc.line(20, 42, 190, 42);
+    // Información del Cliente en tabla profesional
+    const clienteData = [
+      ['Nombre Completo', pago.auto.cliente.nombre],
+      ['Cédula de Identidad', pago.auto.cliente.cedula],
+      ['Teléfono de Contacto', pago.auto.cliente.telefono]
+    ];
     
-    // Información del pago
-    doc.setFontSize(12);
-    let y = 55;
+    if (pago.auto.cliente.email) {
+      clienteData.push(['Email', pago.auto.cliente.email]);
+    }
     
-    doc.setFont('helvetica', 'bold');
-    doc.text('Información del Cliente:', 20, y);
-    doc.setFont('helvetica', 'normal');
-    y += 8;
-    doc.text(`Nombre: ${pago.auto.cliente.nombre}`, 25, y);
-    y += 6;
-    doc.text(`Cédula: ${pago.auto.cliente.cedula}`, 25, y);
-    y += 6;
-    doc.text(`Teléfono: ${pago.auto.cliente.telefono}`, 25, y);
+    autoTable(doc, {
+      startY: currentY,
+      head: [['INFORMACIÓN DEL CLIENTE', '']],
+      body: clienteData,
+      headStyles: {
+        fillColor: COLORS.primary,
+        fontSize: 10,
+        fontStyle: 'bold'
+      },
+      bodyStyles: {
+        fontSize: 9
+      },
+      columnStyles: {
+        0: { cellWidth: 60, fontStyle: 'bold', textColor: COLORS.gray[700] },
+        1: { cellWidth: 122 }
+      },
+      theme: 'grid',
+      margin: { left: 14, right: 14 }
+    });
     
-    y += 15;
-    doc.setFont('helvetica', 'bold');
-    doc.text('Información del Vehículo:', 20, y);
-    doc.setFont('helvetica', 'normal');
-    y += 8;
-    doc.text(`Vehículo: ${pago.auto.marca} ${pago.auto.modelo} ${pago.auto.anio}`, 25, y);
-    y += 6;
-    doc.text(`Matrícula: ${pago.auto.matricula}`, 25, y);
+    currentY = doc.lastAutoTable.finalY + 8;
     
-    // Verificar si hay permuta
+    // Información del Vehículo
+    const vehiculoData = [
+      ['Vehículo', `${pago.auto.marca} ${pago.auto.modelo} ${pago.auto.anio}`],
+      ['Matrícula', pago.auto.matricula || '0km']
+    ];
+    
+    autoTable(doc, {
+      startY: currentY,
+      head: [['INFORMACIÓN DEL VEHÍCULO', '']],
+      body: vehiculoData,
+      headStyles: {
+        fillColor: COLORS.secondary,
+        fontSize: 10,
+        fontStyle: 'bold'
+      },
+      bodyStyles: {
+        fontSize: 9
+      },
+      columnStyles: {
+        0: { cellWidth: 60, fontStyle: 'bold', textColor: COLORS.gray[700] },
+        1: { cellWidth: 122 }
+      },
+      theme: 'grid',
+      margin: { left: 14, right: 14 }
+    });
+    
+    currentY = doc.lastAutoTable.finalY + 8;
+    
+    // Información de Permuta (si existe)
     const permuta = pago.auto.permutas && pago.auto.permutas.length > 0 ? pago.auto.permutas[0] : null;
     
     if (permuta) {
-      y += 15;
-      doc.setFont('helvetica', 'bold');
-      doc.text('Información de Permuta:', 20, y);
-      doc.setFont('helvetica', 'normal');
-      y += 8;
-      
       const tipoPermuta = permuta.tipo === 'auto' ? 'Automóvil' : 
                          permuta.tipo === 'moto' ? 'Motocicleta' : 'Otros';
-      doc.text(`Tipo: ${tipoPermuta}`, 25, y);
-      y += 6;
+      
+      const permutaData = [
+        ['Tipo de Permuta', tipoPermuta]
+      ];
       
       if (permuta.descripcion) {
-        doc.text(`Descripción: ${permuta.descripcion}`, 25, y);
-        y += 6;
+        permutaData.push(['Descripción', permuta.descripcion]);
       }
       
-      doc.text(`Valor Estimado: ${formatCurrency(permuta.valorEstimado)}`, 25, y);
-      y += 6;
+      permutaData.push(['Valor Estimado', formatCurrency(permuta.valorEstimado)]);
       
-      // Calcular y mostrar precio original y precio final
+      // Calcular resumen financiero
       const precioOriginal = pago.auto.precio || 0;
       const valorPermuta = permuta.valorEstimado || 0;
       const precioFinal = precioOriginal - valorPermuta;
       
-      y += 8;
-      doc.setFont('helvetica', 'bold');
-      doc.text('Resumen Financiero:', 20, y);
-      doc.setFont('helvetica', 'normal');
-      y += 8;
-      doc.text(`Precio Original del Vehículo: ${formatCurrency(precioOriginal)}`, 25, y);
-      y += 6;
-      doc.text(`Valor de Permuta: -${formatCurrency(valorPermuta)}`, 25, y);
-      y += 6;
-      doc.setFont('helvetica', 'bold');
-      doc.text(`Monto Financiado: ${formatCurrency(precioFinal)}`, 25, y);
-      doc.setFont('helvetica', 'normal');
+      permutaData.push(
+        ['Precio Original del Vehículo', formatCurrency(precioOriginal)],
+        ['Descuento por Permuta', `-${formatCurrency(valorPermuta)}`],
+        ['MONTO FINANCIADO', formatCurrency(precioFinal)]
+      );
+      
+      autoTable(doc, {
+        startY: currentY,
+        head: [['INFORMACIÓN DE PERMUTA', '']],
+        body: permutaData,
+        headStyles: {
+          fillColor: COLORS.warning,
+          fontSize: 10,
+          fontStyle: 'bold'
+        },
+        bodyStyles: {
+          fontSize: 9
+        },
+        columnStyles: {
+          0: { cellWidth: 80, fontStyle: 'bold', textColor: COLORS.gray[700] },
+          1: { cellWidth: 102, halign: 'right' }
+        },
+        didParseCell: function(data) {
+          if (data.section === 'body' && data.row.index === permutaData.length - 1) {
+            // Última fila (monto financiado) en negrita
+            data.cell.styles.fontSize = 10;
+            data.cell.styles.fontStyle = 'bold';
+            data.cell.styles.textColor = COLORS.primary;
+            data.cell.styles.fillColor = COLORS.gray[50];
+          }
+        },
+        theme: 'grid',
+        margin: { left: 14, right: 14 }
+      });
+      
+      currentY = doc.lastAutoTable.finalY + 8;
     }
     
-    y += 15;
-    doc.setFont('helvetica', 'bold');
-    doc.text('Detalles del Pago:', 20, y);
-    doc.setFont('helvetica', 'normal');
-    y += 8;
-    doc.text(`Número de Cuota: #${pago.numeroCuota}`, 25, y);
-    y += 6;
-    doc.text(`Monto: ${formatCurrency(pago.monto)}`, 25, y);
-    y += 6;
-    doc.text(`Fecha de Vencimiento: ${formatDate(pago.fechaVencimiento)}`, 25, y);
-    y += 6;
+    // Detalles del Pago - Destacado
+    const pagoData = [
+      ['Número de Cuota', `#${pago.numeroCuota}`],
+      ['Monto de la Cuota', formatCurrency(pago.monto)],
+      ['Fecha de Vencimiento', formatDate(pago.fechaVencimiento)]
+    ];
     
     if (pago.estado === 'pagado' && pago.fechaPago) {
-      doc.setTextColor(34, 197, 94);
-      doc.text(`Fecha de Pago: ${formatDate(pago.fechaPago)}`, 25, y);
-      doc.setTextColor(0, 0, 0);
-      y += 6;
-      doc.text('Estado: PAGADO ✓', 25, y);
+      pagoData.push(
+        ['Fecha de Pago', formatDate(pago.fechaPago)],
+        ['Estado', 'PAGADO ✓']
+      );
     } else {
-      doc.setTextColor(239, 68, 68);
-      doc.text('Estado: PENDIENTE', 25, y);
-      doc.setTextColor(0, 0, 0);
+      pagoData.push(['Estado', 'PENDIENTE']);
     }
     
-    // Pie de página
-    y = 270;
-    doc.setFontSize(10);
-    doc.setTextColor(100, 100, 100);
-    doc.text('Este es un comprobante válido de pago', 105, y, { align: 'center' });
-    y += 5;
-    doc.text(`Generado el ${new Date().toLocaleDateString('es-UY')}`, 105, y, { align: 'center' });
-    y += 5;
-    doc.text('RV Automóviles - Su concesionario de confianza', 105, y, { align: 'center' });
+    autoTable(doc, {
+      startY: currentY,
+      head: [['DETALLES DEL PAGO', '']],
+      body: pagoData,
+      headStyles: {
+        fillColor: pago.estado === 'pagado' ? COLORS.success : COLORS.danger,
+        fontSize: 10,
+        fontStyle: 'bold'
+      },
+      bodyStyles: {
+        fontSize: 9
+      },
+      columnStyles: {
+        0: { cellWidth: 80, fontStyle: 'bold', textColor: COLORS.gray[700] },
+        1: { cellWidth: 102, halign: 'right', fontStyle: 'bold' }
+      },
+      didParseCell: function(data) {
+        if (data.section === 'body') {
+          // Monto en negrita y más grande
+          if (data.row.index === 1) {
+            data.cell.styles.fontSize = 11;
+            data.cell.styles.textColor = COLORS.success;
+          }
+          // Estado en color
+          if (data.row.index === pagoData.length - 1) {
+            data.cell.styles.fontSize = 10;
+            data.cell.styles.textColor = pago.estado === 'pagado' ? COLORS.success : COLORS.danger;
+          }
+        }
+      },
+      theme: 'grid',
+      margin: { left: 14, right: 14 }
+    });
     
-    // Descargar
-    doc.save(`Comprobante_Cuota_${pago.numeroCuota}.pdf`);
+    // Agregar pie de página profesional
+    addPDFFooter(doc, {
+      showContact: true,
+      contactInfo: {
+        telefono: '+598 XX XXX XXX',
+        email: 'pagos@nicolastejera.com',
+        web: 'www.nicolastejera.com'
+      }
+    });
+    
+    // Guardar con nombre profesional
+    doc.save(getPDFFileName('Comprobante', `Cuota${pago.numeroCuota}`));
   };
 
   const getEstadoBadge = (pago) => {

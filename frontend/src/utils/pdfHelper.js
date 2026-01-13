@@ -50,16 +50,36 @@ export const addLogoToPDF = async (doc, x = 14, y = 10, width = 40, height = 20,
           resolve(true);
         } catch (error) {
           console.warn('No se pudo agregar el logo al PDF:', error);
+          // Dibujar placeholder si falla
+          doc.setFillColor(...COLORS.primary);
+          doc.setTextColor(255, 255, 255);
+          doc.setFontSize(8);
+          doc.rect(x, y, width, height, 'F');
+          doc.text('NICOLAS TEJERA', x + width/2, y + height/2, { align: 'center', baseline: 'middle' });
           resolve(false);
         }
       };
       
       img.onerror = () => {
         console.warn('No se pudo cargar el logo para el PDF');
+        // Dibujar placeholder si falla la carga
+        doc.setFillColor(...COLORS.primary);
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(8);
+        doc.rect(x, y, width, height, 'F');
+        doc.text('NICOLAS TEJERA', x + width/2, y + height/2, { align: 'center', baseline: 'middle' });
         resolve(false);
       };
       
-      setTimeout(() => resolve(false), 2000);
+      setTimeout(() => {
+        // Dibujar placeholder si timeout
+        doc.setFillColor(...COLORS.primary);
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(8);
+        doc.rect(x, y, width, height, 'F');
+        doc.text('NICOLAS TEJERA', x + width/2, y + height/2, { align: 'center', baseline: 'middle' });
+        resolve(false);
+      }, 3000);
     });
   } catch (error) {
     console.warn('Error al intentar agregar logo:', error);
