@@ -5,6 +5,8 @@ import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { formatCurrency } from '../utils/format';
 import { CreditCard, Plus, AlertCircle, CheckCircle, Calendar, DollarSign, User, ChevronDown, ChevronUp, Car, RefreshCw, MessageSquare, Save, X, Upload, FileText } from 'lucide-react';
+import { SkeletonTable } from '../components/SkeletonLoader';
+import { EmptyPagos, EmptySearch, EmptyFilter } from '../components/EmptyStateIllustrated';
 
 const Pagos = () => {
   const { user } = useAuth();
@@ -879,13 +881,14 @@ const Pagos = () => {
       ) : isStaff ? (
         /* Vista Admin: Clientes agrupados */
         <div className="space-y-4">
-          {clientesConPagosFiltrados.length === 0 ? (
-            <div className="card dark:bg-gray-800 dark:border-gray-700">
-              <div className="text-center py-12">
-                <User className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
-                <p className="text-gray-500 dark:text-gray-400">No se encontraron clientes con pagos</p>
-              </div>
-            </div>
+          {loading ? (
+            <SkeletonTable rows={5} />
+          ) : clientesConPagosFiltrados.length === 0 ? (
+            searchTerm || filter !== 'todos' ? (
+              <EmptyFilter />
+            ) : (
+              <EmptyPagos />
+            )
           ) : (
             clientesConPagosFiltrados.map((clienteData, index) => (
               <div key={clienteData.cliente.id} className="card dark:bg-gray-800 dark:border-gray-700 animate-fadeInUp" style={{animationDelay: `${0.1 * (index % 5)}s`}}>

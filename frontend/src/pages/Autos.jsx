@@ -4,6 +4,10 @@ import { Car, Plus, Search, Edit2, Trash2, Eye, DollarSign, X } from 'lucide-rea
 import { useToast } from '../context/ToastContext';
 import ConfirmDialog from '../components/ConfirmDialog';
 import { formatCurrency, formatPesos } from '../utils/format';
+import { SkeletonTable } from '../components/SkeletonLoader';
+import { EmptyAutos, EmptySearch } from '../components/EmptyStateIllustrated';
+import { SkeletonTable } from '../components/SkeletonLoader';
+import { EmptyAutos, EmptySearch } from '../components/EmptyStateIllustrated';
 
 const Autos = () => {
   const { showToast } = useToast();
@@ -291,14 +295,16 @@ const Autos = () => {
       {/* Tabla de autos - Desktop */}
       <div className="hidden md:block card overflow-hidden animate-fadeInUp" style={{animationDelay: '0.3s'}}>
         {loading ? (
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
-          </div>
+          <SkeletonTable rows={6} />
         ) : filteredAutos.length === 0 ? (
-          <div className="text-center py-12">
-            <Car className="w-12 h-12 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
-            <p className="text-gray-500 dark:text-gray-400">{searchTerm || estadoFilter ? 'No se encontraron autos con ese criterio' : 'No hay autos registrados'}</p>
-          </div>
+          searchTerm || estadoFilter ? (
+            <EmptySearch />
+          ) : (
+            <EmptyAutos onAdd={() => {
+              resetForm();
+              setShowModal(true);
+            }} />
+          )
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -451,14 +457,16 @@ const Autos = () => {
       {/* Cards para móvil */}
       <div className="md:hidden space-y-3 px-2">
         {loading ? (
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
-          </div>
+          <SkeletonTable rows={4} />
         ) : filteredAutos.length === 0 ? (
-          <div className="card text-center py-12">
-            <Car className="w-12 h-12 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
-            <p className="text-sm text-gray-500 dark:text-gray-400">{searchTerm || estadoFilter ? 'No se encontraron autos' : 'No hay autos registrados'}</p>
-          </div>
+          searchTerm || estadoFilter ? (
+            <EmptySearch />
+          ) : (
+            <EmptyAutos onAdd={() => {
+              resetForm();
+              setShowModal(true);
+            }} />
+          )
         ) : (
           filteredAutos.map((auto, index) => (
             <div key={auto.id} className="card p-4 hover-lift animate-fadeInUp" style={{animationDelay: `${0.1 * (index % 6)}s`}}>

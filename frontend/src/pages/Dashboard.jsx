@@ -18,6 +18,7 @@ import {
   X
 } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
+import { SkeletonStatCard, SkeletonTable, SkeletonChart } from '../components/SkeletonLoader';
 
 const Dashboard = () => {
   const { showToast } = useToast();
@@ -160,10 +161,26 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center animate-fadeIn">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-t-4 border-primary-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400 animate-pulse">Cargando estadísticas...</p>
+      <div className="space-y-4 md:space-y-6">
+        <div className="animate-fadeInUp" style={{animationDelay: '0.1s'}}>
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Escritorio</h1>
+          <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 mt-1">Cargando estadísticas...</p>
+        </div>
+        
+        {/* Skeleton para cards de estadísticas */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 px-2 md:px-0">
+          <SkeletonStatCard />
+          <SkeletonStatCard />
+          <SkeletonStatCard />
+          <SkeletonStatCard />
+        </div>
+        
+        {/* Skeleton para gráficos */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-6 px-2 md:px-0">
+          <SkeletonChart />
+          <div className="lg:col-span-2">
+            <SkeletonTable rows={3} />
+          </div>
         </div>
       </div>
     );

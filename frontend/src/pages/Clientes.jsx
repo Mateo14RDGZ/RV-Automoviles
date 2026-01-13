@@ -3,6 +3,8 @@ import { clientesService } from '../services/apiServices';
 import { Users, Plus, Search, Edit2, Trash2, Phone, Mail, MapPin, MessageCircle, Copy, ExternalLink, IdCard } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 import ConfirmDialog from '../components/ConfirmDialog';
+import { SkeletonTable } from '../components/SkeletonLoader';
+import { EmptyClientes, EmptySearch } from '../components/EmptyStateIllustrated';
 
 const Clientes = () => {
   const { showToast } = useToast();
@@ -206,14 +208,16 @@ const Clientes = () => {
 
       {/* Grid de clientes */}
       {loading ? (
-        <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
-        </div>
+        <SkeletonTable rows={6} />
       ) : filteredClientes.length === 0 ? (
-        <div className="card text-center py-12">
-          <Users className="w-12 h-12 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
-          <p className="text-sm text-gray-500 dark:text-gray-400">{searchTerm ? 'No se encontraron clientes' : 'No hay clientes registrados'}</p>
-        </div>
+        searchTerm ? (
+          <EmptySearch />
+        ) : (
+          <EmptyClientes onAdd={() => {
+            resetForm();
+            setShowModal(true);
+          }} />
+        )
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6 px-2 md:px-0">
           {filteredClientes.map((cliente, index) => (
