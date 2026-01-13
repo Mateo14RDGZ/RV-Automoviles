@@ -175,7 +175,7 @@ const Reportes = () => {
       }
       
       // Agregar pie de página profesional
-      addPDFFooter(doc, {
+      await addPDFFooter(doc, {
         showContact: true,
         contactInfo: {
           telefono: '+598 XX XXX XXX',
@@ -437,7 +437,7 @@ const Reportes = () => {
       });
 
       // Agregar pie de página profesional
-      addPDFFooter(doc, {
+      await addPDFFooter(doc, {
         showContact: true,
         contactInfo: {
           telefono: '+598 XX XXX XXX',
@@ -564,7 +564,7 @@ const Reportes = () => {
       doc.text(`Estado: ${estadoFinanciero}`, 105, currentY + 35, { align: 'center' });
       
       // Agregar pie de página profesional
-      addPDFFooter(doc, {
+      await addPDFFooter(doc, {
         showContact: true,
         contactInfo: {
           telefono: '+598 XX XXX XXX',
@@ -675,7 +675,7 @@ const Reportes = () => {
       });
       
       // Agregar pie de página profesional
-      addPDFFooter(doc, {
+      await addPDFFooter(doc, {
         showContact: true,
         contactInfo: {
           telefono: '+598 XX XXX XXX',

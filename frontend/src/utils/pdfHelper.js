@@ -199,7 +199,7 @@ export const addPDFHeader = async (doc, title, subtitle = null, type = 'reporte'
  * @param {jsPDF} doc - Instancia de jsPDF
  * @param {Object} options - Opciones adicionales para el footer
  */
-export const addPDFFooter = (doc, options = {}) => {
+export const addPDFFooter = async (doc, options = {}) => {
   const {
     showContact = true,
     contactInfo = {

@@ -280,7 +280,7 @@ const HistorialPagos = () => {
     }
     
     // Agregar pie de página profesional
-    addPDFFooter(doc, {
+    await addPDFFooter(doc, {
       showContact: true,
       contactInfo: {
         telefono: '+598 XX XXX XXX',
