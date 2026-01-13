@@ -220,9 +220,9 @@ const Reportes = () => {
 
       // Tabla de resumen al inicio con diseño mejorado
       const resumenData = [
-        ['✓ Cuotas Pagadas', cuotasPagadas.toString(), formatCurrency(totalPagado)],
-        ['⏱ Cuotas Pendientes', cuotasPendientes.toString(), formatCurrency(totalPendiente)],
-        ['📊 TOTAL GENERAL', (cuotasPagadas + cuotasPendientes).toString(), formatCurrency(totalPagado + totalPendiente)]
+        ['Cuotas Pagadas', cuotasPagadas.toString(), formatCurrency(totalPagado)],
+        ['Cuotas Pendientes', cuotasPendientes.toString(), formatCurrency(totalPendiente)],
+        ['TOTAL GENERAL', (cuotasPagadas + cuotasPendientes).toString(), formatCurrency(totalPagado + totalPendiente)]
       ];
 
       autoTable(doc, {
@@ -403,11 +403,11 @@ const Reportes = () => {
         // Tabla de totales del cliente con diseño mejorado
         const clienteTotalesData = [
           [
-            '✓ Pagado',
+            'Pagado',
             formatCurrency(clienteTotalPagado),
-            '⏱ Pendiente',
+            'Pendiente',
             formatCurrency(clienteTotalPendiente),
-            '💰 TOTAL',
+            'TOTAL',
             formatCurrency(clienteTotalPagado + clienteTotalPendiente)
           ]
         ];

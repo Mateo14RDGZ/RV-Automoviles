@@ -128,7 +128,7 @@ export const addPDFHeader = async (doc, title, subtitle = null, type = 'reporte'
   
   doc.setFontSize(8);
   doc.setTextColor(230, 230, 230);
-  doc.text('✓ Calidad y Confianza', pageWidth - 14, 31, { align: 'right' });
+  doc.text('Calidad y Confianza', pageWidth - 14, 31, { align: 'right' });
   
   // Línea separadora elegante
   doc.setDrawColor(...COLORS.gray[200]);
@@ -243,20 +243,20 @@ export const addPDFFooter = (doc, options = {}) => {
       
       const centerX = pageWidth / 2;
       
-      // Iconos y contacto organizados
-      doc.text('📞', centerX - 48, pageHeight - 15);
+      // Contacto organizado
+      doc.text('Tel:', centerX - 48, pageHeight - 15);
       doc.setFont(undefined, 'normal');
-      doc.text(contactInfo.telefono, centerX - 44, pageHeight - 15);
+      doc.text(contactInfo.telefono, centerX - 42, pageHeight - 15);
       
       doc.setFont(undefined, 'bold');
-      doc.text('✉', centerX - 48, pageHeight - 10);
+      doc.text('Email:', centerX - 48, pageHeight - 10);
       doc.setFont(undefined, 'normal');
-      doc.text(contactInfo.email, centerX - 44, pageHeight - 10);
+      doc.text(contactInfo.email, centerX - 38, pageHeight - 10);
       
       doc.setFont(undefined, 'bold');
-      doc.text('🌐', centerX - 48, pageHeight - 5);
+      doc.text('Web:', centerX - 48, pageHeight - 5);
       doc.setFont(undefined, 'normal');
-      doc.text(contactInfo.web, centerX - 44, pageHeight - 5);
+      doc.text(contactInfo.web, centerX - 40, pageHeight - 5);
     }
     
     // Número de página con diseño mejorado

@@ -215,7 +215,7 @@ const HistorialPagos = () => {
     if (pago.estado === 'pagado' && pago.fechaPago) {
       pagoData.push(
         ['Fecha de Pago', formatDate(pago.fechaPago)],
-        ['Estado', 'PAGADO ✓']
+        ['Estado', 'PAGADO']
       );
     } else {
       pagoData.push(['Estado', 'PENDIENTE']);
@@ -272,7 +272,7 @@ const HistorialPagos = () => {
       doc.setFontSize(8);
       doc.setTextColor(...COLORS.gray[600]);
       doc.setFont(undefined, 'bold');
-      doc.text('📋 NOTA IMPORTANTE:', 18, finalY + 6);
+      doc.text('NOTA IMPORTANTE:', 18, finalY + 6);
       
       doc.setFont(undefined, 'normal');
       doc.text('Este comprobante tiene validez como constancia de operación financiera.', 18, finalY + 11);
