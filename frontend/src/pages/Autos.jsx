@@ -6,8 +6,6 @@ import ConfirmDialog from '../components/ConfirmDialog';
 import { formatCurrency, formatPesos } from '../utils/format';
 import { SkeletonTable } from '../components/SkeletonLoader';
 import { EmptyAutos, EmptySearch } from '../components/EmptyStateIllustrated';
-import { SkeletonTable } from '../components/SkeletonLoader';
-import { EmptyAutos, EmptySearch } from '../components/EmptyStateIllustrated';
 
 const Autos = () => {
   const { showToast } = useToast();

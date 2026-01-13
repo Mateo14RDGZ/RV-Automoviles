@@ -50,7 +50,6 @@ function SplashScreen({ onFinish }) {
         className="fixed top-0 left-0 right-0 bottom-0 z-[9999] flex items-center justify-center overflow-hidden"
         style={{ 
           width: '100vw',
-          height: '100vh',
           height: '100dvh',
           background: 'linear-gradient(to bottom right, #0A1929, #1565C0, #0D47A1)'
         }}
