@@ -3,6 +3,8 @@ import { CheckCircle, AlertCircle, Clock, Search, Download, Calendar } from 'luc
 import { pagosService } from '../services/apiServices';
 import { formatCurrency, formatDate } from '../utils/format';
 import jsPDF from 'jspdf';
+import { SkeletonTable } from '../components/SkeletonLoader';
+import { EmptyFilter } from '../components/EmptyStateIllustrated';
 
 const HistorialPagos = () => {
   const [loading, setLoading] = useState(true);
@@ -215,8 +217,14 @@ const HistorialPagos = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Historial de Pagos</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">
+            Consulta el detalle completo de todas tus cuotas
+          </p>
+        </div>
+        <SkeletonTable rows={8} />
       </div>
     );
   }
@@ -298,12 +306,21 @@ const HistorialPagos = () => {
       {/* Timeline de pagos */}
       <div className="space-y-4">
         {filteredPagos.length === 0 ? (
-          <div className="card dark:bg-gray-800 dark:border-gray-700">
-            <div className="text-center py-12">
-              <Calendar className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
-              <p className="text-gray-500 dark:text-gray-400">No se encontraron pagos</p>
+          searchTerm || filterEstado !== 'todos' ? (
+            <EmptyFilter />
+          ) : (
+            <div className="card dark:bg-gray-800 dark:border-gray-700">
+              <div className="text-center py-12">
+                <Calendar className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                  No hay pagos registrados
+                </h3>
+                <p className="text-gray-500 dark:text-gray-400">
+                  Cuando tengas cuotas, aparecerán aquí
+                </p>
+              </div>
             </div>
-          </div>
+          )
         ) : (
           filteredPagos.map((pago) => (
             <div

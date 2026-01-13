@@ -873,18 +873,12 @@ const Pagos = () => {
 
       {/* Vista de pagos */}
       {loading ? (
-        <div className="card">
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
-          </div>
-        </div>
+        <SkeletonTable rows={5} />
       ) : isStaff ? (
         /* Vista Admin: Clientes agrupados */
         <div className="space-y-4">
-          {loading ? (
-            <SkeletonTable rows={5} />
-          ) : clientesConPagosFiltrados.length === 0 ? (
-            searchTerm || filter !== 'todos' ? (
+          {clientesConPagosFiltrados.length === 0 ? (
+            clienteSearch || filter === 'vencidos' || filter === 'pagados' ? (
               <EmptyFilter />
             ) : (
               <EmptyPagos />
@@ -1104,12 +1098,21 @@ const Pagos = () => {
       ) : (
         /* Vista Cliente: Tabla para desktop, Cards para móvil */
         <div className="card overflow-hidden">
-          {pagos.length === 0 && !loading ? (
-            <div className="text-center py-12">
-              <CreditCard className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
-              <p className="text-gray-500 dark:text-gray-400">No se encontraron pagos</p>
-            </div>
-          ) : pagos.length > 0 && (
+          {pagos.length === 0 ? (
+            filter === 'vencidos' || filter === 'pagados' ? (
+              <EmptyFilter />
+            ) : (
+              <div className="text-center py-12">
+                <CreditCard className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                  No tienes cuotas registradas
+                </h3>
+                <p className="text-gray-500 dark:text-gray-400">
+                  Cuando tengas cuotas, aparecerán aquí
+                </p>
+              </div>
+            )
+          ) : (
             <>
               {/* Vista Desktop - Tabla */}
               <div className="hidden md:block overflow-x-auto">

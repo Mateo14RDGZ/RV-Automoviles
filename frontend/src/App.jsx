@@ -19,6 +19,7 @@ import Pagos from './pages/Pagos';
 import Comprobantes from './pages/Comprobantes';
 import Reportes from './pages/Reportes';
 import ClienteDashboard from './pages/ClienteDashboard';
+import HistorialPagos from './pages/HistorialPagos';
 
 function App() {
   const [showSplash, setShowSplash] = useState(true);
@@ -57,6 +58,7 @@ function App() {
                   
                   {/* Ruta para clientes */}
                   <Route path="/mi-dashboard" element={<ClienteDashboard />} />
+                  <Route path="/historial-pagos" element={<HistorialPagos />} />
                 </Route>
               </Route>
             </Routes>
