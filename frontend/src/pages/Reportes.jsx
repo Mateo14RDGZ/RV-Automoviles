@@ -113,12 +113,21 @@ const Reportes = () => {
       const startY = await addPDFHeader(
         doc,
         'Base de Datos de Clientes',
-        `Total: ${clientes.length} clientes`,
+        `Total de clientes registrados: ${clientes.length}`,
         'Base de Clientes'
       );
       
-      // Tabla única con toda la información
-      const tableData = clientes.map(cliente => [
+      // Sección descriptiva
+      const sectionY = addSection(
+        doc,
+        startY,
+        'Listado Completo de Clientes',
+        'Información de contacto y datos personales'
+      );
+      
+      // Tabla profesional con toda la información
+      const tableData = clientes.map((cliente, index) => [
+        String(index + 1), // Número de fila
         String(cliente.nombre || '-'),
         String(cliente.cedula || '-'),
         String(cliente.telefono || '-'),
@@ -127,20 +136,45 @@ const Reportes = () => {
       ]);
       
       autoTable(doc, {
-        startY: startY,
-        head: [['Nombre Completo', 'Cédula', 'Teléfono', 'Email', 'Dirección']],
+        startY: sectionY,
+        head: [['#', 'Nombre Completo', 'Cédula', 'Teléfono', 'Email', 'Dirección']],
         body: tableData,
         ...getTableStyles('secondary'),
         columnStyles: {
-          0: { cellWidth: 42, fontStyle: 'bold' },
-          1: { cellWidth: 24, halign: 'center' },
-          2: { cellWidth: 26, halign: 'center' },
-          3: { cellWidth: 42 },
-          4: { cellWidth: 48 }
+          0: { cellWidth: 10, halign: 'center', fontStyle: 'bold' },
+          1: { cellWidth: 40, fontStyle: 'bold' },
+          2: { cellWidth: 22, halign: 'center' },
+          3: { cellWidth: 24, halign: 'center' },
+          4: { cellWidth: 40 },
+          5: { cellWidth: 46 }
+        },
+        didParseCell: function(data) {
+          // Alternar colores más suaves
+          if (data.section === 'body' && data.row.index % 2 === 0) {
+            data.cell.styles.fillColor = [249, 250, 251];
+          }
         }
       });
       
-      // Agregar pie de página
+      // Agregar estadística al final si hay espacio
+      const finalY = doc.lastAutoTable.finalY + 10;
+      if (finalY < 250) {
+        doc.setFillColor(...COLORS.gray[50]);
+        doc.roundedRect(14, finalY, 182, 20, 2, 2, 'F');
+        doc.setDrawColor(...COLORS.gray[200]);
+        doc.roundedRect(14, finalY, 182, 20, 2, 2);
+        
+        doc.setFontSize(10);
+        doc.setFont(undefined, 'bold');
+        doc.setTextColor(...COLORS.gray[700]);
+        doc.text('RESUMEN:', 18, finalY + 7);
+        
+        doc.setFont(undefined, 'normal');
+        doc.setTextColor(...COLORS.gray[600]);
+        doc.text(`Total de clientes activos en el sistema: ${clientes.length}`, 18, finalY + 14);
+      }
+      
+      // Agregar pie de página profesional
       addPDFFooter(doc, {
         showContact: true,
         contactInfo: {
@@ -184,11 +218,11 @@ const Reportes = () => {
       const cuotasPagadas = pagos.filter(p => p.estado === 'pagado').length;
       const cuotasPendientes = pagos.filter(p => p.estado !== 'pagado').length;
 
-      // Tabla de resumen al inicio
+      // Tabla de resumen al inicio con diseño mejorado
       const resumenData = [
-        ['Cuotas Pagadas', cuotasPagadas.toString(), formatCurrency(totalPagado)],
-        ['Cuotas Pendientes', cuotasPendientes.toString(), formatCurrency(totalPendiente)],
-        ['TOTAL', (cuotasPagadas + cuotasPendientes).toString(), formatCurrency(totalPagado + totalPendiente)]
+        ['✓ Cuotas Pagadas', cuotasPagadas.toString(), formatCurrency(totalPagado)],
+        ['⏱ Cuotas Pendientes', cuotasPendientes.toString(), formatCurrency(totalPendiente)],
+        ['📊 TOTAL GENERAL', (cuotasPagadas + cuotasPendientes).toString(), formatCurrency(totalPagado + totalPendiente)]
       ];
 
       autoTable(doc, {
@@ -198,12 +232,33 @@ const Reportes = () => {
         ...getTableStyles('success'),
         columnStyles: {
           0: { cellWidth: 80, fontStyle: 'bold' },
-          1: { cellWidth: 50, halign: 'center' },
-          2: { cellWidth: 52, halign: 'right', fontStyle: 'bold' }
+          1: { cellWidth: 50, halign: 'center', fontStyle: 'bold', fontSize: 10 },
+          2: { cellWidth: 52, halign: 'right', fontStyle: 'bold', fontSize: 10 }
+        },
+        didParseCell: function(data) {
+          if (data.section === 'body') {
+            if (data.row.index === 0) {
+              // Fila de pagadas en verde
+              data.cell.styles.textColor = COLORS.success;
+            } else if (data.row.index === 1) {
+              // Fila de pendientes en amarillo
+              data.cell.styles.textColor = COLORS.warning;
+            } else if (data.row.index === 2) {
+              // Fila total en azul y más grande
+              data.cell.styles.textColor = COLORS.primary;
+              data.cell.styles.fontSize = 11;
+              data.cell.styles.fillColor = COLORS.gray[50];
+            }
+          }
         }
       });
 
-      let currentY = doc.lastAutoTable.finalY + 10;
+      let currentY = doc.lastAutoTable.finalY + 12;
+      
+      // Agregar separador visual
+      doc.setDrawColor(...COLORS.gray[300]);
+      doc.setLineWidth(0.5);
+      doc.line(14, currentY - 4, 196, currentY - 4);
 
       // Agrupar pagos por cliente
       const pagosPorCliente = pagos.reduce((acc, pago) => {
@@ -239,33 +294,37 @@ const Reportes = () => {
           .filter(p => p.estado !== 'pagado')
           .reduce((sum, p) => sum + (parseFloat(p.monto) || 0), 0);
 
-        // Título del cliente
+        // Título del cliente con diseño mejorado
         doc.setFillColor(...COLORS.primary);
-        doc.rect(14, currentY, 182, 8, 'F');
-        doc.setFontSize(10);
+        doc.roundedRect(14, currentY, 182, 10, 2, 2, 'F');
+        
+        // Borde decorativo
+        doc.setDrawColor(...COLORS.accent);
+        doc.setLineWidth(0.5);
+        doc.roundedRect(14, currentY, 182, 10, 2, 2);
+        
+        doc.setFontSize(11);
         doc.setTextColor(255, 255, 255);
         doc.setFont(undefined, 'bold');
-        doc.text(nombre, 16, currentY + 5.5);
+        doc.text(nombre, 18, currentY + 7);
         doc.setFont(undefined, 'normal');
         
-        currentY += 10;
+        // Indicador del número de cliente
+        doc.setFontSize(8);
+        doc.text(`Cliente #${index + 1}`, 190, currentY + 7, { align: 'right' });
+        
+        currentY += 12;
 
-        // Tabla de datos del cliente
+        // Tabla de datos del cliente con mejor formato
         const clienteInfoData = [];
         if (cliente) {
-          clienteInfoData.push([
-            'Cédula',
-            cliente.cedula || 'N/A',
-            'Teléfono',
-            cliente.telefono || 'N/A'
-          ]);
+          if (cliente.cedula) {
+            clienteInfoData.push(['Cédula', cliente.cedula, 'Teléfono', cliente.telefono || 'N/A']);
+          }
           if (cliente.email) {
-            clienteInfoData.push([
-              'Email',
-              cliente.email,
-              '',
-              ''
-            ]);
+            clienteInfoData.push(['Email', cliente.email, 'Dirección', cliente.direccion || 'Sin dirección']);
+          } else if (cliente.direccion) {
+            clienteInfoData.push(['Dirección', cliente.direccion, '', '']);
           }
         }
 
@@ -276,19 +335,20 @@ const Reportes = () => {
             theme: 'plain',
             styles: {
               fontSize: 8,
-              cellPadding: 1
+              cellPadding: 2,
+              fillColor: [249, 250, 251]
             },
             columnStyles: {
-              0: { cellWidth: 20, fontStyle: 'bold', textColor: COLORS.gray[600] },
-              1: { cellWidth: 70 },
-              2: { cellWidth: 20, fontStyle: 'bold', textColor: COLORS.gray[600] },
-              3: { cellWidth: 72 }
+              0: { cellWidth: 22, fontStyle: 'bold', textColor: COLORS.gray[600] },
+              1: { cellWidth: 68 },
+              2: { cellWidth: 22, fontStyle: 'bold', textColor: COLORS.gray[600] },
+              3: { cellWidth: 70 }
             }
           });
-          currentY = doc.lastAutoTable.finalY + 3;
+          currentY = doc.lastAutoTable.finalY + 5;
         }
 
-        // Tabla de pagos del cliente
+        // Tabla de pagos del cliente con mejor diseño
         const tableData = pagoCliente.map(pago => {
           const monto = formatCurrency(parseFloat(pago.monto || 0));
           const estado = pago.estado === 'pagado' ? 'Pagado' : 
@@ -298,9 +358,9 @@ const Reportes = () => {
             String(pago.auto?.matricula || '0km'),
             `#${String(pago.numeroCuota || '')}`,
             monto,
-            pago.fechaVencimiento ? new Date(pago.fechaVencimiento).toLocaleDateString('es-UY', {day: '2-digit', month: '2-digit', year: '2-digit'}) : '-',
+            pago.fechaVencimiento ? new Date(pago.fechaVencimiento).toLocaleDateString('es-ES', {day: '2-digit', month: '2-digit', year: 'numeric'}) : '-',
             estado,
-            pago.fechaPago ? new Date(pago.fechaPago).toLocaleDateString('es-UY', {day: '2-digit', month: '2-digit', year: '2-digit'}) : '-'
+            pago.fechaPago ? new Date(pago.fechaPago).toLocaleDateString('es-ES', {day: '2-digit', month: '2-digit', year: 'numeric'}) : '-'
           ];
         });
 
@@ -314,9 +374,9 @@ const Reportes = () => {
             1: { cellWidth: 22, halign: 'center' },
             2: { cellWidth: 15, halign: 'center', fontStyle: 'bold' },
             3: { cellWidth: 26, halign: 'right', fontStyle: 'bold' },
-            4: { cellWidth: 22, halign: 'center' },
+            4: { cellWidth: 22, halign: 'center', fontSize: 8 },
             5: { cellWidth: 22, halign: 'center' },
-            6: { cellWidth: 22, halign: 'center' }
+            6: { cellWidth: 22, halign: 'center', fontSize: 8 }
           },
           didParseCell: function(data) {
             if (data.section === 'body' && data.column.index === 5) {
@@ -324,27 +384,30 @@ const Reportes = () => {
               if (estado === 'Pagado') {
                 data.cell.styles.textColor = COLORS.success;
                 data.cell.styles.fontStyle = 'bold';
+                data.cell.styles.fillColor = [220, 252, 231]; // Verde muy claro
               } else if (estado === 'Vencido') {
                 data.cell.styles.textColor = COLORS.danger;
                 data.cell.styles.fontStyle = 'bold';
+                data.cell.styles.fillColor = [254, 226, 226]; // Rojo muy claro
               } else {
                 data.cell.styles.textColor = COLORS.warning;
                 data.cell.styles.fontStyle = 'bold';
+                data.cell.styles.fillColor = [254, 243, 199]; // Amarillo muy claro
               }
             }
           }
         });
 
-        currentY = doc.lastAutoTable.finalY + 2;
+        currentY = doc.lastAutoTable.finalY + 3;
 
-        // Tabla de totales del cliente
+        // Tabla de totales del cliente con diseño mejorado
         const clienteTotalesData = [
           [
-            'Pagado',
+            '✓ Pagado',
             formatCurrency(clienteTotalPagado),
-            'Pendiente',
+            '⏱ Pendiente',
             formatCurrency(clienteTotalPendiente),
-            'TOTAL',
+            '💰 TOTAL',
             formatCurrency(clienteTotalPagado + clienteTotalPendiente)
           ]
         ];
@@ -355,20 +418,22 @@ const Reportes = () => {
           theme: 'plain',
           styles: {
             fontSize: 9,
-            cellPadding: 2,
-            fillColor: COLORS.gray[50]
+            cellPadding: 3,
+            fillColor: COLORS.gray[50],
+            lineWidth: 0.1,
+            lineColor: COLORS.gray[300]
           },
           columnStyles: {
             0: { cellWidth: 30, fontStyle: 'bold', textColor: COLORS.success },
             1: { cellWidth: 30, halign: 'right', fontStyle: 'bold', textColor: COLORS.success },
-            2: { cellWidth: 30, fontStyle: 'bold', textColor: COLORS.danger },
-            3: { cellWidth: 30, halign: 'right', fontStyle: 'bold', textColor: COLORS.danger },
-            4: { cellWidth: 30, fontStyle: 'bold' },
-            5: { cellWidth: 32, halign: 'right', fontStyle: 'bold' }
+            2: { cellWidth: 30, fontStyle: 'bold', textColor: COLORS.warning },
+            3: { cellWidth: 30, halign: 'right', fontStyle: 'bold', textColor: COLORS.warning },
+            4: { cellWidth: 30, fontStyle: 'bold', textColor: COLORS.primary, fontSize: 10 },
+            5: { cellWidth: 32, halign: 'right', fontStyle: 'bold', textColor: COLORS.primary, fontSize: 10 }
           }
         });
 
-        currentY = doc.lastAutoTable.finalY + 8;
+        currentY = doc.lastAutoTable.finalY + 10;
       });
 
       // Agregar pie de página profesional

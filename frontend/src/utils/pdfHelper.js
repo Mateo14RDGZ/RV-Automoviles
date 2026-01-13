@@ -97,59 +97,72 @@ export const addLogoToPDF = async (doc, x = 14, y = 10, width = 40, height = 20,
 export const addPDFHeader = async (doc, title, subtitle = null, type = 'reporte') => {
   const pageWidth = doc.internal.pageSize.getWidth();
   
-  // Banner superior con degradado simulado
+  // Banner superior con efecto profesional
   doc.setFillColor(...COLORS.primary);
-  doc.rect(0, 0, pageWidth, 45, 'F');
+  doc.rect(0, 0, pageWidth, 46, 'F');
   
-  // Franja decorativa
+  // Franja decorativa degradada (simulada con múltiples líneas)
   doc.setFillColor(...COLORS.accent);
-  doc.rect(0, 42, pageWidth, 3, 'F');
+  doc.rect(0, 43, pageWidth, 3, 'F');
   
-  // Logo con fondo blanco
+  // Logo con fondo blanco y sombra
   doc.setFillColor(255, 255, 255);
-  doc.roundedRect(12, 8, 44, 24, 2, 2, 'F');
-  await addLogoToPDF(doc, 14, 10, 40, 20, false);
+  doc.roundedRect(12, 8, 44, 26, 3, 3, 'F');
   
-  // Información de la empresa
+  // Borde decorativo del logo
+  doc.setDrawColor(...COLORS.accent);
+  doc.setLineWidth(0.3);
+  doc.roundedRect(12, 8, 44, 26, 3, 3);
+  
+  await addLogoToPDF(doc, 14, 10, 40, 22, false);
+  
+  // Información de la empresa con mejor diseño
   doc.setTextColor(255, 255, 255);
-  doc.setFontSize(20);
+  doc.setFontSize(22);
   doc.setFont(undefined, 'bold');
-  doc.text('NICOLAS TEJERA', pageWidth - 14, 18, { align: 'right' });
+  doc.text('NICOLAS TEJERA', pageWidth - 14, 17, { align: 'right' });
   
-  doc.setFontSize(11);
+  doc.setFontSize(12);
   doc.setFont(undefined, 'normal');
   doc.text('Automóviles', pageWidth - 14, 25, { align: 'right' });
   
   doc.setFontSize(8);
-  doc.setTextColor(220, 220, 220);
-  doc.text('Calidad y Confianza', pageWidth - 14, 31, { align: 'right' });
+  doc.setTextColor(230, 230, 230);
+  doc.text('✓ Calidad y Confianza', pageWidth - 14, 31, { align: 'right' });
   
-  // Título del documento
-  doc.setTextColor(...COLORS.gray[800]);
-  doc.setFontSize(18);
+  // Línea separadora elegante
+  doc.setDrawColor(...COLORS.gray[200]);
+  doc.setLineWidth(0.3);
+  doc.line(14, 52, pageWidth - 14, 52);
+  
+  // Título del documento con mejor tipografía
+  doc.setTextColor(...COLORS.gray[900]);
+  doc.setFontSize(19);
   doc.setFont(undefined, 'bold');
-  doc.text(title, 14, 60);
+  doc.text(title, 14, 62);
   
-  // Línea decorativa bajo el título
+  // Línea decorativa bajo el título (más corta y elegante)
   doc.setDrawColor(...COLORS.accent);
-  doc.setLineWidth(2);
-  doc.line(14, 63, 60, 63);
+  doc.setLineWidth(2.5);
+  const titleWidth = doc.getTextWidth(title);
+  doc.line(14, 65, 14 + Math.min(titleWidth, 70), 65);
   
   // Subtítulo si existe
-  let yPos = 70;
+  let yPos = 73;
   if (subtitle) {
     doc.setFontSize(10);
     doc.setFont(undefined, 'normal');
     doc.setTextColor(...COLORS.gray[600]);
     doc.text(subtitle, 14, yPos);
-    yPos += 6;
+    yPos += 7;
   }
   
-  // Información del documento en tabla
+  // Información del documento en caja profesional
   doc.setFillColor(...COLORS.gray[50]);
-  doc.rect(14, yPos, pageWidth - 28, 18, 'F');
+  doc.roundedRect(14, yPos, pageWidth - 28, 20, 2, 2, 'F');
   doc.setDrawColor(...COLORS.gray[200]);
-  doc.rect(14, yPos, pageWidth - 28, 18);
+  doc.setLineWidth(0.3);
+  doc.roundedRect(14, yPos, pageWidth - 28, 20, 2, 2);
   
   doc.setFontSize(8);
   doc.setFont(undefined, 'bold');
@@ -163,19 +176,22 @@ export const addPDFHeader = async (doc, title, subtitle = null, type = 'reporte'
     minute: '2-digit'
   });
   
-  doc.text('Fecha de Generación:', 18, yPos + 7);
-  doc.text('Tipo de Documento:', 18, yPos + 13);
+  doc.text('📅 Fecha de Generación:', 18, yPos + 8);
+  doc.text('📄 Tipo de Documento:', 18, yPos + 14);
   
   doc.setFont(undefined, 'normal');
-  doc.text(fecha, 60, yPos + 7);
-  doc.text(type.toUpperCase(), 60, yPos + 13);
+  doc.text(fecha, 62, yPos + 8);
+  doc.text(type.toUpperCase(), 62, yPos + 14);
   
-  // Marca de agua "DOCUMENTO OFICIAL"
-  doc.setTextColor(...COLORS.gray[300]);
+  // Marca de agua "DOCUMENTO OFICIAL" mejorada
+  doc.setFillColor(...COLORS.accent);
+  doc.roundedRect(pageWidth - 52, yPos + 6, 34, 8, 1, 1, 'F');
+  doc.setTextColor(255, 255, 255);
   doc.setFontSize(7);
-  doc.text('DOCUMENTO OFICIAL', pageWidth - 18, yPos + 10, { align: 'right' });
+  doc.setFont(undefined, 'bold');
+  doc.text('DOCUMENTO OFICIAL', pageWidth - 35, yPos + 11, { align: 'center' });
   
-  return yPos + 24;
+  return yPos + 26;
 };
 
 /**
@@ -200,38 +216,68 @@ export const addPDFFooter = (doc, options = {}) => {
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
     
-    // Línea superior decorativa
+    // Línea superior decorativa con degradado simulado
     doc.setDrawColor(...COLORS.accent);
-    doc.setLineWidth(1);
+    doc.setLineWidth(1.5);
+    doc.line(14, pageHeight - 26, pageWidth - 14, pageHeight - 26);
+    
+    // Segunda línea más delgada
+    doc.setDrawColor(...COLORS.gray[200]);
+    doc.setLineWidth(0.3);
     doc.line(14, pageHeight - 25, pageWidth - 14, pageHeight - 25);
     
-    // Fondo del footer
+    // Fondo del footer con borde
     doc.setFillColor(...COLORS.gray[50]);
     doc.rect(0, pageHeight - 24, pageWidth, 24, 'F');
     
-    // Logo pequeño en footer
-    const logoPromise = addLogoToPDF(doc, 14, pageHeight - 20, 20, 10, false);
+    // Logo pequeño en footer con borde redondeado
+    doc.setFillColor(255, 255, 255);
+    doc.roundedRect(13, pageHeight - 21, 22, 12, 1, 1, 'F');
+    await addLogoToPDF(doc, 14, pageHeight - 20, 20, 10, false);
     
-    // Información de contacto (si está habilitada)
+    // Información de contacto mejorada
     if (showContact) {
-      doc.setFontSize(7);
-      doc.setTextColor(...COLORS.gray[600]);
-      doc.setFont(undefined, 'normal');
+      doc.setFontSize(7.5);
+      doc.setTextColor(...COLORS.gray[700]);
+      doc.setFont(undefined, 'bold');
       
       const centerX = pageWidth / 2;
-      doc.text(`Tel: ${contactInfo.telefono}`, centerX - 45, pageHeight - 15);
-      doc.text(`Email: ${contactInfo.email}`, centerX - 45, pageHeight - 10);
-      doc.text(`Web: ${contactInfo.web}`, centerX - 45, pageHeight - 5);
+      
+      // Iconos y contacto organizados
+      doc.text('📞', centerX - 48, pageHeight - 15);
+      doc.setFont(undefined, 'normal');
+      doc.text(contactInfo.telefono, centerX - 44, pageHeight - 15);
+      
+      doc.setFont(undefined, 'bold');
+      doc.text('✉', centerX - 48, pageHeight - 10);
+      doc.setFont(undefined, 'normal');
+      doc.text(contactInfo.email, centerX - 44, pageHeight - 10);
+      
+      doc.setFont(undefined, 'bold');
+      doc.text('🌐', centerX - 48, pageHeight - 5);
+      doc.setFont(undefined, 'normal');
+      doc.text(contactInfo.web, centerX - 44, pageHeight - 5);
     }
     
-    // Número de página con diseño profesional
+    // Número de página con diseño mejorado
     doc.setFillColor(...COLORS.primary);
-    doc.roundedRect(pageWidth - 32, pageHeight - 20, 18, 8, 1, 1, 'F');
+    doc.roundedRect(pageWidth - 34, pageHeight - 20, 20, 10, 2, 2, 'F');
+    
+    // Borde del número de página
+    doc.setDrawColor(...COLORS.accent);
+    doc.setLineWidth(0.3);
+    doc.roundedRect(pageWidth - 34, pageHeight - 20, 20, 10, 2, 2);
     
     doc.setFontSize(9);
     doc.setFont(undefined, 'bold');
     doc.setTextColor(255, 255, 255);
-    doc.text(`${i}/${pageCount}`, pageWidth - 23, pageHeight - 14.5, { align: 'center' });
+    doc.text(`${i}/${pageCount}`, pageWidth - 24, pageHeight - 13.5, { align: 'center' });
+    
+    // Texto decorativo en la esquina inferior derecha
+    doc.setFontSize(6);
+    doc.setTextColor(...COLORS.gray[400]);
+    doc.setFont(undefined, 'italic');
+    doc.text('Documento generado automáticamente', pageWidth - 14, pageHeight - 3, { align: 'right' });
   }
 };
 

@@ -241,19 +241,43 @@ const HistorialPagos = () => {
         if (data.section === 'body') {
           // Monto en negrita y más grande
           if (data.row.index === 1) {
-            data.cell.styles.fontSize = 11;
+            data.cell.styles.fontSize = 12;
             data.cell.styles.textColor = COLORS.success;
+            data.cell.styles.fillColor = [220, 252, 231]; // Verde muy claro
           }
           // Estado en color
           if (data.row.index === pagoData.length - 1) {
-            data.cell.styles.fontSize = 10;
+            data.cell.styles.fontSize = 11;
             data.cell.styles.textColor = pago.estado === 'pagado' ? COLORS.success : COLORS.danger;
+            data.cell.styles.fillColor = pago.estado === 'pagado' ? [220, 252, 231] : [254, 226, 226];
           }
         }
       },
       theme: 'grid',
       margin: { left: 14, right: 14 }
     });
+    
+    // Agregar nota legal/informativa al final
+    const finalY = doc.lastAutoTable.finalY + 12;
+    if (finalY < 250) {
+      // Marco decorativo para nota
+      doc.setDrawColor(...COLORS.gray[300]);
+      doc.setLineWidth(0.3);
+      doc.roundedRect(14, finalY, 182, 18, 2, 2);
+      
+      doc.setFillColor(...COLORS.gray[50]);
+      doc.roundedRect(14, finalY, 182, 18, 2, 2, 'F');
+      
+      // Texto de la nota
+      doc.setFontSize(8);
+      doc.setTextColor(...COLORS.gray[600]);
+      doc.setFont(undefined, 'bold');
+      doc.text('📋 NOTA IMPORTANTE:', 18, finalY + 6);
+      
+      doc.setFont(undefined, 'normal');
+      doc.text('Este comprobante tiene validez como constancia de operación financiera.', 18, finalY + 11);
+      doc.text('Para consultas o aclaraciones, comuníquese con nuestro departamento de cobranzas.', 18, finalY + 15);
+    }
     
     // Agregar pie de página profesional
     addPDFFooter(doc, {
