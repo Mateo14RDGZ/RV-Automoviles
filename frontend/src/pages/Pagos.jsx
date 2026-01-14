@@ -10,6 +10,7 @@ import { EmptyPagos, EmptySearch, EmptyFilter } from '../components/EmptyStateIl
 
 const Pagos = () => {
   const { user } = useAuth();
+  const { showToast } = useToast();
   const location = useLocation();
   
   // Helper para verificar si es staff (admin o empleado)
