@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import RFStudioModal from '../components/RFStudioModal';
 import { Car, Lock, Mail, ArrowRight, Sparkles, ShieldCheck, CreditCard, IdCard, Eye, EyeOff } from 'lucide-react';
 
 const Login = () => {
@@ -15,6 +16,7 @@ const Login = () => {
   const [focusedInput, setFocusedInput] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordCliente, setShowPasswordCliente] = useState(false);
+  const [showRFModal, setShowRFModal] = useState(false);
   const { login, loginCliente } = useAuth();
   const navigate = useNavigate();
 
@@ -318,16 +320,17 @@ const Login = () => {
 
         {/* Footer - Powered by RF Digital Studio */}
         <div className="text-center mt-6 animate-fadeInUp" style={{animationDelay: '0.3s'}}>
-          <a
-            href="https://www.instagram.com/rf_digitalstudio/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm text-gray-500 hover:text-blue-400 transition-colors duration-200 inline-flex items-center gap-1"
+          <button
+            onClick={() => setShowRFModal(true)}
+            className="text-sm text-gray-500 hover:text-blue-400 transition-colors duration-200 inline-flex items-center gap-1 cursor-pointer"
           >
             Powered by <span className="font-semibold">RF Digital Studio</span>
-          </a>
+          </button>
         </div>
       </div>
+
+      {/* Modal de RF Studio Digital */}
+      <RFStudioModal isOpen={showRFModal} onClose={() => setShowRFModal(false)} />
     </div>
   );
 };

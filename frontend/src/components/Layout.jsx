@@ -1,6 +1,7 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import PageTransition from './PageTransition';
+import RFStudioModal from './RFStudioModal';
 import { 
   LayoutDashboard, 
   Car, 
@@ -24,6 +25,7 @@ const Layout = () => {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [cuotasVencidas, setCuotasVencidas] = useState(0);
+  const [showRFModal, setShowRFModal] = useState(false);
   const isStaff = user?.rol === 'admin' || user?.rol === 'empleado';
 
   // Cargar cuotas vencidas para staff
@@ -191,14 +193,12 @@ const Layout = () => {
             
             {/* Powered by RF Digital Studio */}
             <div className="text-center">
-              <a
-                href="https://www.instagram.com/rf_digitalstudio/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-gray-400 hover:text-blue-500 transition-colors duration-200 inline-flex items-center gap-1"
+              <button
+                onClick={() => setShowRFModal(true)}
+                className="text-xs text-gray-400 hover:text-blue-500 transition-colors duration-200 inline-flex items-center gap-1 cursor-pointer"
               >
                 Powered by <span className="font-semibold">RF Digital Studio</span>
-              </a>
+              </button>
             </div>
           </div>
         </div>
@@ -318,14 +318,12 @@ const Layout = () => {
               
               {/* Powered by RF Digital Studio */}
               <div className="text-center">
-                <a
-                  href="https://www.instagram.com/rf_digitalstudio/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs text-gray-400 hover:text-blue-500 transition-colors duration-200 inline-flex items-center gap-1"
+                <button
+                  onClick={() => setShowRFModal(true)}
+                  className="text-xs text-gray-400 hover:text-blue-500 transition-colors duration-200 inline-flex items-center gap-1 cursor-pointer"
                 >
                   Powered by <span className="font-semibold">RF Digital Studio</span>
-                </a>
+                </button>
               </div>
             </div>
           </div>
@@ -353,6 +351,9 @@ const Layout = () => {
           </div>
         </main>
       </div>
+
+      {/* Modal de RF Studio Digital */}
+      <RFStudioModal isOpen={showRFModal} onClose={() => setShowRFModal(false)} />
     </div>
   );
 };
