@@ -14,55 +14,58 @@ const RFStudioModal = ({ isOpen, onClose }) => {
 
   return (
     <div 
-      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn"
+      className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center p-4 z-50 transition-all duration-300"
       onClick={onClose}
+      style={{ animation: 'fadeIn 0.3s ease-out' }}
     >
       <div 
-        className="bg-white dark:bg-gray-900 rounded-3xl max-w-md w-full shadow-2xl transform transition-all animate-scaleIn border border-gray-200 dark:border-gray-700 overflow-hidden"
+        className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-2xl max-w-md w-full shadow-2xl transform transition-all border border-slate-700/50 overflow-hidden"
         onClick={(e) => e.stopPropagation()}
+        style={{ animation: 'scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)' }}
       >
-        {/* Header minimalista con gradiente sutil */}
-        <div className="relative bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-800 dark:via-gray-800 dark:to-gray-800 p-8 text-center">
+        {/* Header profesional */}
+        <div className="relative bg-gradient-to-r from-blue-900 via-slate-800 to-blue-900 p-8 text-center border-b border-slate-700/50">
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-all duration-300 hover:rotate-90"
+            className="absolute top-4 right-4 p-2 hover:bg-slate-700/50 rounded-lg transition-all duration-200 group"
             aria-label="Cerrar"
           >
-            <X className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+            <X className="w-5 h-5 text-slate-400 group-hover:text-white group-hover:rotate-90 transition-all duration-300" />
           </button>
           
           <div className="space-y-2">
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent animate-pulse-slow">
+            <h2 className="text-3xl font-bold text-white tracking-tight">
               RF Studio Digital
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 text-sm font-medium">
+            <p className="text-slate-400 text-sm font-medium tracking-wide">
               Desarrollo Web & Software
             </p>
           </div>
         </div>
 
         {/* Contenido */}
-        <div className="p-6 space-y-3">
-          {/* Enlaces de contacto con diseño moderno */}
+        <div className="p-6 space-y-3 bg-slate-900">
+          {/* Enlaces de contacto profesionales */}
           <div className="space-y-3">
             {/* Web */}
             <a
               href={contactInfo.webUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex items-center gap-4 p-4 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-2xl hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border border-blue-200 dark:border-blue-800/50"
+              className="group flex items-center gap-4 p-4 bg-slate-800/50 rounded-xl hover:bg-slate-800 transition-all duration-200 border border-slate-700/50 hover:border-blue-600/50 hover:shadow-lg hover:shadow-blue-900/20"
+              style={{ transform: 'translateZ(0)' }}
             >
               <div className="relative">
-                <div className="absolute inset-0 bg-blue-500 rounded-xl blur-md opacity-30 group-hover:opacity-50 transition-opacity"></div>
-                <div className="relative w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
+                <div className="absolute inset-0 bg-blue-600 rounded-lg blur-xl opacity-0 group-hover:opacity-40 transition-opacity duration-300"></div>
+                <div className="relative w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform duration-200 shadow-lg shadow-blue-900/50">
                   <Globe className="w-6 h-6 text-white" />
                 </div>
               </div>
               <div className="flex-1">
-                <p className="text-xs text-blue-600 dark:text-blue-400 font-semibold uppercase tracking-wider">Sitio Web</p>
-                <p className="font-semibold text-gray-900 dark:text-white text-sm">{contactInfo.web}</p>
+                <p className="text-xs text-blue-400 font-semibold uppercase tracking-wider mb-0.5">Sitio Web</p>
+                <p className="font-semibold text-white text-sm">{contactInfo.web}</p>
               </div>
-              <ExternalLink className="w-4 h-4 text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <ExternalLink className="w-4 h-4 text-blue-400 opacity-0 group-hover:opacity-100 transition-all duration-200 group-hover:translate-x-1" />
             </a>
 
             {/* Instagram */}
@@ -70,19 +73,20 @@ const RFStudioModal = ({ isOpen, onClose }) => {
               href={contactInfo.instagramUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex items-center gap-4 p-4 bg-gradient-to-r from-pink-50 to-purple-50 dark:from-pink-900/20 dark:to-purple-900/20 rounded-2xl hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border border-pink-200 dark:border-pink-800/50"
+              className="group flex items-center gap-4 p-4 bg-slate-800/50 rounded-xl hover:bg-slate-800 transition-all duration-200 border border-slate-700/50 hover:border-slate-600 hover:shadow-lg hover:shadow-slate-900/30"
+              style={{ transform: 'translateZ(0)' }}
             >
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl blur-md opacity-30 group-hover:opacity-50 transition-opacity"></div>
-                <div className="relative w-12 h-12 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 rounded-xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
+                <div className="absolute inset-0 bg-slate-600 rounded-lg blur-xl opacity-0 group-hover:opacity-40 transition-opacity duration-300"></div>
+                <div className="relative w-12 h-12 bg-gradient-to-br from-slate-600 to-slate-700 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform duration-200 shadow-lg shadow-slate-900/50">
                   <Instagram className="w-6 h-6 text-white" />
                 </div>
               </div>
               <div className="flex-1">
-                <p className="text-xs text-pink-600 dark:text-pink-400 font-semibold uppercase tracking-wider">Instagram</p>
-                <p className="font-semibold text-gray-900 dark:text-white text-sm">{contactInfo.instagram}</p>
+                <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-0.5">Instagram</p>
+                <p className="font-semibold text-white text-sm">{contactInfo.instagram}</p>
               </div>
-              <ExternalLink className="w-4 h-4 text-pink-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <ExternalLink className="w-4 h-4 text-slate-400 opacity-0 group-hover:opacity-100 transition-all duration-200 group-hover:translate-x-1" />
             </a>
 
             {/* WhatsApp */}
@@ -90,25 +94,26 @@ const RFStudioModal = ({ isOpen, onClose }) => {
               href={`https://wa.me/${contactInfo.whatsappNumber}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex items-center gap-4 p-4 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-2xl hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border border-green-200 dark:border-green-800/50"
+              className="group flex items-center gap-4 p-4 bg-slate-800/50 rounded-xl hover:bg-slate-800 transition-all duration-200 border border-slate-700/50 hover:border-emerald-600/50 hover:shadow-lg hover:shadow-emerald-900/20"
+              style={{ transform: 'translateZ(0)' }}
             >
               <div className="relative">
-                <div className="absolute inset-0 bg-green-500 rounded-xl blur-md opacity-30 group-hover:opacity-50 transition-opacity"></div>
-                <div className="relative w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
+                <div className="absolute inset-0 bg-emerald-600 rounded-lg blur-xl opacity-0 group-hover:opacity-40 transition-opacity duration-300"></div>
+                <div className="relative w-12 h-12 bg-gradient-to-br from-emerald-600 to-emerald-700 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform duration-200 shadow-lg shadow-emerald-900/50">
                   <MessageCircle className="w-6 h-6 text-white" />
                 </div>
               </div>
               <div className="flex-1">
-                <p className="text-xs text-green-600 dark:text-green-400 font-semibold uppercase tracking-wider">WhatsApp</p>
-                <p className="font-semibold text-gray-900 dark:text-white text-sm">{contactInfo.whatsapp}</p>
+                <p className="text-xs text-emerald-400 font-semibold uppercase tracking-wider mb-0.5">WhatsApp</p>
+                <p className="font-semibold text-white text-sm">{contactInfo.whatsapp}</p>
               </div>
-              <ExternalLink className="w-4 h-4 text-green-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <ExternalLink className="w-4 h-4 text-emerald-400 opacity-0 group-hover:opacity-100 transition-all duration-200 group-hover:translate-x-1" />
             </a>
           </div>
 
-          {/* Footer minimalista */}
+          {/* Footer */}
           <div className="pt-6 mt-2">
-            <p className="text-center text-xs text-gray-400 dark:text-gray-600">
+            <p className="text-center text-xs text-slate-500">
               © 2026 RF Studio Digital
             </p>
           </div>
