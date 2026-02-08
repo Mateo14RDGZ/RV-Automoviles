@@ -538,8 +538,7 @@ const Pagos = () => {
         year: 'numeric'
       });
       
-      const mensaje = `*CONFIRMACIÓN DE PAGO*\n` +
-        `Nicolas Tejera Automóviles\n\n` +
+      const mensaje = `*CONFIRMACIÓN DE PAGO*\n\n` +
         `Estimado/a ${cliente.nombre},\n\n` +
         `Le confirmamos la recepción de su pago correspondiente a:\n\n` +
         `Vehículo: ${auto.marca} ${auto.modelo} ${auto.anio}\n` +
@@ -554,7 +553,7 @@ const Pagos = () => {
         `Usuario (Cédula): ${cliente.cedula}\n` +
         `Contraseña: ${cliente.passwordTemporal || 'Consulte su contraseña original'}\n\n` +
         `Saludos cordiales,\n` +
-        `*Nicolas Tejera Automóviles*`;
+        `*Sistema de Gestión*`;
       
       // MODO DEMO: Abrir WhatsApp con el mensaje pre-llenado (solo visual)
       // Limpiar el número de teléfono (quitar espacios, guiones, etc.)

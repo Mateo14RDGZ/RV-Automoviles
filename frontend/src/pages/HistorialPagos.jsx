@@ -284,8 +284,8 @@ const HistorialPagos = () => {
       showContact: true,
       contactInfo: {
         telefono: '+598 XX XXX XXX',
-        email: 'pagos@nicolastejera.com',
-        web: 'www.nicolastejera.com'
+        email: 'pagos@example.com',
+        web: 'www.example.com'
       }
     });
     

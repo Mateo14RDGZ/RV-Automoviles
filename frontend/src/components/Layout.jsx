@@ -101,22 +101,8 @@ const Layout = () => {
         <div className="flex flex-col flex-grow bg-white border-r border-gray-200 overflow-y-auto">
           <div className="flex items-center justify-center flex-shrink-0 bg-blue-900 py-5 px-4">
             <div className="text-center w-full">
-              <img 
-                src="/nico-cars-logo.png" 
-                alt="NICO CARS" 
-                className="h-32 w-auto mx-auto object-contain drop-shadow-lg"
-                onError={(e) => {
-                  // Si la imagen no carga, intentar con otro nombre
-                  if (e.target.src.includes('nico-cars-logo.png')) {
-                    e.target.src = '/logo-nico-cars.png';
-                  } else {
-                    e.target.style.display = 'none';
-                    e.target.nextElementSibling.style.display = 'block';
-                  }
-                }}
-              />
-              <p className="text-white text-sm font-semibold mt-2">Nicolas Tejera Automoviles</p>
-              <div className="text-3xl mb-1 hidden">🚗</div>
+              <div className="text-4xl mb-2">🚗</div>
+              <p className="text-white text-sm font-semibold mt-2">Sistema de Gestión</p>
             </div>
           </div>
           
@@ -214,22 +200,8 @@ const Layout = () => {
             <div className="flex items-center justify-center bg-blue-900 py-3 px-3">
               <div className="flex items-center justify-between w-full">
                 <div className="flex flex-col items-center justify-center flex-1">
-                  <img 
-                    src="/nico-cars-logo.png" 
-                    alt="NICO CARS" 
-                    className="h-20 w-auto object-contain drop-shadow-lg"
-                    onError={(e) => {
-                      // Si la imagen no carga, intentar con otro nombre
-                      if (e.target.src.includes('nico-cars-logo.png')) {
-                        e.target.src = '/logo-nico-cars.png';
-                      } else {
-                        e.target.style.display = 'none';
-                        e.target.nextElementSibling.style.display = 'block';
-                      }
-                    }}
-                  />
-                  <p className="text-white text-xs font-semibold mt-1">Nicolas Tejera Automoviles</p>
-                  <div className="text-2xl hidden">🚗</div>
+                  <div className="text-3xl mb-1">🚗</div>
+                  <p className="text-white text-xs font-semibold mt-1">Sistema de Gestión</p>
                 </div>
                 <button
                   onClick={() => setSidebarOpen(false)}

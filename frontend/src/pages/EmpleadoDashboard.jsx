@@ -91,8 +91,7 @@ const EmpleadoDashboard = () => {
         year: 'numeric'
       });
       
-      const mensaje = `*CONFIRMACIÓN DE PAGO*\n` +
-        `Nicolas Tejera Automóviles\n\n` +
+      const mensaje = `*CONFIRMACIÓN DE PAGO*\n\n` +
         `Estimado/a ${cliente.nombre},\n\n` +
         `Le confirmamos la recepción de su pago correspondiente a:\n\n` +
         `Vehículo: ${auto.marca} ${auto.modelo} ${auto.anio}\n` +
@@ -107,7 +106,7 @@ const EmpleadoDashboard = () => {
         `Usuario (Cédula): ${cliente.cedula}\n` +
         `Contraseña: ${cliente.passwordTemporal || 'Consulte su contraseña original'}\n\n` +
         `Saludos cordiales,\n` +
-        `*Nicolas Tejera Automóviles*`;
+        `*Sistema de Gestión*`;
       
       // Limpiar el número de teléfono (quitar espacios, guiones, etc.)
       let telefono = cliente.telefono.replace(/[^0-9]/g, '');

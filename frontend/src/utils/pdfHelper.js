@@ -32,59 +32,8 @@ const COLORS = {
  * @param {boolean} withFrame - Si debe incluir un marco decorativo
  */
 export const addLogoToPDF = async (doc, x = 14, y = 10, width = 40, height = 20, withFrame = false) => {
-  try {
-    const img = new Image();
-    img.src = '/logo-nicolas-tejera.png';
-    
-    return new Promise((resolve) => {
-      img.onload = () => {
-        try {
-          // Marco decorativo opcional
-          if (withFrame) {
-            doc.setDrawColor(...COLORS.primary);
-            doc.setLineWidth(0.5);
-            doc.roundedRect(x - 2, y - 2, width + 4, height + 4, 2, 2);
-          }
-          
-          doc.addImage(img, 'PNG', x, y, width, height);
-          resolve(true);
-        } catch (error) {
-          console.warn('No se pudo agregar el logo al PDF:', error);
-          // Dibujar placeholder si falla
-          doc.setFillColor(...COLORS.primary);
-          doc.setTextColor(255, 255, 255);
-          doc.setFontSize(8);
-          doc.rect(x, y, width, height, 'F');
-          doc.text('NICOLAS TEJERA', x + width/2, y + height/2, { align: 'center', baseline: 'middle' });
-          resolve(false);
-        }
-      };
-      
-      img.onerror = () => {
-        console.warn('No se pudo cargar el logo para el PDF');
-        // Dibujar placeholder si falla la carga
-        doc.setFillColor(...COLORS.primary);
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(8);
-        doc.rect(x, y, width, height, 'F');
-        doc.text('NICOLAS TEJERA', x + width/2, y + height/2, { align: 'center', baseline: 'middle' });
-        resolve(false);
-      };
-      
-      setTimeout(() => {
-        // Dibujar placeholder si timeout
-        doc.setFillColor(...COLORS.primary);
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(8);
-        doc.rect(x, y, width, height, 'F');
-        doc.text('NICOLAS TEJERA', x + width/2, y + height/2, { align: 'center', baseline: 'middle' });
-        resolve(false);
-      }, 3000);
-    });
-  } catch (error) {
-    console.warn('Error al intentar agregar logo:', error);
-    return false;
-  }
+  // No agregar logo, solo retornar true para mantener compatibilidad
+  return true;
 };
 
 /**
@@ -105,22 +54,11 @@ export const addPDFHeader = async (doc, title, subtitle = null, type = 'reporte'
   doc.setFillColor(...COLORS.accent);
   doc.rect(0, 43, pageWidth, 3, 'F');
   
-  // Logo con fondo blanco y sombra
-  doc.setFillColor(255, 255, 255);
-  doc.roundedRect(12, 8, 44, 26, 3, 3, 'F');
-  
-  // Borde decorativo del logo
-  doc.setDrawColor(...COLORS.accent);
-  doc.setLineWidth(0.3);
-  doc.roundedRect(12, 8, 44, 26, 3, 3);
-  
-  await addLogoToPDF(doc, 14, 10, 40, 22, false);
-  
-  // Información de la empresa con mejor diseño
+  // Información del sistema con mejor diseño
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(22);
   doc.setFont(undefined, 'bold');
-  doc.text('NICOLAS TEJERA', pageWidth - 14, 17, { align: 'right' });
+  doc.text('SISTEMA DE GESTIÓN', pageWidth - 14, 17, { align: 'right' });
   
   doc.setFontSize(12);
   doc.setFont(undefined, 'normal');
@@ -128,7 +66,7 @@ export const addPDFHeader = async (doc, title, subtitle = null, type = 'reporte'
   
   doc.setFontSize(8);
   doc.setTextColor(230, 230, 230);
-  doc.text('Calidad y Confianza', pageWidth - 14, 31, { align: 'right' });
+  doc.text('Gestión Profesional', pageWidth - 14, 31, { align: 'right' });
   
   // Línea separadora elegante
   doc.setDrawColor(...COLORS.gray[200]);
@@ -204,8 +142,8 @@ export const addPDFFooter = async (doc, options = {}) => {
     showContact = true,
     contactInfo = {
       telefono: '+598 XX XXX XXX',
-      email: 'info@nicolastejera.com',
-      web: 'www.nicolastejera.com'
+      email: 'info@example.com',
+      web: 'www.example.com'
     }
   } = options;
   
@@ -230,10 +168,7 @@ export const addPDFFooter = async (doc, options = {}) => {
     doc.setFillColor(...COLORS.gray[50]);
     doc.rect(0, pageHeight - 24, pageWidth, 24, 'F');
     
-    // Logo pequeño en footer con borde redondeado
-    doc.setFillColor(255, 255, 255);
-    doc.roundedRect(13, pageHeight - 21, 22, 12, 1, 1, 'F');
-    await addLogoToPDF(doc, 14, pageHeight - 20, 20, 10, false);
+    // Espacio reservado para información del sistema
     
     // Información de contacto mejorada
     if (showContact) {
@@ -395,9 +330,8 @@ export const createStandardPDF = async (title, subtitle = null, type = 'reporte'
  */
 export const getPDFFileName = (type, description = '') => {
   const fecha = new Date().toISOString().split('T')[0];
-  const empresa = 'NicolasTejera';
   const desc = description ? `_${description}` : '';
-  return `${empresa}_${type}${desc}_${fecha}.pdf`;
+  return `${type}${desc}_${fecha}.pdf`;
 };
 
 export { COLORS };

@@ -101,8 +101,7 @@ const Comprobantes = () => {
         year: 'numeric'
       });
       
-      const mensaje = `*CONFIRMACIÓN DE PAGO*\n` +
-        `Nicolas Tejera Automóviles\n\n` +
+      const mensaje = `*CONFIRMACIÓN DE PAGO*\n\n` +
         `Estimado/a ${cliente.nombre},\n\n` +
         `Le confirmamos la recepción de su pago correspondiente a:\n\n` +
         `Vehículo: ${auto.marca} ${auto.modelo} ${auto.anio}\n` +
@@ -117,7 +116,7 @@ const Comprobantes = () => {
         `Usuario: ${cliente.cedula}\n` +
         `Contraseña: (la recibida por WhatsApp)\n\n` +
         `Saludos cordiales,\n` +
-        `*Nicolas Tejera Automóviles*`;
+        `*Sistema de Gestión*`;
       
       // Limpiar el número de teléfono
       let telefono = cliente.telefono.replace(/[^0-9]/g, '');

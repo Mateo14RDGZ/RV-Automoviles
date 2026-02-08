@@ -179,8 +179,8 @@ const Reportes = () => {
         showContact: true,
         contactInfo: {
           telefono: '+598 XX XXX XXX',
-          email: 'info@nicolastejera.com',
-          web: 'www.nicolastejera.com'
+          email: 'info@example.com',
+          web: 'www.example.com'
         }
       });
       
@@ -441,8 +441,8 @@ const Reportes = () => {
         showContact: true,
         contactInfo: {
           telefono: '+598 XX XXX XXX',
-          email: 'cobranzas@nicolastejera.com',
-          web: 'www.nicolastejera.com'
+          email: 'cobranzas@example.com',
+          web: 'www.example.com'
         }
       });
 
@@ -568,8 +568,8 @@ const Reportes = () => {
         showContact: true,
         contactInfo: {
           telefono: '+598 XX XXX XXX',
-          email: 'info@nicolastejera.com',
-          web: 'www.nicolastejera.com'
+          email: 'info@example.com',
+          web: 'www.example.com'
         }
       });
       
@@ -679,8 +679,8 @@ const Reportes = () => {
         showContact: true,
         contactInfo: {
           telefono: '+598 XX XXX XXX',
-          email: 'info@nicolastejera.com',
-          web: 'www.nicolastejera.com'
+          email: 'info@example.com',
+          web: 'www.example.com'
         }
       });
       

@@ -68,17 +68,7 @@ const Login = () => {
         {/* Logo y título */}
         <div className="text-center mb-8 animate-fadeInUp" style={{animationDelay: '0.1s'}}>
           <div className="flex justify-center mb-4">
-            <img 
-              src="/logo-nicolas-tejera.png" 
-              alt="Nicolas Tejera Automoviles" 
-              className="h-40 md:h-56 lg:h-64 w-auto object-contain"
-              onError={(e) => {
-                // Si la imagen no carga, mostrar emoji como fallback
-                e.target.style.display = 'none';
-                e.target.nextElementSibling.style.display = 'block';
-              }}
-            />
-            <div className="text-6xl hidden">
+            <div className="text-6xl">
               🚗
             </div>
           </div>
@@ -86,7 +76,7 @@ const Login = () => {
             Sistema de Gestión
           </h1>
           <p className="text-gray-500 text-sm">
-            Nicolas Tejera Automoviles
+            Gestión de Automóviles
           </p>
         </div>
 
