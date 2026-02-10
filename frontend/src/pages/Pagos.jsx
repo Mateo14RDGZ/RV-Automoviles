@@ -551,7 +551,7 @@ const Pagos = () => {
         `*📱 ACCESO A TU PORTAL DE CUOTAS*\n` +
         `━━━━━━━━━━━━━━━━━━━━\n\n` +
         `Consulta el estado de todas tus cuotas en cualquier momento:\n\n` +
-        `🌐 *Link:* https://rv-gestion-automotora20.vercel.app\n\n` +
+        `🌐 *Link:* https://rv--automoviles.vercel.app\n\n` +
         `🔐 *TUS CREDENCIALES:*\n` +
         `👤 Usuario (Cédula): *${cliente.cedula}*\n` +
         `🔑 Contraseña: *${cliente.passwordTemporal || 'Consultar con RV Automóviles'}*\n\n` +

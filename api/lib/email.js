@@ -220,7 +220,7 @@ async function enviarConfirmacionPago(cliente, pago, auto) {
                   Ahora puedes ver el estado de todas tus cuotas en cualquier momento desde nuestra plataforma web.
                 </p>
                 <div style="text-align: center; margin: 20px 0;">
-                  <a href="https://rv-gestion-automotora20.vercel.app" 
+                  <a href="https://rv--automoviles.vercel.app" 
                      style="display: inline-block; background: #3b82f6; color: white; padding: 12px 30px; 
                             border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 15px;">
                     🚗 Ingresar a Mi Portal
@@ -245,7 +245,7 @@ async function enviarConfirmacionPago(cliente, pago, auto) {
               <p class="footer-title">RV Automóviles</p>
               <p class="footer-text">Sistema de Gestión de Cuotas</p>
               <p class="footer-text" style="margin-top: 10px;">
-                🌐 <a href="https://rv-gestion-automotora20.vercel.app" style="color: #3b82f6; text-decoration: none;">rv-gestion-automotora20.vercel.app</a>
+                🌐 <a href="https://rv--automoviles.vercel.app" style="color: #3b82f6; text-decoration: none;">rv--automoviles.vercel.app</a>
               </p>
               <p class="footer-text" style="margin-top: 15px;">
                 Este es un correo automático. Por favor, no responda directamente a este mensaje.
