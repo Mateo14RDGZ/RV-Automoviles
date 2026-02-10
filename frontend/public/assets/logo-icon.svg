@@ -1,44 +1,64 @@
-<!-- Icon RV Automóviles - Para PWA y Favicon -->
+<!-- Icon RV Automóviles - Diseño consistente con Login y Sidebar -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <!-- Fondo con gradiente azul profesional -->
   <defs>
+    <!-- Gradiente para el fondo -->
     <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" style="stop-color:#1e3a8a;stop-opacity:1" />
       <stop offset="50%" style="stop-color:#1e40af;stop-opacity:1" />
       <stop offset="100%" style="stop-color:#1e3a8a;stop-opacity:1" />
     </linearGradient>
+    
+    <!-- Gradiente para RV (similar al del login pero adaptado) -->
+    <linearGradient id="rvGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#e5e7eb;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Sombra para el texto -->
     <filter id="textShadow">
-      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-opacity="0.3"/>
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-opacity="0.4"/>
+    </filter>
+    
+    <!-- Línea decorativa con blur -->
+    <filter id="lineGlow">
+      <feGaussianBlur stdDeviation="2"/>
     </filter>
   </defs>
   
+  <!-- Fondo con gradiente azul -->
   <rect width="512" height="512" fill="url(#bgGradient)" rx="100"/>
   
-  <!-- RV en grande con mejor diseño -->
-  <text x="256" y="280" 
+  <!-- RV en grande con estilo del login -->
+  <text x="256" y="260" 
         font-family="Arial, Helvetica, sans-serif" 
-        font-size="200" 
+        font-size="180" 
         font-weight="900" 
-        fill="#ffffff" 
+        fill="url(#rvGradient)" 
         text-anchor="middle" 
-        letter-spacing="-8"
+        letter-spacing="-6"
         filter="url(#textShadow)">RV</text>
+  
+  <!-- Línea decorativa azul brillante (como en el login) -->
+  <line x1="180" y1="295" x2="332" y2="295" 
+        stroke="#60a5fa" 
+        stroke-width="3" 
+        opacity="0.8"
+        filter="url(#lineGlow)"/>
   
   <!-- Automóviles en elegante -->
   <text x="256" y="360" 
         font-family="Arial, Helvetica, sans-serif" 
-        font-size="38" 
+        font-size="32" 
         font-weight="300" 
         fill="#ffffff" 
         text-anchor="middle" 
         opacity="0.95"
-        letter-spacing="6"
+        letter-spacing="8"
         style="text-transform: uppercase;">AUTOMÓVILES</text>
   
-  <!-- Línea decorativa con puntos -->
-  <circle cx="180" cy="320" r="3" fill="#ffffff" opacity="0.4"/>
-  <path d="M 188 320 L 220 320" stroke="#ffffff" stroke-width="2" opacity="0.4"/>
-  <circle cx="256" cy="320" r="4" fill="#ffffff" opacity="0.6"/>
-  <path d="M 292 320 L 324 320" stroke="#ffffff" stroke-width="2" opacity="0.4"/>
-  <circle cx="332" cy="320" r="3" fill="#ffffff" opacity="0.4"/>
+  <!-- Decoración con líneas y punto (como en el login) -->
+  <line x1="160" y1="385" x2="220" y2="385" stroke="#ffffff" stroke-width="1" opacity="0.4"/>
+  <circle cx="256" cy="385" r="3" fill="#ffffff" opacity="0.6"/>
+  <line x1="292" y1="385" x2="352" y2="385" stroke="#ffffff" stroke-width="1" opacity="0.4"/>
 </svg>
