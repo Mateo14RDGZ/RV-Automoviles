@@ -147,29 +147,6 @@ const Login = () => {
               {loginMode === 'admin' ? (
                 /* Formulario para admin o empleado */
                 <>
-                  {/* Credenciales de prueba */}
-                  <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                    <h4 className="text-sm font-semibold text-blue-800 mb-2 flex items-center gap-2">
-                      <Sparkles className="w-4 h-4" />
-                      Credenciales de Prueba
-                    </h4>
-                    <div className="space-y-1 text-xs text-blue-700">
-                      <div className="pb-2 border-b border-blue-200">
-                        <p className="font-semibold mb-1">👑 Administrador</p>
-                        <p><span className="font-medium">Email:</span> admin@demo.com</p>
-                        <p><span className="font-medium">Contraseña:</span> admin123</p>
-                      </div>
-                      <div className="pt-2">
-                        <p className="font-semibold mb-1">👤 Empleado</p>
-                        <p><span className="font-medium">Email:</span> empleado@demo.com</p>
-                        <p><span className="font-medium">Contraseña:</span> admin123</p>
-                        <p className="text-[10px] text-blue-600 mt-1 italic">
-                          Acceso limitado (sin Dashboard ni Reportes)
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
                   <div className="space-y-2">
                     <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                       Correo Electrónico
