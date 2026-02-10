@@ -54,19 +54,19 @@ export const addPDFHeader = async (doc, title, subtitle = null, type = 'reporte'
   doc.setFillColor(...COLORS.accent);
   doc.rect(0, 43, pageWidth, 3, 'F');
   
-  // Información del sistema con mejor diseño
+  // Logo RV Automóviles
   doc.setTextColor(255, 255, 255);
-  doc.setFontSize(22);
+  doc.setFontSize(28);
   doc.setFont(undefined, 'bold');
-  doc.text('SISTEMA DE GESTIÓN', pageWidth - 14, 17, { align: 'right' });
+  doc.text('RV', pageWidth - 14, 17, { align: 'right' });
   
-  doc.setFontSize(12);
+  doc.setFontSize(14);
   doc.setFont(undefined, 'normal');
-  doc.text('Automóviles', pageWidth - 14, 25, { align: 'right' });
+  doc.text('Automóviles', pageWidth - 14, 26, { align: 'right' });
   
   doc.setFontSize(8);
   doc.setTextColor(230, 230, 230);
-  doc.text('Gestión Profesional', pageWidth - 14, 31, { align: 'right' });
+  doc.text('Sistema de Gestión', pageWidth - 14, 33, { align: 'right' });
   
   // Línea separadora elegante
   doc.setDrawColor(...COLORS.gray[200]);

@@ -101,8 +101,12 @@ const Layout = () => {
         <div className="flex flex-col flex-grow bg-white border-r border-gray-200 overflow-y-auto">
           <div className="flex items-center justify-center flex-shrink-0 bg-blue-900 py-5 px-4">
             <div className="text-center w-full">
-              <div className="text-4xl mb-2">🚗</div>
-              <p className="text-white text-sm font-semibold mt-2">Sistema de Gestión</p>
+              <img 
+                src="/assets/logo-horizontal.svg" 
+                alt="RV Automóviles" 
+                className="w-40 h-12 object-contain mx-auto"
+              />
+              <p className="text-white text-xs font-semibold mt-2">Sistema de Gestión</p>
             </div>
           </div>
           
@@ -197,10 +201,14 @@ const Layout = () => {
             onClick={() => setSidebarOpen(false)}
           />
           <div className="fixed inset-y-0 left-0 flex flex-col w-64 bg-white">
-            <div className="flex items-center justify-center bg-blue-900 py-3 px-3">
+            <div className="flex items-center justify-center bg-blue-900 py-5 px-4">
               <div className="flex items-center justify-between w-full">
                 <div className="flex flex-col items-center justify-center flex-1">
-                  <div className="text-3xl mb-1">🚗</div>
+                  <img 
+                    src="/assets/logo-horizontal.svg" 
+                    alt="RV Automóviles" 
+                    className="w-32 h-10 object-contain"
+                  />
                   <p className="text-white text-xs font-semibold mt-1">Sistema de Gestión</p>
                 </div>
                 <button

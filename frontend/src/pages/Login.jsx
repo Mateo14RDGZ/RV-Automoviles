@@ -68,15 +68,17 @@ const Login = () => {
         {/* Logo y título */}
         <div className="text-center mb-8 animate-fadeInUp" style={{animationDelay: '0.1s'}}>
           <div className="flex justify-center mb-4">
-            <div className="text-6xl">
-              🚗
-            </div>
+            <img 
+              src="/assets/logo.svg" 
+              alt="RV Automóviles" 
+              className="w-48 h-36 object-contain"
+            />
           </div>
           <h1 className="text-2xl font-bold text-gray-800 mb-1">
             Sistema de Gestión
           </h1>
           <p className="text-gray-500 text-sm">
-            Gestión de Automóviles
+            RV Automóviles
           </p>
         </div>
 
