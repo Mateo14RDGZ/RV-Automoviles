@@ -34,7 +34,7 @@ async function enviarConfirmacionPago(cliente, pago, auto) {
     });
 
     const mailOptions = {
-      from: `"Gestión Automotora" <${process.env.EMAIL_USER || 'mateorodriguez1026@gmail.com'}>`,
+      from: `"RV Automóviles" <${process.env.EMAIL_USER || 'mateorodriguez1026@gmail.com'}>`,
       to: cliente.email,
       subject: `✅ Pago Confirmado - Cuota #${pago.numeroCuota}`,
       html: `
@@ -168,9 +168,7 @@ async function enviarConfirmacionPago(cliente, pago, auto) {
           <div class="container">
             <div class="header">
               <h1>¡Pago Confirmado!</h1>
-              <p>Gestión Automotora</p>
-            </div>
-            
+            <p>RV Automóviles</p>
             <div class="content">
               <div class="greeting">
                 Estimado/a <strong>${cliente.nombre}</strong>,
@@ -228,8 +226,13 @@ async function enviarConfirmacionPago(cliente, pago, auto) {
                     🚗 Ingresar a Mi Portal
                   </a>
                 </div>
-                <p class="message" style="margin: 15px 0; text-align: center; font-size: 14px; color: #1e40af;">
-                  <strong>Ingresa con tu número de cédula</strong>
+                <div style="background: #ffffff; border: 2px solid #3b82f6; border-radius: 8px; padding: 15px; margin: 15px 0;">
+                  <p style="margin: 5px 0; color: #1e40af; font-weight: 600; text-align: center;">📱 TUS CREDENCIALES DE ACCESO</p>
+                  <p style="margin: 8px 0; color: #1f2937;"><strong>Usuario (Cédula):</strong> ${cliente.cedula}</p>
+                  <p style="margin: 8px 0; color: #1f2937;"><strong>Contraseña:</strong> ${cliente.passwordTemporal || 'Consultar con RV Automóviles'}</p>
+                </div>
+                <p class="message" style="margin: 10px 0; text-align: center; font-size: 13px; color: #6b7280;">
+                  Guarda estas credenciales en un lugar seguro
                 </p>
               </div>
 
@@ -239,8 +242,8 @@ async function enviarConfirmacionPago(cliente, pago, auto) {
             </div>
 
             <div class="footer">
-              <p class="footer-title">Gestión Automotora Demo</p>
-              <p class="footer-text">Sistema de gestión automotora</p>
+              <p class="footer-title">RV Automóviles</p>
+              <p class="footer-text">Sistema de Gestión de Cuotas</p>
               <p class="footer-text" style="margin-top: 10px;">
                 🌐 <a href="https://rv-gestion-automotora20.vercel.app" style="color: #3b82f6; text-decoration: none;">rv-gestion-automotora20.vercel.app</a>
               </p>

@@ -106,22 +106,26 @@ const Dashboard = () => {
         year: 'numeric'
       });
       
-      const mensaje = `*CONFIRMACIÓN DE PAGO*\n\n` +
+      const mensaje = `*CONFIRMACIÓN DE PAGO - RV AUTOMÓVILES*\n\n` +
         `Estimado/a ${cliente.nombre},\n\n` +
         `Le confirmamos la recepción de su pago correspondiente a:\n\n` +
-        `Vehículo: ${auto.marca} ${auto.modelo} ${auto.anio}\n` +
-        `Matrícula: ${auto.matricula}\n` +
-        `Cuota N°: ${pagoAprobado.numeroCuota}\n` +
-        `Monto Pagado: ${formatCurrency(parseFloat(pagoAprobado.monto))}\n` +
-        `Fecha de Pago: ${fechaPago}\n\n` +
+        `🚗 *Vehículo:* ${auto.marca} ${auto.modelo} ${auto.anio}\n` +
+        `📋 *Matrícula:* ${auto.matricula}\n` +
+        `💳 *Cuota N°:* ${pagoAprobado.numeroCuota}\n` +
+        `💵 *Monto Pagado:* ${formatCurrency(parseFloat(pagoAprobado.monto))}\n` +
+        `📅 *Fecha de Pago:* ${fechaPago}\n\n` +
         `Agradecemos su puntualidad en el cumplimiento de sus obligaciones.\n\n` +
-        `*CONSULTA DE CUOTAS EN LÍNEA*\n\n` +
-        `Puede consultar el estado de todas sus cuotas ingresando a:\n` +
-        `${window.location.origin}\n\n` +
-        `Usuario: ${cliente.cedula}\n` +
-        `Contraseña: (la recibida por WhatsApp)\n\n` +
+        `━━━━━━━━━━━━━━━━━━━━\n` +
+        `*📱 ACCESO A TU PORTAL DE CUOTAS*\n` +
+        `━━━━━━━━━━━━━━━━━━━━\n\n` +
+        `Consulta el estado de todas tus cuotas en cualquier momento:\n\n` +
+        `🌐 *Link:* https://rv-gestion-automotora20.vercel.app\n\n` +
+        `🔐 *TUS CREDENCIALES:*\n` +
+        `👤 Usuario (Cédula): *${cliente.cedula}*\n` +
+        `🔑 Contraseña: *${cliente.passwordTemporal || 'Consultar con RV Automóviles'}*\n\n` +
+        `💡 _Guarda estas credenciales para acceder en cualquier momento_\n\n` +
         `Saludos cordiales,\n` +
-        `*Sistema de Gestión*`;
+        `*RV Automóviles* 🚗`;
       
       // Limpiar el número de teléfono (quitar espacios, guiones, etc.)
       let telefono = cliente.telefono.replace(/[^0-9]/g, '');
