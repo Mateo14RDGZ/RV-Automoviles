@@ -1,30 +1,44 @@
 <!-- Icon RV Automóviles - Para PWA y Favicon -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <!-- Fondo azul profesional -->
-  <rect width="512" height="512" fill="#1e3a8a" rx="80"/>
+  <!-- Fondo con gradiente azul profesional -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e3a8a;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#1e40af;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1e3a8a;stop-opacity:1" />
+    </linearGradient>
+    <filter id="textShadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-opacity="0.3"/>
+    </filter>
+  </defs>
   
-  <!-- RV en grande y centrado con mejor tipografía -->
-  <text x="256" y="300" 
+  <rect width="512" height="512" fill="url(#bgGradient)" rx="100"/>
+  
+  <!-- RV en grande con mejor diseño -->
+  <text x="256" y="280" 
         font-family="Arial, Helvetica, sans-serif" 
-        font-size="220" 
-        font-weight="bold" 
+        font-size="200" 
+        font-weight="900" 
         fill="#ffffff" 
         text-anchor="middle" 
-        letter-spacing="-10">RV</text>
+        letter-spacing="-8"
+        filter="url(#textShadow)">RV</text>
   
-  <!-- Automóviles en pequeño -->
-  <text x="256" y="380" 
+  <!-- Automóviles en elegante -->
+  <text x="256" y="360" 
         font-family="Arial, Helvetica, sans-serif" 
-        font-size="42" 
+        font-size="38" 
         font-weight="300" 
         fill="#ffffff" 
         text-anchor="middle" 
-        opacity="0.9"
-        letter-spacing="2">Automóviles</text>
+        opacity="0.95"
+        letter-spacing="6"
+        style="text-transform: uppercase;">AUTOMÓVILES</text>
   
-  <!-- Línea decorativa -->
-  <path d="M 140 340 L 372 340" 
-        stroke="#ffffff" 
-        stroke-width="3" 
-        opacity="0.3"/>
+  <!-- Línea decorativa con puntos -->
+  <circle cx="180" cy="320" r="3" fill="#ffffff" opacity="0.4"/>
+  <path d="M 188 320 L 220 320" stroke="#ffffff" stroke-width="2" opacity="0.4"/>
+  <circle cx="256" cy="320" r="4" fill="#ffffff" opacity="0.6"/>
+  <path d="M 292 320 L 324 320" stroke="#ffffff" stroke-width="2" opacity="0.4"/>
+  <circle cx="332" cy="320" r="3" fill="#ffffff" opacity="0.4"/>
 </svg>

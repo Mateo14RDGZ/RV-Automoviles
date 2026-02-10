@@ -68,17 +68,24 @@ const Login = () => {
         {/* Logo y título */}
         <div className="text-center mb-8 animate-fadeInUp" style={{animationDelay: '0.1s'}}>
           <div className="flex flex-col items-center justify-center mb-4">
-            <div className="text-6xl font-bold tracking-tight">
-              <span className="bg-gradient-to-r from-gray-600 via-gray-500 to-gray-600 bg-clip-text text-transparent">
-                RV
-              </span>
+            <div className="relative">
+              <div className="text-7xl font-extrabold tracking-tight relative">
+                <span className="bg-gradient-to-br from-gray-700 via-gray-500 to-gray-700 bg-clip-text text-transparent drop-shadow-2xl" style={{textShadow: '0 4px 10px rgba(0,0,0,0.1)'}}>
+                  RV
+                </span>
+              </div>
+              <div className="absolute -bottom-1 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-blue-400 to-transparent opacity-50 blur-sm"></div>
             </div>
-            <div className="text-2xl font-normal text-gray-500 tracking-wide -mt-2">
+            <div className="text-2xl font-light text-gray-600 tracking-widest mt-3 uppercase" style={{letterSpacing: '0.3em'}}>
               Automóviles
             </div>
-            <div className="w-32 h-0.5 bg-gradient-to-r from-transparent via-gray-400 to-transparent mt-2"></div>
+            <div className="flex items-center gap-2 mt-3">
+              <div className="w-12 h-px bg-gradient-to-r from-transparent via-gray-400 to-gray-400"></div>
+              <div className="w-2 h-2 rounded-full bg-gray-400"></div>
+              <div className="w-12 h-px bg-gradient-to-l from-transparent via-gray-400 to-gray-400"></div>
+            </div>
           </div>
-          <h1 className="text-xl font-semibold text-gray-700 mb-1">
+          <h1 className="text-lg font-medium text-gray-600 mt-4 tracking-wide">
             Sistema de Gestión
           </h1>
         </div>

@@ -99,18 +99,22 @@ const Layout = () => {
       {/* Sidebar para desktop */}
       <aside className="hidden md:fixed md:inset-y-0 md:flex md:w-64 md:flex-col">
         <div className="flex flex-col flex-grow bg-white border-r border-gray-200 overflow-y-auto">
-          <div className="flex items-center justify-center flex-shrink-0 bg-blue-900 py-5 px-4">
+          <div className="flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900 py-6 px-4 shadow-lg">
             <div className="text-center w-full">
               <div className="flex flex-col items-center">
-                <div className="text-4xl font-bold tracking-tight text-white">
+                <div className="text-5xl font-extrabold tracking-tight text-white drop-shadow-lg">
                   RV
                 </div>
-                <div className="text-sm font-light text-white/90 tracking-wider -mt-1">
+                <div className="text-sm font-light text-white/95 tracking-widest uppercase mt-1" style={{letterSpacing: '0.25em'}}>
                   Automóviles
                 </div>
-                <div className="w-20 h-px bg-white/30 mt-2"></div>
+                <div className="flex items-center gap-1 mt-3">
+                  <div className="w-8 h-px bg-white/40"></div>
+                  <div className="w-1.5 h-1.5 rounded-full bg-white/60"></div>
+                  <div className="w-8 h-px bg-white/40"></div>
+                </div>
               </div>
-              <p className="text-white text-xs font-medium mt-3 opacity-80">Sistema de Gestión</p>
+              <p className="text-white/80 text-xs font-medium mt-3 tracking-wide">Sistema de Gestión</p>
             </div>
           </div>
           
@@ -205,18 +209,18 @@ const Layout = () => {
             onClick={() => setSidebarOpen(false)}
           />
           <div className="fixed inset-y-0 left-0 flex flex-col w-64 bg-white">
-            <div className="flex items-center justify-center bg-blue-900 py-5 px-4">
+            <div className="flex items-center justify-center bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900 py-5 px-4">
               <div className="flex items-center justify-between w-full">
                 <div className="flex flex-col items-center justify-center flex-1">
                   <div className="flex flex-col items-center">
-                    <div className="text-3xl font-bold tracking-tight text-white">
+                    <div className="text-4xl font-extrabold tracking-tight text-white drop-shadow-lg">
                       RV
                     </div>
-                    <div className="text-xs font-light text-white/90 tracking-wider -mt-1">
+                    <div className="text-xs font-light text-white/95 tracking-widest uppercase" style={{letterSpacing: '0.2em'}}>
                       Automóviles
                     </div>
                   </div>
-                  <p className="text-white text-xs font-medium mt-2 opacity-80">Sistema de Gestión</p>
+                  <p className="text-white/80 text-xs font-medium mt-2 tracking-wide">Sistema de Gestión</p>
                 </div>
                 <button
                   onClick={() => setSidebarOpen(false)}
