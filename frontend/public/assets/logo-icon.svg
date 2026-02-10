@@ -1,20 +1,30 @@
 <!-- Icon RV Automóviles - Para PWA y Favicon -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <!-- Fondo -->
+  <!-- Fondo azul profesional -->
   <rect width="512" height="512" fill="#1e3a8a" rx="80"/>
   
-  <!-- Logo RV -->
-  <defs>
-    <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#e5e7eb;stop-opacity:1" />
-    </linearGradient>
-  </defs>
+  <!-- RV en grande y centrado con mejor tipografía -->
+  <text x="256" y="300" 
+        font-family="Arial, Helvetica, sans-serif" 
+        font-size="220" 
+        font-weight="bold" 
+        fill="#ffffff" 
+        text-anchor="middle" 
+        letter-spacing="-10">RV</text>
   
-  <!-- RV en grande y centrado -->
-  <text x="256" y="320" font-family="Arial, sans-serif" font-size="200" font-weight="bold" 
-        fill="url(#iconGradient)" text-anchor="middle">RV</text>
+  <!-- Automóviles en pequeño -->
+  <text x="256" y="380" 
+        font-family="Arial, Helvetica, sans-serif" 
+        font-size="42" 
+        font-weight="300" 
+        fill="#ffffff" 
+        text-anchor="middle" 
+        opacity="0.9"
+        letter-spacing="2">Automóviles</text>
   
   <!-- Línea decorativa -->
-  <path d="M 150 360 Q 256 355 362 360" stroke="#ffffff" stroke-width="4" fill="none" opacity="0.6"/>
+  <path d="M 140 340 L 372 340" 
+        stroke="#ffffff" 
+        stroke-width="3" 
+        opacity="0.3"/>
 </svg>

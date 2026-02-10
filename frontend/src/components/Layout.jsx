@@ -101,12 +101,16 @@ const Layout = () => {
         <div className="flex flex-col flex-grow bg-white border-r border-gray-200 overflow-y-auto">
           <div className="flex items-center justify-center flex-shrink-0 bg-blue-900 py-5 px-4">
             <div className="text-center w-full">
-              <img 
-                src="/assets/logo-horizontal.svg" 
-                alt="RV Automóviles" 
-                className="w-40 h-12 object-contain mx-auto"
-              />
-              <p className="text-white text-xs font-semibold mt-2">Sistema de Gestión</p>
+              <div className="flex flex-col items-center">
+                <div className="text-4xl font-bold tracking-tight text-white">
+                  RV
+                </div>
+                <div className="text-sm font-light text-white/90 tracking-wider -mt-1">
+                  Automóviles
+                </div>
+                <div className="w-20 h-px bg-white/30 mt-2"></div>
+              </div>
+              <p className="text-white text-xs font-medium mt-3 opacity-80">Sistema de Gestión</p>
             </div>
           </div>
           
@@ -204,12 +208,15 @@ const Layout = () => {
             <div className="flex items-center justify-center bg-blue-900 py-5 px-4">
               <div className="flex items-center justify-between w-full">
                 <div className="flex flex-col items-center justify-center flex-1">
-                  <img 
-                    src="/assets/logo-horizontal.svg" 
-                    alt="RV Automóviles" 
-                    className="w-32 h-10 object-contain"
-                  />
-                  <p className="text-white text-xs font-semibold mt-1">Sistema de Gestión</p>
+                  <div className="flex flex-col items-center">
+                    <div className="text-3xl font-bold tracking-tight text-white">
+                      RV
+                    </div>
+                    <div className="text-xs font-light text-white/90 tracking-wider -mt-1">
+                      Automóviles
+                    </div>
+                  </div>
+                  <p className="text-white text-xs font-medium mt-2 opacity-80">Sistema de Gestión</p>
                 </div>
                 <button
                   onClick={() => setSidebarOpen(false)}

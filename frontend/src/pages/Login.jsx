@@ -67,19 +67,20 @@ const Login = () => {
       <div className="max-w-md w-full animate-zoomIn">
         {/* Logo y título */}
         <div className="text-center mb-8 animate-fadeInUp" style={{animationDelay: '0.1s'}}>
-          <div className="flex justify-center mb-4">
-            <img 
-              src="/assets/logo.svg" 
-              alt="RV Automóviles" 
-              className="w-48 h-36 object-contain"
-            />
+          <div className="flex flex-col items-center justify-center mb-4">
+            <div className="text-6xl font-bold tracking-tight">
+              <span className="bg-gradient-to-r from-gray-600 via-gray-500 to-gray-600 bg-clip-text text-transparent">
+                RV
+              </span>
+            </div>
+            <div className="text-2xl font-normal text-gray-500 tracking-wide -mt-2">
+              Automóviles
+            </div>
+            <div className="w-32 h-0.5 bg-gradient-to-r from-transparent via-gray-400 to-transparent mt-2"></div>
           </div>
-          <h1 className="text-2xl font-bold text-gray-800 mb-1">
+          <h1 className="text-xl font-semibold text-gray-700 mb-1">
             Sistema de Gestión
           </h1>
-          <p className="text-gray-500 text-sm">
-            RV Automóviles
-          </p>
         </div>
 
         {/* Formulario de login minimalista */}
