@@ -11,9 +11,10 @@
 -- PASO 1: Verificar que las tablas existen
 -- ============================================
 -- Ejecuta esto primero para verificar que las migraciones se aplicaron
-SELECT table_name 
-FROM information_schema.tables 
-WHERE table_schema = 'public' 
+SELECT table_name
+FROM information_schema.tables
+WHERE
+    table_schema = 'public'
 ORDER BY table_name;
 
 -- Deberías ver estas tablas:
@@ -35,33 +36,31 @@ DELETE FROM "Usuario" WHERE email = 'admin@rvautomoviles.com';
 -- Crear usuario admin
 -- Email: admin@rvautomoviles.com
 -- Password: admin123 (CÁMBIALO INMEDIATAMENTE DESPUÉS DEL PRIMER LOGIN)
-INSERT INTO "Usuario" (
-  email, 
-  password, 
-  rol, 
-  "clienteId",
-  "createdAt", 
-  "updatedAt"
-)
+INSERT INTO
+    "Usuario" (
+        email,
+        password,
+        rol,
+        "clienteId",
+        "createdAt",
+        "updatedAt"
+    )
 VALUES (
-  'admin@rvautomoviles.com',
-  '$2a$10$YourHashedPasswordHere',  -- Hash de bcrypt para 'admin123'
-  'admin',
-  NULL,
-  NOW(),
-  NOW()
-);
+        'admin@rvautomoviles.com',
+        '$2a$10$YourHashedPasswordHere', -- Hash de bcrypt para 'admin123'
+        'admin',
+        NULL,
+        NOW(),
+        NOW()
+    );
 
 -- ============================================
 -- PASO 3: Verificar que se creó correctamente
 -- ============================================
-SELECT 
-  id,
-  email,
-  rol,
-  "createdAt"
-FROM "Usuario" 
-WHERE email = 'admin@rvautomoviles.com';
+SELECT id, email, rol, "createdAt"
+FROM "Usuario"
+WHERE
+    email = 'admin@rvautomoviles.com';
 
 -- ============================================
 -- INFORMACIÓN IMPORTANTE
@@ -81,63 +80,66 @@ WHERE email = 'admin@rvautomoviles.com';
 -- ============================================
 
 -- Cliente de prueba
-INSERT INTO "Cliente" (
-  nombre,
-  cedula,
-  telefono,
-  direccion,
-  email,
-  activo,
-  "createdAt",
-  "updatedAt"
-)
+INSERT INTO
+    "Cliente" (
+        nombre,
+        cedula,
+        telefono,
+        direccion,
+        email,
+        activo,
+        "createdAt",
+        "updatedAt"
+    )
 VALUES (
-  'Juan Pérez',
-  '12345678',
-  '099123456',
-  'Calle 123, Montevideo',
-  'juan.perez@email.com',
-  true,
-  NOW(),
-  NOW()
-);
+        'Juan Pérez',
+        '12345678',
+        '099123456',
+        'Calle 123, Montevideo',
+        'juan.perez@email.com',
+        true,
+        NOW(),
+        NOW()
+    );
 
 -- Auto de prueba
-INSERT INTO "Auto" (
-  marca,
-  modelo,
-  anio,
-  matricula,
-  precio,
-  estado,
-  activo,
-  kilometraje,
-  color,
-  combustible,
-  transmision,
-  observaciones,
-  "createdAt",
-  "updatedAt"
-)
+INSERT INTO
+    "Auto" (
+        marca,
+        modelo,
+        anio,
+        matricula,
+        precio,
+        estado,
+        activo,
+        kilometraje,
+        color,
+        combustible,
+        transmision,
+        observaciones,
+        "createdAt",
+        "updatedAt"
+    )
 VALUES (
-  'Toyota',
-  'Corolla',
-  2020,
-  'SAA1234',
-  25000.00,
-  'disponible',
-  true,
-  50000,
-  'Blanco',
-  'Nafta',
-  'Manual',
-  'Vehículo en excelente estado',
-  NOW(),
-  NOW()
-);
+        'Toyota',
+        'Corolla',
+        2020,
+        'SAA1234',
+        25000.00,
+        'disponible',
+        true,
+        50000,
+        'Blanco',
+        'Nafta',
+        'Manual',
+        'Vehículo en excelente estado',
+        NOW(),
+        NOW()
+    );
 
 -- Verificar datos creados
 SELECT * FROM "Cliente";
+
 SELECT * FROM "Auto";
 
 -- ============================================

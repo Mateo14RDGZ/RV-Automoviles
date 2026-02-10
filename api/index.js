@@ -8,6 +8,15 @@ const { body, validationResult } = require('express-validator');
 
 const app = express();
 
+// Logs de inicio
+console.log('🚀 Iniciando API RV Automóviles...');
+console.log('📝 Variables de entorno:');
+console.log('   NODE_ENV:', process.env.NODE_ENV);
+console.log('   FRONTEND_URL:', process.env.FRONTEND_URL || 'No configurado');
+console.log('   DATABASE_URL:', process.env.DATABASE_URL ? '✅ Configurado' : '❌ No configurado');
+console.log('   POSTGRES_PRISMA_URL:', process.env.POSTGRES_PRISMA_URL ? '✅ Configurado' : '❌ No configurado');
+console.log('   JWT_SECRET:', process.env.JWT_SECRET ? '✅ Configurado' : '❌ No configurado');
+
 // Middleware
 app.use(helmet());
 
@@ -121,34 +130,59 @@ app.post('/api/auth/login', [
   body('password').notEmpty().withMessage('La contraseña es requerida')
 ], async (req, res) => {
   try {
+    console.log('🔐 Intentando login con email:', req.body.email);
+    
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('❌ Errores de validación:', errors.array());
       return res.status(400).json({ error: 'Datos inválidos', details: errors.array() });
     }
 
     const { email, password } = req.body;
 
+    // Verificar que JWT_SECRET está configurado
+    if (!process.env.JWT_SECRET) {
+      console.error('❌ JWT_SECRET no está configurado');
+      return res.status(500).json({ error: 'Error de configuración del servidor' });
+    }
+
+    console.log('🔍 Buscando usuario en base de datos...');
     const user = await prisma.usuario.findFirst({ where: { email } });
+    
     if (!user) {
+      console.log('❌ Usuario no encontrado');
       return res.status(401).json({ error: 'Credenciales inválidas' });
     }
 
+    console.log('✅ Usuario encontrado:', user.email, '- Rol:', user.rol);
+    console.log('🔑 Verificando contraseña...');
+    
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) {
+      console.log('❌ Contraseña incorrecta');
       return res.status(401).json({ error: 'Credenciales inválidas' });
     }
 
+    console.log('✅ Contraseña correcta, generando token...');
+    
     const token = jwt.sign(
       { id: user.id, email: user.email, rol: user.rol },
       process.env.JWT_SECRET,
       { expiresIn: '24h' }
     );
 
+    console.log('✅ Token generado exitosamente');
+    
     const { password: _, ...userWithoutPassword } = user;
     res.json({ token, user: userWithoutPassword });
   } catch (error) {
-    console.error('Error en login:', error);
-    res.status(500).json({ error: 'Error al iniciar sesión' });
+    console.error('❌ Error en login:', error);
+    console.error('Error stack:', error.stack);
+    console.error('Error message:', error.message);
+    res.status(500).json({ 
+      error: 'Error al iniciar sesión',
+      details: process.env.NODE_ENV === 'production' ? undefined : error.message
+    });
   }
 });
 
