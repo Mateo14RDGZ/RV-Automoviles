@@ -74,11 +74,16 @@ const HistorialPagos = () => {
   const descargarComprobante = async (pago) => {
     const doc = new jsPDF();
     
+    // Asegurar que todos los valores sean strings válidos
+    const numeroCuota = (pago.numeroCuota || 0).toString();
+    const estadoPago = (pago.estado || 'pendiente').toString();
+    const estadoTexto = estadoPago === 'pagado' ? 'PAGADO' : 'PENDIENTE';
+    
     // Header profesional con logo de RV Automóviles
     const startY = await addPDFHeader(
       doc,
       'Comprobante de Pago',
-      `Cuota N° ${pago.numeroCuota} - Estado: ${pago.estado === 'pagado' ? 'PAGADO' : 'PENDIENTE'}`,
+      `Cuota N° ${numeroCuota} - Estado: ${estadoTexto}`,
       'COMPROBANTE'
     );
     
@@ -86,17 +91,17 @@ const HistorialPagos = () => {
     
     // === INFORMACIÓN DEL CLIENTE ===
     const clienteData = [
-      ['Nombre Completo', pago.auto.cliente.nombre],
-      ['Cédula de Identidad', pago.auto.cliente.cedula],
-      ['Teléfono', pago.auto.cliente.telefono]
+      ['Nombre Completo', (pago.auto?.cliente?.nombre || 'N/A').toString()],
+      ['Cédula de Identidad', (pago.auto?.cliente?.cedula || 'N/A').toString()],
+      ['Teléfono', (pago.auto?.cliente?.telefono || 'N/A').toString()]
     ];
     
-    if (pago.auto.cliente.email) {
-      clienteData.push(['Correo Electrónico', pago.auto.cliente.email]);
+    if (pago.auto?.cliente?.email) {
+      clienteData.push(['Correo Electrónico', pago.auto.cliente.email.toString()]);
     }
     
-    if (pago.auto.cliente.direccion) {
-      clienteData.push(['Dirección', pago.auto.cliente.direccion]);
+    if (pago.auto?.cliente?.direccion) {
+      clienteData.push(['Dirección', pago.auto.cliente.direccion.toString()]);
     }
     
     autoTable(doc, {
@@ -125,14 +130,19 @@ const HistorialPagos = () => {
     currentY = doc.lastAutoTable.finalY + 6;
     
     // === INFORMACIÓN DEL VEHÍCULO ===
+    const marca = (pago.auto?.marca || '').toString();
+    const modelo = (pago.auto?.modelo || '').toString();
+    const anio = (pago.auto?.anio || 0).toString();
+    const matricula = (pago.auto?.matricula || 'Sin matrícula (0km)').toString();
+    
     const vehiculoData = [
-      ['Vehículo', `${pago.auto.marca} ${pago.auto.modelo}`],
-      ['Año', pago.auto.anio.toString()],
-      ['Matrícula', pago.auto.matricula || 'Sin matrícula (0km)']
+      ['Vehículo', `${marca} ${modelo}`.trim()],
+      ['Año', anio],
+      ['Matrícula', matricula]
     ];
     
-    if (pago.auto.color) {
-      vehiculoData.push(['Color', pago.auto.color]);
+    if (pago.auto?.color) {
+      vehiculoData.push(['Color', pago.auto.color.toString()]);
     }
     
     autoTable(doc, {
@@ -232,7 +242,7 @@ const HistorialPagos = () => {
     
     // === DETALLES DEL PAGO ===
     const pagoData = [
-      ['Número de Cuota', `${pago.numeroCuota}`],
+      ['Número de Cuota', numeroCuota],
       ['Monto de la Cuota', formatCurrency(pago.monto)],
       ['Fecha de Vencimiento', formatDate(pago.fechaVencimiento)]
     ];
@@ -241,7 +251,7 @@ const HistorialPagos = () => {
       pagoData.push(['Fecha de Pago', formatDate(pago.fechaPago)]);
     }
     
-    pagoData.push(['Estado del Pago', pago.estado.toUpperCase()]);
+    pagoData.push(['Estado del Pago', estadoTexto]);
     
     autoTable(doc, {
       startY: currentY,

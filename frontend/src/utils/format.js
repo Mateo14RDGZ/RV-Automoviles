@@ -1,5 +1,10 @@
 // Utilidades de formato
 export const formatCurrency = (value) => {
+  // Validar que el valor sea un número válido
+  if (value === null || value === undefined || isNaN(value)) {
+    return 'U$S 0,00';
+  }
+  
   // Formatear con punto para miles y coma para decimales (formato uruguayo)
   const formatted = new Intl.NumberFormat('es-UY', {
     minimumFractionDigits: 2,
@@ -11,6 +16,11 @@ export const formatCurrency = (value) => {
 };
 
 export const formatPesos = (value) => {
+  // Validar que el valor sea un número válido
+  if (value === null || value === undefined || isNaN(value)) {
+    return '$ 0,00';
+  }
+  
   // Formatear con punto para miles y coma para decimales (formato uruguayo)
   const formatted = new Intl.NumberFormat('es-UY', {
     minimumFractionDigits: 2,
@@ -22,11 +32,25 @@ export const formatPesos = (value) => {
 };
 
 export const formatDate = (dateString) => {
-  return new Date(dateString).toLocaleDateString('es-UY', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  });
+  // Validar que la fecha sea válida
+  if (!dateString) {
+    return 'Fecha no disponible';
+  }
+  
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      return 'Fecha inválida';
+    }
+    
+    return date.toLocaleDateString('es-UY', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    });
+  } catch (error) {
+    return 'Fecha inválida';
+  }
 };
 
 export const formatDateTime = (dateString) => {

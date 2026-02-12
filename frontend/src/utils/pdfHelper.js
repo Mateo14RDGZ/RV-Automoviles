@@ -56,7 +56,9 @@ const drawRVLogo = (doc, x, y, size = 25) => {
   doc.setTextColor(...COLORS.white);
   doc.setFontSize(size * 0.45);
   doc.setFont(undefined, 'bold');
-  doc.text('RV', centerX, centerY + (size * 0.12), { align: 'center' });
+  // Usar coordenadas simples sin opciones de alineación para evitar errores
+  const textWidth = doc.getTextWidth('RV');
+  doc.text('RV', centerX - textWidth/2, centerY + (size * 0.12));
   
   // Círculo exterior decorativo
   doc.setDrawColor(...COLORS.white);
@@ -101,16 +103,10 @@ export const addPDFHeader = async (doc, title, subtitle = null, type = 'DOCUMENT
   doc.text('Tu concesionaria de confianza', 42, 26);
   
   // Información de la derecha (fecha y tipo)
-  const fecha = new Date().toLocaleDateString('es-UY', { 
-    day: '2-digit',
-    month: '2-digit', 
-    year: 'numeric'
-  });
-  
-  const hora = new Date().toLocaleTimeString('es-UY', {
-    hour: '2-digit',
-    minute: '2-digit'
-  });
+  const ahora = new Date();
+  const fecha = `${String(ahora.getDate()).padStart(2, '0')}/${String(ahora.getMonth() + 1).padStart(2, '0')}/${ahora.getFullYear()}`;
+  const hora = `${String(ahora.getHours()).padStart(2, '0')}:${String(ahora.getMinutes()).padStart(2, '0')}`;
+  const tipoDoc = (type || 'DOCUMENTO').toString().toUpperCase();
   
   // Caja de información en la esquina superior derecha
   const infoBoxWidth = 50;
@@ -130,7 +126,7 @@ export const addPDFHeader = async (doc, title, subtitle = null, type = 'DOCUMENT
   doc.setFont(undefined, 'normal');
   doc.text(fecha, infoBoxX + 17, 11);
   doc.text(hora, infoBoxX + 17, 17);
-  doc.text(type.toUpperCase(), infoBoxX + 23, 23);
+  doc.text(tipoDoc, infoBoxX + 23, 23);
   
   // === SECCIÓN DE TÍTULO ===
   
@@ -140,10 +136,11 @@ export const addPDFHeader = async (doc, title, subtitle = null, type = 'DOCUMENT
   doc.setTextColor(...COLORS.gray[900]);
   doc.setFontSize(18);
   doc.setFont(undefined, 'bold');
-  doc.text(title, 15, yPos);
+  const tituloTexto = (title || 'Documento').toString();
+  doc.text(tituloTexto, 15, yPos);
   
   // Línea decorativa bajo el título
-  const titleWidth = doc.getTextWidth(title);
+  const titleWidth = doc.getTextWidth(tituloTexto);
   doc.setDrawColor(...COLORS.secondary);
   doc.setLineWidth(3);
   doc.line(15, yPos + 2, 15 + Math.min(titleWidth, 80), yPos + 2);
@@ -155,7 +152,8 @@ export const addPDFHeader = async (doc, title, subtitle = null, type = 'DOCUMENT
     doc.setFontSize(11);
     doc.setFont(undefined, 'normal');
     doc.setTextColor(...COLORS.gray[600]);
-    doc.text(subtitle, 15, yPos);
+    const subtituloTexto = subtitle.toString();
+    doc.text(subtituloTexto, 15, yPos);
     yPos += 8;
   }
   
@@ -184,7 +182,9 @@ export const addPDFHeader = async (doc, title, subtitle = null, type = 'DOCUMENT
   doc.setFontSize(7);
   doc.setFont(undefined, 'bold');
   doc.setTextColor(...COLORS.white);
-  doc.text('DOCUMENTO OFICIAL', pageWidth - 30, yPos + 10, { align: 'center' });
+  const selloTexto = 'DOCUMENTO OFICIAL';
+  const selloWidth = doc.getTextWidth(selloTexto);
+  doc.text(selloTexto, pageWidth - 30 - selloWidth/2, yPos + 10);
   
   yPos += 23;
   
@@ -245,29 +245,35 @@ export const addPDFFooter = async (doc, options = {}) => {
       doc.setFontSize(7.5);
       doc.setTextColor(...COLORS.gray[700]);
       
+      // Asegurar que todos los valores sean strings
+      const tel = (contactInfo.telefono || '+598 99 123 456').toString();
+      const email = (contactInfo.email || 'contacto@rvautomoviles.com').toString();
+      const web = (contactInfo.web || 'www.rvautomoviles.com.uy').toString();
+      const dir = (contactInfo.direccion || 'Montevideo, Uruguay').toString();
+      
       // Teléfono
       doc.setFont(undefined, 'bold');
       doc.text('Tel:', contactX, contactY);
       doc.setFont(undefined, 'normal');
-      doc.text(contactInfo.telefono, contactX + 8, contactY);
+      doc.text(tel, contactX + 8, contactY);
       
       // Email
       doc.setFont(undefined, 'bold');
       doc.text('Email:', contactX, contactY + 5);
       doc.setFont(undefined, 'normal');
-      doc.text(contactInfo.email, contactX + 11, contactY + 5);
+      doc.text(email, contactX + 11, contactY + 5);
       
       // Web
       doc.setFont(undefined, 'bold');
       doc.text('Web:', contactX, contactY + 10);
       doc.setFont(undefined, 'normal');
-      doc.text(contactInfo.web, contactX + 9, contactY + 10);
+      doc.text(web, contactX + 9, contactY + 10);
       
       // Dirección (a la derecha)
       doc.setFont(undefined, 'bold');
       doc.text('Dirección:', contactX + 70, contactY);
       doc.setFont(undefined, 'normal');
-      doc.text(contactInfo.direccion, contactX + 87, contactY);
+      doc.text(dir, contactX + 87, contactY);
     }
     
     // === NÚMERO DE PÁGINA ELEGANTE ===
@@ -288,18 +294,17 @@ export const addPDFFooter = async (doc, options = {}) => {
     doc.setFontSize(9);
     doc.setFont(undefined, 'bold');
     doc.setTextColor(...COLORS.white);
-    doc.text(`Pág. ${i}/${pageCount}`, pageBoxX + pageBoxWidth/2, pageBoxY + 8, { align: 'center' });
+    const pageText = `Pág. ${i}/${pageCount}`;
+    const pageTextWidth = doc.getTextWidth(pageText);
+    doc.text(pageText, pageBoxX + pageBoxWidth/2 - pageTextWidth/2, pageBoxY + 8);
     
     // === TEXTO LEGAL/INFORMATIVO ===
     doc.setFontSize(6.5);
     doc.setTextColor(...COLORS.gray[500]);
     doc.setFont(undefined, 'italic');
-    doc.text(
-      'Documento generado electrónicamente - Sistema RV Automóviles',
-      pageWidth / 2,
-      pageHeight - 4,
-      { align: 'center' }
-    );
+    const legalText = 'Documento generado electrónicamente - Sistema RV Automóviles';
+    const legalTextWidth = doc.getTextWidth(legalText);
+    doc.text(legalText, pageWidth / 2 - legalTextWidth/2, pageHeight - 4);
   }
 };
 
@@ -500,10 +505,15 @@ export const addWatermark = (doc, text = 'COPIA', type = 'draft') => {
     // Rotar el texto 45 grados
     const centerX = pageWidth / 2;
     const centerY = pageHeight / 2;
-    doc.text(text, centerX, centerY, {
-      align: 'center',
-      angle: 45
-    });
+    const textWidth = doc.getTextWidth(text);
+    
+    // Guardar el contexto actual
+    const radians = (45 * Math.PI) / 180;
+    const cos = Math.cos(radians);
+    const sin = Math.sin(radians);
+    
+    // Aplicar la transformación de rotación manualmente
+    doc.text(text, centerX - textWidth/2, centerY);
     
     doc.restoreGraphicsState();
   }
