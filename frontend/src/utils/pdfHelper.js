@@ -40,26 +40,28 @@ const COLORS = {
  * @param {number} size - Tamaño del logo
  */
 const drawRVLogo = (doc, x, y, size = 25) => {
+  const centerX = x + size/2;
+  const centerY = y + size/2;
+  const radius = size/2;
+  
   // Fondo circular con gradiente simulado
   doc.setFillColor(...COLORS.primary);
-  doc.circle(x + size/2, y + size/2, size/2, 'F');
+  doc.ellipse(centerX, centerY, radius, radius, 'F');
   
   // Círculo interior decorativo
   doc.setFillColor(...COLORS.secondary);
-  doc.circle(x + size/2, y + size/2, size/2.3, 'F');
+  doc.ellipse(centerX, centerY, radius/1.3, radius/1.3, 'F');
   
   // Letras RV en el centro
   doc.setTextColor(...COLORS.white);
   doc.setFontSize(size * 0.45);
   doc.setFont(undefined, 'bold');
-  doc.text('RV', x + size/2, y + size/2 + (size * 0.12), { align: 'center' });
+  doc.text('RV', centerX, centerY + (size * 0.12), { align: 'center' });
   
-  // Detalles decorativos - líneas elegantes
+  // Círculo exterior decorativo
   doc.setDrawColor(...COLORS.white);
-  doc.setLineWidth(0.8);
-  doc.setLineDash([1, 1]);
-  doc.circle(x + size/2, y + size/2, size/2.8, 'S');
-  doc.setLineDash([]);
+  doc.setLineWidth(0.6);
+  doc.ellipse(centerX, centerY, radius * 0.85, radius * 0.85, 'S');
 };
 
 /**
@@ -370,7 +372,7 @@ export const addSection = (doc, yPos, title, description = null) => {
   doc.setFontSize(13);
   doc.setFont(undefined, 'bold');
   doc.setTextColor(...COLORS.gray[800]);
-  doc.text(title, 22,  + 7);
+  doc.text(title, 22, yPos + 7);
   
   let newY = yPos + 12;
   
