@@ -1,149 +1,211 @@
-// Helper para agregar logo y encabezados consistentes a los PDFs de forma profesional
+// Sistema profesional de generación de PDFs para RV Automóviles
 
-// Colores corporativos
+// Paleta de colores corporativa RV Automóviles
 const COLORS = {
-  primary: [14, 70, 135], // Azul oscuro profesional
-  secondary: [59, 130, 246], // Azul medio
-  accent: [37, 99, 235], // Azul vibrante
-  success: [22, 163, 74], // Verde
-  warning: [245, 158, 11], // Naranja
-  danger: [220, 38, 38], // Rojo
+  // Azules corporativos
+  primary: [25, 55, 109], // Azul oscuro corporativo
+  secondary: [41, 98, 255], // Azul brillante
+  accent: [79, 70, 229], // Índigo moderno
+  
+  // Estados
+  success: [16, 185, 129], // Verde esmeralda
+  warning: [251, 146, 60], // Naranja cálido
+  danger: [239, 68, 68], // Rojo coral
+  info: [59, 130, 246], // Azul información
+  
+  // Grises premium
   gray: {
-    50: [249, 250, 251],
-    100: [243, 244, 246],
-    200: [229, 231, 235],
-    300: [209, 213, 219],
-    400: [156, 163, 175],
-    500: [107, 114, 128],
-    600: [75, 85, 99],
-    700: [55, 65, 81],
-    800: [31, 41, 55],
-    900: [17, 24, 39]
-  }
+    50: [250, 250, 250],
+    100: [245, 245, 245],
+    200: [230, 230, 230],
+    300: [212, 212, 212],
+    400: [163, 163, 163],
+    500: [115, 115, 115],
+    600: [82, 82, 82],
+    700: [64, 64, 64],
+    800: [38, 38, 38],
+    900: [23, 23, 23]
+  },
+  
+  // Colores adicionales
+  white: [255, 255, 255],
+  black: [0, 0, 0]
 };
 
 /**
- * Agrega el logo de la empresa al PDF con marco profesional
+ * Dibuja el logo profesional de RV Automóviles
  * @param {jsPDF} doc - Instancia de jsPDF
- * @param {number} x - Posición X del logo
- * @param {number} y - Posición Y del logo
- * @param {number} width - Ancho del logo
- * @param {number} height - Alto del logo
- * @param {boolean} withFrame - Si debe incluir un marco decorativo
+ * @param {number} x - Posición X
+ * @param {number} y - Posición Y
+ * @param {number} size - Tamaño del logo
  */
-export const addLogoToPDF = async (doc, x = 14, y = 10, width = 40, height = 20, withFrame = false) => {
-  // No agregar logo, solo retornar true para mantener compatibilidad
-  return true;
+const drawRVLogo = (doc, x, y, size = 25) => {
+  // Fondo circular con gradiente simulado
+  doc.setFillColor(...COLORS.primary);
+  doc.circle(x + size/2, y + size/2, size/2, 'F');
+  
+  // Círculo interior decorativo
+  doc.setFillColor(...COLORS.secondary);
+  doc.circle(x + size/2, y + size/2, size/2.3, 'F');
+  
+  // Letras RV en el centro
+  doc.setTextColor(...COLORS.white);
+  doc.setFontSize(size * 0.45);
+  doc.setFont(undefined, 'bold');
+  doc.text('RV', x + size/2, y + size/2 + (size * 0.12), { align: 'center' });
+  
+  // Detalles decorativos - líneas elegantes
+  doc.setDrawColor(...COLORS.white);
+  doc.setLineWidth(0.8);
+  doc.setLineDash([1, 1]);
+  doc.circle(x + size/2, y + size/2, size/2.8, 'S');
+  doc.setLineDash([]);
 };
 
 /**
- * Agrega un encabezado profesional con banner superior
+ * Agrega header profesional con logo de RV Automóviles
  * @param {jsPDF} doc - Instancia de jsPDF
  * @param {string} title - Título del documento
  * @param {string} subtitle - Subtítulo opcional
- * @param {string} type - Tipo de documento (reporte, historial, inventario)
+ * @param {string} type - Tipo de documento
+ * @returns {number} - Posición Y donde termina el header
  */
-export const addPDFHeader = async (doc, title, subtitle = null, type = 'reporte') => {
+export const addPDFHeader = async (doc, title, subtitle = null, type = 'DOCUMENTO') => {
   const pageWidth = doc.internal.pageSize.getWidth();
   
-  // Banner superior con efecto profesional
+  // === SECCIÓN SUPERIOR CON LOGO Y MARCA ===
+  
+  // Banda superior con color corporativo
   doc.setFillColor(...COLORS.primary);
-  doc.rect(0, 0, pageWidth, 46, 'F');
+  doc.rect(0, 0, pageWidth, 35, 'F');
   
-  // Franja decorativa degradada (simulada con múltiples líneas)
-  doc.setFillColor(...COLORS.accent);
-  doc.rect(0, 43, pageWidth, 3, 'F');
+  // Línea decorativa inferior
+  doc.setFillColor(...COLORS.secondary);
+  doc.rect(0, 35, pageWidth, 2, 'F');
   
-  // Logo RV Automóviles
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(28);
+  // Logo RV Automóviles (círculo con letras)
+  drawRVLogo(doc, 15, 7, 20);
+  
+  // Nombre de la empresa
+  doc.setTextColor(...COLORS.white);
+  doc.setFontSize(20);
   doc.setFont(undefined, 'bold');
-  doc.text('RV', pageWidth - 14, 17, { align: 'right' });
+  doc.text('RV Automóviles', 42, 18);
   
-  doc.setFontSize(14);
+  // Slogan/Descripción
+  doc.setFontSize(9);
   doc.setFont(undefined, 'normal');
-  doc.text('Automóviles', pageWidth - 14, 26, { align: 'right' });
+  doc.setTextColor(240, 240, 240);
+  doc.text('Tu concesionaria de confianza', 42, 26);
   
-  doc.setFontSize(8);
-  doc.setTextColor(230, 230, 230);
-  doc.text('Sistema de Gestión', pageWidth - 14, 33, { align: 'right' });
+  // Información de la derecha (fecha y tipo)
+  const fecha = new Date().toLocaleDateString('es-UY', { 
+    day: '2-digit',
+    month: '2-digit', 
+    year: 'numeric'
+  });
   
-  // Línea separadora elegante
-  doc.setDrawColor(...COLORS.gray[200]);
-  doc.setLineWidth(0.3);
-  doc.line(14, 52, pageWidth - 14, 52);
-  
-  // Título del documento con mejor tipografía
-  doc.setTextColor(...COLORS.gray[900]);
-  doc.setFontSize(19);
-  doc.setFont(undefined, 'bold');
-  doc.text(title, 14, 62);
-  
-  // Línea decorativa bajo el título (más corta y elegante)
-  doc.setDrawColor(...COLORS.accent);
-  doc.setLineWidth(2.5);
-  const titleWidth = doc.getTextWidth(title);
-  doc.line(14, 65, 14 + Math.min(titleWidth, 70), 65);
-  
-  // Subtítulo si existe
-  let yPos = 73;
-  if (subtitle) {
-    doc.setFontSize(10);
-    doc.setFont(undefined, 'normal');
-    doc.setTextColor(...COLORS.gray[600]);
-    doc.text(subtitle, 14, yPos);
-    yPos += 7;
-  }
-  
-  // Información del documento en caja profesional
-  doc.setFillColor(...COLORS.gray[50]);
-  doc.roundedRect(14, yPos, pageWidth - 28, 20, 2, 2, 'F');
-  doc.setDrawColor(...COLORS.gray[200]);
-  doc.setLineWidth(0.3);
-  doc.roundedRect(14, yPos, pageWidth - 28, 20, 2, 2);
-  
-  doc.setFontSize(8);
-  doc.setFont(undefined, 'bold');
-  doc.setTextColor(...COLORS.gray[700]);
-  
-  const fecha = new Date().toLocaleDateString('es-ES', { 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric',
+  const hora = new Date().toLocaleTimeString('es-UY', {
     hour: '2-digit',
     minute: '2-digit'
   });
   
-  doc.text('📅 Fecha de Generación:', 18, yPos + 8);
-  doc.text('📄 Tipo de Documento:', 18, yPos + 14);
+  // Caja de información en la esquina superior derecha
+  const infoBoxWidth = 50;
+  const infoBoxX = pageWidth - infoBoxWidth - 10;
   
-  doc.setFont(undefined, 'normal');
-  doc.text(fecha, 62, yPos + 8);
-  doc.text(type.toUpperCase(), 62, yPos + 14);
+  doc.setFillColor(255, 255, 255, 0.15); // Blanco semi-transparente
+  doc.roundedRect(infoBoxX, 6, infoBoxWidth, 23, 2, 2, 'F');
   
-  // Marca de agua "DOCUMENTO OFICIAL" mejorada
-  doc.setFillColor(...COLORS.accent);
-  doc.roundedRect(pageWidth - 52, yPos + 6, 34, 8, 1, 1, 'F');
-  doc.setTextColor(255, 255, 255);
   doc.setFontSize(7);
   doc.setFont(undefined, 'bold');
-  doc.text('DOCUMENTO OFICIAL', pageWidth - 35, yPos + 11, { align: 'center' });
+  doc.setTextColor(...COLORS.white);
+  doc.text('FECHA:', infoBoxX + 3, 11);
+  doc.text('HORA:', infoBoxX + 3, 17);
+  doc.text('DOCUMENTO:', infoBoxX + 3, 23);
   
-  return yPos + 26;
+  doc.setFont(undefined, 'normal');
+  doc.text(fecha, infoBoxX + 17, 11);
+  doc.text(hora, infoBoxX + 17, 17);
+  doc.text(type.toUpperCase(), infoBoxX + 23, 23);
+  
+  // === SECCIÓN DE TÍTULO ===
+  
+  let yPos = 50;
+  
+  // Título principal del documento
+  doc.setTextColor(...COLORS.gray[900]);
+  doc.setFontSize(18);
+  doc.setFont(undefined, 'bold');
+  doc.text(title, 15, yPos);
+  
+  // Línea decorativa bajo el título
+  const titleWidth = doc.getTextWidth(title);
+  doc.setDrawColor(...COLORS.secondary);
+  doc.setLineWidth(3);
+  doc.line(15, yPos + 2, 15 + Math.min(titleWidth, 80), yPos + 2);
+  
+  yPos += 8;
+  
+  // Subtítulo si existe
+  if (subtitle) {
+    doc.setFontSize(11);
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(...COLORS.gray[600]);
+    doc.text(subtitle, 15, yPos);
+    yPos += 8;
+  }
+  
+  // === CAJA DE INFORMACIÓN ADICIONAL ===
+  
+  yPos += 2;
+  
+  // Caja con fondo suave
+  doc.setFillColor(...COLORS.gray[50]);
+  doc.setDrawColor(...COLORS.gray[200]);
+  doc.setLineWidth(0.5);
+  doc.roundedRect(15, yPos, pageWidth - 30, 18, 3, 3, 'FD');
+  
+  // Icono y texto de información
+  doc.setFontSize(8);
+  doc.setTextColor(...COLORS.gray[700]);
+  doc.setFont(undefined, 'normal');
+  
+  const infoY = yPos + 7;
+  doc.text('Este documento ha sido generado automáticamente por el Sistema de Gestión de', 20, infoY);
+  doc.text('RV Automóviles. Conserve este documento como comprobante oficial.', 20, infoY + 5);
+  
+  // Sello digital
+  doc.setFillColor(...COLORS.info);
+  doc.roundedRect(pageWidth - 45, yPos + 4, 30, 10, 2, 2, 'F');
+  doc.setFontSize(7);
+  doc.setFont(undefined, 'bold');
+  doc.setTextColor(...COLORS.white);
+  doc.text('DOCUMENTO OFICIAL', pageWidth - 30, yPos + 10, { align: 'center' });
+  
+  yPos += 23;
+  
+  // Línea separadora elegante
+  doc.setDrawColor(...COLORS.gray[300]);
+  doc.setLineWidth(0.5);
+  doc.line(15, yPos, pageWidth - 15, yPos);
+  
+  return yPos + 5;
 };
 
 /**
- * Agrega pie de página profesional con información completa
+ * Agrega footer profesional con información de contacto
  * @param {jsPDF} doc - Instancia de jsPDF
- * @param {Object} options - Opciones adicionales para el footer
+ * @param {Object} options - Opciones de configuración
  */
 export const addPDFFooter = async (doc, options = {}) => {
   const {
     showContact = true,
     contactInfo = {
-      telefono: '+598 XX XXX XXX',
-      email: 'info@example.com',
-      web: 'www.example.com'
+      telefono: '+598 99 123 456',
+      email: 'contacto@rvautomoviles.com',
+      web: 'www.rvautomoviles.com.uy',
+      direccion: 'Montevideo, Uruguay'
     }
   } = options;
   
@@ -154,71 +216,94 @@ export const addPDFFooter = async (doc, options = {}) => {
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
     
-    // Línea superior decorativa con degradado simulado
-    doc.setDrawColor(...COLORS.accent);
-    doc.setLineWidth(1.5);
-    doc.line(14, pageHeight - 26, pageWidth - 14, pageHeight - 26);
+    const footerY = pageHeight - 25;
     
-    // Segunda línea más delgada
+    // === LÍNEAS DECORATIVAS SUPERIORES ===
+    doc.setDrawColor(...COLORS.secondary);
+    doc.setLineWidth(1.5);
+    doc.line(15, footerY - 2, pageWidth - 15, footerY - 2);
+    
     doc.setDrawColor(...COLORS.gray[200]);
     doc.setLineWidth(0.3);
-    doc.line(14, pageHeight - 25, pageWidth - 14, pageHeight - 25);
+    doc.line(15, footerY - 1, pageWidth - 15, footerY - 1);
     
-    // Fondo del footer con borde
+    // === FONDO DEL FOOTER ===
     doc.setFillColor(...COLORS.gray[50]);
-    doc.rect(0, pageHeight - 24, pageWidth, 24, 'F');
+    doc.rect(0, footerY, pageWidth, 25, 'F');
     
-    // Espacio reservado para información del sistema
+    // === LOGO PEQUEÑO EN FOOTER ===
+    drawRVLogo(doc, 18, footerY + 4, 12);
     
-    // Información de contacto mejorada
+    // === INFORMACIÓN DE CONTACTO ===
     if (showContact) {
+      const contactX = 35;
+      const contactY = footerY + 6;
+      
       doc.setFontSize(7.5);
       doc.setTextColor(...COLORS.gray[700]);
+      
+      // Teléfono
       doc.setFont(undefined, 'bold');
-      
-      const centerX = pageWidth / 2;
-      
-      // Contacto organizado
-      doc.text('Tel:', centerX - 48, pageHeight - 15);
+      doc.text('Tel:', contactX, contactY);
       doc.setFont(undefined, 'normal');
-      doc.text(contactInfo.telefono, centerX - 42, pageHeight - 15);
+      doc.text(contactInfo.telefono, contactX + 8, contactY);
       
+      // Email
       doc.setFont(undefined, 'bold');
-      doc.text('Email:', centerX - 48, pageHeight - 10);
+      doc.text('Email:', contactX, contactY + 5);
       doc.setFont(undefined, 'normal');
-      doc.text(contactInfo.email, centerX - 38, pageHeight - 10);
+      doc.text(contactInfo.email, contactX + 11, contactY + 5);
       
+      // Web
       doc.setFont(undefined, 'bold');
-      doc.text('Web:', centerX - 48, pageHeight - 5);
+      doc.text('Web:', contactX, contactY + 10);
       doc.setFont(undefined, 'normal');
-      doc.text(contactInfo.web, centerX - 40, pageHeight - 5);
+      doc.text(contactInfo.web, contactX + 9, contactY + 10);
+      
+      // Dirección (a la derecha)
+      doc.setFont(undefined, 'bold');
+      doc.text('Dirección:', contactX + 70, contactY);
+      doc.setFont(undefined, 'normal');
+      doc.text(contactInfo.direccion, contactX + 87, contactY);
     }
     
-    // Número de página con diseño mejorado
+    // === NÚMERO DE PÁGINA ELEGANTE ===
+    const pageBoxWidth = 22;
+    const pageBoxX = pageWidth - pageBoxWidth - 15;
+    const pageBoxY = footerY + 5;
+    
+    // Fondo del número de página
     doc.setFillColor(...COLORS.primary);
-    doc.roundedRect(pageWidth - 34, pageHeight - 20, 20, 10, 2, 2, 'F');
+    doc.roundedRect(pageBoxX, pageBoxY, pageBoxWidth, 12, 2, 2, 'F');
     
-    // Borde del número de página
-    doc.setDrawColor(...COLORS.accent);
-    doc.setLineWidth(0.3);
-    doc.roundedRect(pageWidth - 34, pageHeight - 20, 20, 10, 2, 2);
+    // Borde decorativo
+    doc.setDrawColor(...COLORS.secondary);
+    doc.setLineWidth(0.5);
+    doc.roundedRect(pageBoxX, pageBoxY, pageBoxWidth, 12, 2, 2, 'S');
     
+    // Texto del número de página
     doc.setFontSize(9);
     doc.setFont(undefined, 'bold');
-    doc.setTextColor(255, 255, 255);
-    doc.text(`${i}/${pageCount}`, pageWidth - 24, pageHeight - 13.5, { align: 'center' });
+    doc.setTextColor(...COLORS.white);
+    doc.text(`Pág. ${i}/${pageCount}`, pageBoxX + pageBoxWidth/2, pageBoxY + 8, { align: 'center' });
     
-    // Texto decorativo en la esquina inferior derecha
-    doc.setFontSize(6);
-    doc.setTextColor(...COLORS.gray[400]);
+    // === TEXTO LEGAL/INFORMATIVO ===
+    doc.setFontSize(6.5);
+    doc.setTextColor(...COLORS.gray[500]);
     doc.setFont(undefined, 'italic');
-    doc.text('Documento generado automáticamente', pageWidth - 14, pageHeight - 3, { align: 'right' });
+    doc.text(
+      'Documento generado electrónicamente - Sistema RV Automóviles',
+      pageWidth / 2,
+      pageHeight - 4,
+      { align: 'center' }
+    );
   }
 };
 
 /**
- * Configuración de tabla profesional estándar
+ * Estilos profesionales para tablas en PDFs
  * @param {string} color - Color del tema (primary, success, warning, danger)
+ * @returns {Object} - Configuración de estilos para jsPDF-autoTable
  */
 export const getTableStyles = (color = 'primary') => {
   const colorMap = {
@@ -226,26 +311,29 @@ export const getTableStyles = (color = 'primary') => {
     secondary: COLORS.secondary,
     success: COLORS.success,
     warning: COLORS.warning,
-    danger: COLORS.danger
+    danger: COLORS.danger,
+    info: COLORS.info
   };
+  
+  const headerColor = colorMap[color] || COLORS.primary;
   
   return {
     theme: 'grid',
     headStyles: { 
-      fillColor: colorMap[color] || COLORS.primary,
-      textColor: [255, 255, 255],
+      fillColor: headerColor,
+      textColor: COLORS.white,
       fontSize: 9,
       fontStyle: 'bold',
       halign: 'center',
       valign: 'middle',
-      lineWidth: 0.1,
-      lineColor: [255, 255, 255],
-      cellPadding: { top: 4, right: 3, bottom: 4, left: 3 }
+      lineWidth: 0.2,
+      lineColor: COLORS.white,
+      cellPadding: { top: 5, right: 4, bottom: 5, left: 4 }
     },
     bodyStyles: { 
-      fontSize: 8,
-      cellPadding: { top: 3, right: 2, bottom: 3, left: 2 },
-      lineWidth: 0.1,
+      fontSize: 9,
+      cellPadding: { top: 4, right: 3, bottom: 4, left: 3 },
+      lineWidth: 0.2,
       lineColor: COLORS.gray[200],
       textColor: COLORS.gray[800]
     },
@@ -254,61 +342,110 @@ export const getTableStyles = (color = 'primary') => {
     },
     styles: {
       overflow: 'linebreak',
-      cellWidth: 'wrap'
+      cellWidth: 'wrap',
+      minCellHeight: 8
     },
-    margin: { left: 14, right: 14 },
+    margin: { left: 15, right: 15 },
     tableLineColor: COLORS.gray[300],
-    tableLineWidth: 0.1
+    tableLineWidth: 0.2
   };
 };
 
 /**
- * Agrega una sección con título y descripción
+ * Agrega una sección con título destacado
  * @param {jsPDF} doc - Instancia de jsPDF
  * @param {number} yPos - Posición Y inicial
  * @param {string} title - Título de la sección
  * @param {string} description - Descripción opcional
+ * @returns {number} - Nueva posición Y
  */
 export const addSection = (doc, yPos, title, description = null) => {
   const pageWidth = doc.internal.pageSize.getWidth();
   
-  // Fondo de sección
-  doc.setFillColor(...COLORS.accent);
-  doc.rect(14, yPos, 6, 8, 'F');
+  // Barra lateral decorativa
+  doc.setFillColor(...COLORS.secondary);
+  doc.rect(15, yPos, 4, 10, 'F');
   
-  // Título
-  doc.setFontSize(12);
+  // Título de la sección
+  doc.setFontSize(13);
   doc.setFont(undefined, 'bold');
   doc.setTextColor(...COLORS.gray[800]);
-  doc.text(title, 22, yPos + 6);
+  doc.text(title, 22,  + 7);
   
-  let newY = yPos + 10;
+  let newY = yPos + 12;
   
-  // Descripción
+  // Descripción si existe
   if (description) {
     doc.setFontSize(9);
     doc.setFont(undefined, 'normal');
     doc.setTextColor(...COLORS.gray[600]);
-    doc.text(description, 14, newY);
-    newY += 6;
+    const lines = doc.splitTextToSize(description, pageWidth - 30);
+    doc.text(lines, 15, newY);
+    newY += lines.length * 4 + 2;
   }
   
-  // Línea separadora
+  // Línea separadora suave
   doc.setDrawColor(...COLORS.gray[200]);
-  doc.setLineWidth(0.3);
-  doc.line(14, newY, pageWidth - 14, newY);
+  doc.setLineWidth(0.5);
+  doc.line(15, newY, pageWidth - 15, newY);
   
-  return newY + 4;
+  return newY + 6;
 };
 
 /**
- * Crea un documento PDF con el formato profesional estándar
+ * Agrega una caja informativa destacada
+ * @param {jsPDF} doc - Instancia de jsPDF
+ * @param {number} yPos - Posición Y
+ * @param {string} title - Título de la caja
+ * @param {string} content - Contenido
+ * @param {string} type - Tipo (info, success, warning, danger)
+ * @returns {number} - Nueva posición Y
+ */
+export const addInfoBox = (doc, yPos, title, content, type = 'info') => {
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const boxWidth = pageWidth - 30;
+  
+  const colorMap = {
+    info: { bg: [219, 234, 254], border: COLORS.info, text: [30, 64, 175] },
+    success: { bg: [220, 252, 231], border: COLORS.success, text: [21, 128, 61] },
+    warning: { bg: [254, 243, 199], border: COLORS.warning, text: [146, 64, 14] },
+    danger: { bg: [254, 226, 226], border: COLORS.danger, text: [153, 27, 27] }
+  };
+  
+  const colors = colorMap[type] || colorMap.info;
+  
+  // Calcular altura necesaria
+  const contentLines = doc.splitTextToSize(content, boxWidth - 10);
+  const boxHeight = 12 + (contentLines.length * 4);
+  
+  // Fondo de la caja
+  doc.setFillColor(...colors.bg);
+  doc.setDrawColor(...colors.border);
+  doc.setLineWidth(0.8);
+  doc.roundedRect(15, yPos, boxWidth, boxHeight, 3, 3, 'FD');
+  
+  // Título
+  doc.setFontSize(10);
+  doc.setFont(undefined, 'bold');
+  doc.setTextColor(...colors.text);
+  doc.text(title, 20, yPos + 7);
+  
+  // Contenido
+  doc.setFontSize(9);
+  doc.setFont(undefined, 'normal');
+  doc.text(contentLines, 20, yPos + 13);
+  
+  return yPos + boxHeight + 5;
+};
+
+/**
+ * Crea un PDF con formato estándar profesional
  * @param {string} title - Título del documento
  * @param {string} subtitle - Subtítulo opcional
  * @param {string} type - Tipo de documento
  * @returns {Promise<{doc: jsPDF, startY: number}>}
  */
-export const createStandardPDF = async (title, subtitle = null, type = 'reporte') => {
+export const createStandardPDF = async (title, subtitle = null, type = 'DOCUMENTO') => {
   const { jsPDF } = await import('jspdf');
   const doc = new jsPDF({
     orientation: 'portrait',
@@ -317,21 +454,56 @@ export const createStandardPDF = async (title, subtitle = null, type = 'reporte'
     compress: true
   });
   
-  // Agregar encabezado profesional
+  // Agregar header con logo
   const startY = await addPDFHeader(doc, title, subtitle, type);
   
   return { doc, startY };
 };
 
 /**
- * Obtiene el nombre del archivo con formato estándar
+ * Genera nombre de archivo con formato estándar
  * @param {string} type - Tipo de documento
  * @param {string} description - Descripción adicional
+ * @returns {string} - Nombre del archivo
  */
 export const getPDFFileName = (type, description = '') => {
   const fecha = new Date().toISOString().split('T')[0];
+  const hora = new Date().toTimeString().split(' ')[0].replace(/:/g, '-');
   const desc = description ? `_${description}` : '';
-  return `${type}${desc}_${fecha}.pdf`;
+  return `RV_${type}${desc}_${fecha}_${hora}.pdf`;
+};
+
+/**
+ * Agrega marca de agua al documento
+ * @param {jsPDF} doc - Instancia de jsPDF
+ * @param {string} text - Texto de la marca de agua
+ * @param {string} type - Tipo (draft, confidential, copy)
+ */
+export const addWatermark = (doc, text = 'COPIA', type = 'draft') => {
+  const pageCount = doc.internal.getNumberOfPages();
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    
+    doc.saveGraphicsState();
+    doc.setGState(new doc.GState({ opacity: 0.1 }));
+    
+    doc.setTextColor(...COLORS.gray[400]);
+    doc.setFontSize(60);
+    doc.setFont(undefined, 'bold');
+    
+    // Rotar el texto 45 grados
+    const centerX = pageWidth / 2;
+    const centerY = pageHeight / 2;
+    doc.text(text, centerX, centerY, {
+      align: 'center',
+      angle: 45
+    });
+    
+    doc.restoreGraphicsState();
+  }
 };
 
 export { COLORS };

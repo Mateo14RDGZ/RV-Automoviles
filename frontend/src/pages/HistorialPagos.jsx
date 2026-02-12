@@ -74,78 +74,79 @@ const HistorialPagos = () => {
   const descargarComprobante = async (pago) => {
     const doc = new jsPDF();
     
-    // Agregar encabezado profesional con logo
+    // Header profesional con logo de RV Automóviles
     const startY = await addPDFHeader(
       doc,
       'Comprobante de Pago',
-      `Cuota #${pago.numeroCuota} - ${pago.estado === 'pagado' ? 'PAGADO' : 'PENDIENTE'}`,
-      'Comprobante'
+      `Cuota N° ${pago.numeroCuota} - Estado: ${pago.estado === 'pagado' ? 'PAGADO' : 'PENDIENTE'}`,
+      'COMPROBANTE'
     );
     
     let currentY = startY;
     
-    // Información del Cliente en tabla profesional
+    // === INFORMACIÓN DEL CLIENTE ===
     const clienteData = [
       ['Nombre Completo', pago.auto.cliente.nombre],
       ['Cédula de Identidad', pago.auto.cliente.cedula],
-      ['Teléfono de Contacto', pago.auto.cliente.telefono]
+      ['Teléfono', pago.auto.cliente.telefono]
     ];
     
     if (pago.auto.cliente.email) {
-      clienteData.push(['Email', pago.auto.cliente.email]);
+      clienteData.push(['Correo Electrónico', pago.auto.cliente.email]);
+    }
+    
+    if (pago.auto.cliente.direccion) {
+      clienteData.push(['Dirección', pago.auto.cliente.direccion]);
     }
     
     autoTable(doc, {
       startY: currentY,
-      head: [['INFORMACIÓN DEL CLIENTE', '']],
+      head: [['DATOS DEL CLIENTE', '']],
       body: clienteData,
+      ...getTableStyles('primary'),
       headStyles: {
+        ...getTableStyles('primary').headStyles,
         fillColor: COLORS.primary,
-        fontSize: 10,
-        fontStyle: 'bold'
-      },
-      bodyStyles: {
-        fontSize: 9
+        fontSize: 10
       },
       columnStyles: {
         0: { cellWidth: 60, fontStyle: 'bold', textColor: COLORS.gray[700] },
         1: { cellWidth: 122 }
-      },
-      theme: 'grid',
-      margin: { left: 14, right: 14 }
+      }
     });
     
-    currentY = doc.lastAutoTable.finalY + 8;
+    currentY = doc.lastAutoTable.finalY + 6;
     
-    // Información del Vehículo
+    // === INFORMACIÓN DEL VEHÍCULO ===
     const vehiculoData = [
-      ['Vehículo', `${pago.auto.marca} ${pago.auto.modelo} ${pago.auto.anio}`],
-      ['Matrícula', pago.auto.matricula || '0km']
+      ['Vehículo', `${pago.auto.marca} ${pago.auto.modelo}`],
+      ['Año', pago.auto.anio.toString()],
+      ['Matrícula', pago.auto.matricula || 'Sin matrícula (0km)']
     ];
+    
+    if (pago.auto.color) {
+      vehiculoData.push(['Color', pago.auto.color]);
+    }
     
     autoTable(doc, {
       startY: currentY,
-      head: [['INFORMACIÓN DEL VEHÍCULO', '']],
+      head: [['DATOS DEL VEHÍCULO', '']],
       body: vehiculoData,
+      ...getTableStyles('secondary'),
       headStyles: {
+        ...getTableStyles('secondary').headStyles,
         fillColor: COLORS.secondary,
-        fontSize: 10,
-        fontStyle: 'bold'
-      },
-      bodyStyles: {
-        fontSize: 9
+        fontSize: 10
       },
       columnStyles: {
         0: { cellWidth: 60, fontStyle: 'bold', textColor: COLORS.gray[700] },
         1: { cellWidth: 122 }
-      },
-      theme: 'grid',
-      margin: { left: 14, right: 14 }
+      }
     });
     
-    currentY = doc.lastAutoTable.finalY + 8;
+    currentY = doc.lastAutoTable.finalY + 6;
     
-    // Información de Permuta (si existe)
+    // === INFORMACIÓN DE PERMUTA (si existe) ===
     const permuta = pago.auto.permutas && pago.auto.permutas.length > 0 ? pago.auto.permutas[0] : null;
     
     if (permuta) {
@@ -153,85 +154,83 @@ const HistorialPagos = () => {
                          permuta.tipo === 'moto' ? 'Motocicleta' : 'Otros';
       
       const permutaData = [
-        ['Tipo de Permuta', tipoPermuta]
+        ['Tipo de Bien', tipoPermuta]
       ];
       
       if (permuta.descripcion) {
         permutaData.push(['Descripción', permuta.descripcion]);
       }
       
-      permutaData.push(['Valor Estimado', formatCurrency(permuta.valorEstimado)]);
+      if (permuta.tipo === 'auto') {
+        permutaData.push(
+          ['Marca y Modelo', `${permuta.autoMarca || ''} ${permuta.autoModelo || ''}`.trim()],
+          ['Año', permuta.autoAnio ? permuta.autoAnio.toString() : 'N/A']
+        );
+      }
       
-      // Calcular resumen financiero
+      permutaData.push(['Valor Acordado', formatCurrency(permuta.valorEstimado)]);
+      
+      // Cálculo financiero
       const precioOriginal = pago.auto.precio || 0;
       const valorPermuta = permuta.valorEstimado || 0;
       const precioFinal = precioOriginal - valorPermuta;
       
       permutaData.push(
-        ['Precio Original del Vehículo', formatCurrency(precioOriginal)],
-        ['Descuento por Permuta', `-${formatCurrency(valorPermuta)}`],
+        ['Precio del Vehículo', formatCurrency(precioOriginal)],
+        ['Descuento por Permuta', formatCurrency(valorPermuta)],
         ['MONTO FINANCIADO', formatCurrency(precioFinal)]
       );
       
       autoTable(doc, {
         startY: currentY,
-        head: [['INFORMACIÓN DE PERMUTA', '']],
+        head: [['PERMUTA INCLUIDA', '']],
         body: permutaData,
+        ...getTableStyles('warning'),
         headStyles: {
+          ...getTableStyles('warning').headStyles,
           fillColor: COLORS.warning,
-          fontSize: 10,
-          fontStyle: 'bold'
-        },
-        bodyStyles: {
-          fontSize: 9
+          fontSize: 10
         },
         columnStyles: {
           0: { cellWidth: 80, fontStyle: 'bold', textColor: COLORS.gray[700] },
           1: { cellWidth: 102, halign: 'right' }
         },
         didParseCell: function(data) {
+          // Destacar monto financiado
           if (data.section === 'body' && data.row.index === permutaData.length - 1) {
-            // Última fila (monto financiado) en negrita
-            data.cell.styles.fontSize = 10;
+            data.cell.styles.fontSize = 11;
             data.cell.styles.fontStyle = 'bold';
-            data.cell.styles.textColor = COLORS.primary;
-            data.cell.styles.fillColor = COLORS.gray[50];
+            data.cell.styles.textColor = COLORS.success;
+            data.cell.styles.fillColor = [220, 252, 231];
           }
-        },
-        theme: 'grid',
-        margin: { left: 14, right: 14 }
+        }
       });
       
-      currentY = doc.lastAutoTable.finalY + 8;
+      currentY = doc.lastAutoTable.finalY + 6;
     }
     
-    // Detalles del Pago - Destacado
+    // === DETALLES DEL PAGO ===
     const pagoData = [
-      ['Número de Cuota', `#${pago.numeroCuota}`],
+      ['Número de Cuota', `${pago.numeroCuota}`],
       ['Monto de la Cuota', formatCurrency(pago.monto)],
       ['Fecha de Vencimiento', formatDate(pago.fechaVencimiento)]
     ];
     
     if (pago.estado === 'pagado' && pago.fechaPago) {
-      pagoData.push(
-        ['Fecha de Pago', formatDate(pago.fechaPago)],
-        ['Estado', 'PAGADO']
-      );
-    } else {
-      pagoData.push(['Estado', 'PENDIENTE']);
+      pagoData.push(['Fecha de Pago', formatDate(pago.fechaPago)]);
     }
+    
+    pagoData.push(['Estado del Pago', pago.estado.toUpperCase()]);
     
     autoTable(doc, {
       startY: currentY,
-      head: [['DETALLES DEL PAGO', '']],
+      head: [['INFORMACIÓN DEL PAGO', '']],
       body: pagoData,
+      ...getTableStyles(pago.estado === 'pagado' ? 'success' : 'info'),
       headStyles: {
-        fillColor: pago.estado === 'pagado' ? COLORS.success : COLORS.danger,
-        fontSize: 10,
-        fontStyle: 'bold'
-      },
-      bodyStyles: {
-        fontSize: 9
+        ...getTableStyles(pago.estado === 'pagado' ? 'success' : 'info').headStyles,
+        fillColor: pago.estado === 'pagado' ? COLORS.success : COLORS.info,
+        fontSize: 10
       },
       columnStyles: {
         0: { cellWidth: 80, fontStyle: 'bold', textColor: COLORS.gray[700] },
@@ -239,58 +238,57 @@ const HistorialPagos = () => {
       },
       didParseCell: function(data) {
         if (data.section === 'body') {
-          // Monto en negrita y más grande
+          // Destacar monto
           if (data.row.index === 1) {
-            data.cell.styles.fontSize = 12;
+            data.cell.styles.fontSize = 13;
             data.cell.styles.textColor = COLORS.success;
-            data.cell.styles.fillColor = [220, 252, 231]; // Verde muy claro
+            data.cell.styles.fillColor = [220, 252, 231];
           }
-          // Estado en color
+          // Destacar estado
           if (data.row.index === pagoData.length - 1) {
             data.cell.styles.fontSize = 11;
-            data.cell.styles.textColor = pago.estado === 'pagado' ? COLORS.success : COLORS.danger;
-            data.cell.styles.fillColor = pago.estado === 'pagado' ? [220, 252, 231] : [254, 226, 226];
+            data.cell.styles.fontStyle = 'bold';
+            data.cell.styles.textColor = pago.estado === 'pagado' ? COLORS.success : COLORS.warning;
+            data.cell.styles.fillColor = pago.estado === 'pagado' ? [220, 252, 231] : [254, 243, 199];
           }
         }
-      },
-      theme: 'grid',
-      margin: { left: 14, right: 14 }
-    });
-    
-    // Agregar nota legal/informativa al final
-    const finalY = doc.lastAutoTable.finalY + 12;
-    if (finalY < 250) {
-      // Marco decorativo para nota
-      doc.setDrawColor(...COLORS.gray[300]);
-      doc.setLineWidth(0.3);
-      doc.roundedRect(14, finalY, 182, 18, 2, 2);
-      
-      doc.setFillColor(...COLORS.gray[50]);
-      doc.roundedRect(14, finalY, 182, 18, 2, 2, 'F');
-      
-      // Texto de la nota
-      doc.setFontSize(8);
-      doc.setTextColor(...COLORS.gray[600]);
-      doc.setFont(undefined, 'bold');
-      doc.text('NOTA IMPORTANTE:', 18, finalY + 6);
-      
-      doc.setFont(undefined, 'normal');
-      doc.text('Este comprobante tiene validez como constancia de operación financiera.', 18, finalY + 11);
-      doc.text('Para consultas o aclaraciones, comuníquese con nuestro departamento de cobranzas.', 18, finalY + 15);
-    }
-    
-    // Agregar pie de página profesional
-    await addPDFFooter(doc, {
-      showContact: true,
-      contactInfo: {
-        telefono: '+598 XX XXX XXX',
-        email: 'pagos@example.com',
-        web: 'www.example.com'
       }
     });
     
-    // Guardar con nombre profesional
-    doc.save(getPDFFileName('Comprobante', `Cuota${pago.numeroCuota}`));
+    // === NOTA LEGAL ===
+    const finalY = doc.lastAutoTable.finalY + 10;
+    const pageHeight = doc.internal.pageSize.getHeight();
+    
+    if (finalY < pageHeight - 50) {
+      doc.setFillColor(...COLORS.gray[50]);
+      doc.setDrawColor(...COLORS.gray[300]);
+      doc.setLineWidth(0.5);
+      doc.roundedRect(15, finalY, 180, 20, 3, 3, 'FD');
+      
+      doc.setFontSize(8);
+      doc.setFont(undefined, 'bold');
+      doc.setTextColor(...COLORS.gray[700]);
+      doc.text('INFORMACIÓN IMPORTANTE', 20, finalY + 6);
+      
+      doc.setFont(undefined, 'normal');
+      doc.setTextColor(...COLORS.gray[600]);
+      doc.text('Este documento constituye comprobante válido de la operación financiera.', 20, finalY + 11);
+      doc.text('Para consultas, comuníquese con RV Automóviles a través de los canales oficiales.', 20, finalY + 16);
+    }
+    
+    // Footer profesional con datos de contacto
+    await addPDFFooter(doc, {
+      showContact: true,
+      contactInfo: {
+        telefono: '+598 99 123 456',
+        email: 'info@rvautomoviles.com',
+        web: 'www.rvautomoviles.com.uy',
+        direccion: 'Montevideo, Uruguay'
+      }
+    });
+    
+    // Guardar PDF con nombre descriptivo
+    doc.save(getPDFFileName('Comprobante', `Cuota${pago.numeroCuota}_${pago.auto.cliente.nombre.replace(/\s+/g, '_')}`));
   };
 
   const getEstadoBadge = (pago) => {
