@@ -740,6 +740,7 @@ app.post('/api/clientes', authenticateToken, requireStaff, async (req, res) => {
         telefono,
         direccion,
         email,
+        passwordTemporal, // Guardar contraseña en texto plano para enviar siempre
         usuario: {
           create: {
             email: email || `${cedula}@cliente.com`,
