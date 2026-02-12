@@ -4,7 +4,7 @@ import { pagosService } from '../services/apiServices';
 import { formatCurrency, formatDate } from '../utils/format';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { addPDFHeader, addPDFFooter, COLORS, getPDFFileName } from '../utils/pdfHelper';
+import { addPDFHeader, addPDFFooter, COLORS, getPDFFileName, getTableStyles } from '../utils/pdfHelper';
 import { SkeletonTable } from '../components/SkeletonLoader';
 import { EmptyFilter } from '../components/EmptyStateIllustrated';
 
@@ -103,16 +103,23 @@ const HistorialPagos = () => {
       startY: currentY,
       head: [['DATOS DEL CLIENTE', '']],
       body: clienteData,
-      ...getTableStyles('primary'),
+      theme: 'grid',
       headStyles: {
-        ...getTableStyles('primary').headStyles,
         fillColor: COLORS.primary,
-        fontSize: 10
+        textColor: COLORS.white,
+        fontSize: 10,
+        fontStyle: 'bold',
+        halign: 'center',
+        valign: 'middle'
+      },
+      bodyStyles: {
+        fontSize: 9
       },
       columnStyles: {
         0: { cellWidth: 60, fontStyle: 'bold', textColor: COLORS.gray[700] },
         1: { cellWidth: 122 }
-      }
+      },
+      margin: { left: 15, right: 15 }
     });
     
     currentY = doc.lastAutoTable.finalY + 6;
@@ -132,16 +139,23 @@ const HistorialPagos = () => {
       startY: currentY,
       head: [['DATOS DEL VEHÍCULO', '']],
       body: vehiculoData,
-      ...getTableStyles('secondary'),
+      theme: 'grid',
       headStyles: {
-        ...getTableStyles('secondary').headStyles,
         fillColor: COLORS.secondary,
-        fontSize: 10
+        textColor: COLORS.white,
+        fontSize: 10,
+        fontStyle: 'bold',
+        halign: 'center',
+        valign: 'middle'
+      },
+      bodyStyles: {
+        fontSize: 9
       },
       columnStyles: {
         0: { cellWidth: 60, fontStyle: 'bold', textColor: COLORS.gray[700] },
         1: { cellWidth: 122 }
-      }
+      },
+      margin: { left: 15, right: 15 }
     });
     
     currentY = doc.lastAutoTable.finalY + 6;
@@ -185,16 +199,23 @@ const HistorialPagos = () => {
         startY: currentY,
         head: [['PERMUTA INCLUIDA', '']],
         body: permutaData,
-        ...getTableStyles('warning'),
+        theme: 'grid',
         headStyles: {
-          ...getTableStyles('warning').headStyles,
           fillColor: COLORS.warning,
-          fontSize: 10
+          textColor: COLORS.white,
+          fontSize: 10,
+          fontStyle: 'bold',
+          halign: 'center',
+          valign: 'middle'
+        },
+        bodyStyles: {
+          fontSize: 9
         },
         columnStyles: {
           0: { cellWidth: 80, fontStyle: 'bold', textColor: COLORS.gray[700] },
           1: { cellWidth: 102, halign: 'right' }
         },
+        margin: { left: 15, right: 15 },
         didParseCell: function(data) {
           // Destacar monto financiado
           if (data.section === 'body' && data.row.index === permutaData.length - 1) {
@@ -226,16 +247,23 @@ const HistorialPagos = () => {
       startY: currentY,
       head: [['INFORMACIÓN DEL PAGO', '']],
       body: pagoData,
-      ...getTableStyles(pago.estado === 'pagado' ? 'success' : 'info'),
+      theme: 'grid',
       headStyles: {
-        ...getTableStyles(pago.estado === 'pagado' ? 'success' : 'info').headStyles,
         fillColor: pago.estado === 'pagado' ? COLORS.success : COLORS.info,
-        fontSize: 10
+        textColor: COLORS.white,
+        fontSize: 10,
+        fontStyle: 'bold',
+        halign: 'center',
+        valign: 'middle'
+      },
+      bodyStyles: {
+        fontSize: 9
       },
       columnStyles: {
         0: { cellWidth: 80, fontStyle: 'bold', textColor: COLORS.gray[700] },
         1: { cellWidth: 102, halign: 'right', fontStyle: 'bold' }
       },
+      margin: { left: 15, right: 15 },
       didParseCell: function(data) {
         if (data.section === 'body') {
           // Destacar monto

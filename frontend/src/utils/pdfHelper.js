@@ -116,7 +116,8 @@ export const addPDFHeader = async (doc, title, subtitle = null, type = 'DOCUMENT
   const infoBoxWidth = 50;
   const infoBoxX = pageWidth - infoBoxWidth - 10;
   
-  doc.setFillColor(255, 255, 255, 0.15); // Blanco semi-transparente
+  // Usar color sólido en lugar de transparencia
+  doc.setFillColor(45, 75, 125); // Azul semi-oscuro
   doc.roundedRect(infoBoxX, 6, infoBoxWidth, 23, 2, 2, 'F');
   
   doc.setFontSize(7);
