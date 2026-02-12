@@ -87,9 +87,6 @@ export const addPDFHeader = async (doc, title, subtitle = null, type = 'DOCUMENT
   doc.setFillColor(...COLORS.secondary);
   doc.rect(0, 35, pageWidth, 2, 'F');
   
-  // Logo RV Automóviles (círculo con letras)
-  drawRVLogo(doc, 15, 7, 20);
-  
   // Nombre de la empresa
   doc.setTextColor(...COLORS.white);
   doc.setFontSize(20);
@@ -233,9 +230,6 @@ export const addPDFFooter = async (doc, options = {}) => {
     // === FONDO DEL FOOTER ===
     doc.setFillColor(...COLORS.gray[50]);
     doc.rect(0, footerY, pageWidth, 25, 'F');
-    
-    // === LOGO PEQUEÑO EN FOOTER ===
-    drawRVLogo(doc, 18, footerY + 4, 12);
     
     // === INFORMACIÓN DE CONTACTO ===
     if (showContact) {

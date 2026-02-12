@@ -4,7 +4,7 @@ import { pagosService } from '../services/apiServices';
 import { formatCurrency, formatDate } from '../utils/format';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { addPDFHeader, addPDFFooter, COLORS, getPDFFileName, getTableStyles } from '../utils/pdfHelper';
+import { addPDFHeader, COLORS, getPDFFileName, getTableStyles } from '../utils/pdfHelper';
 import { SkeletonTable } from '../components/SkeletonLoader';
 import { EmptyFilter } from '../components/EmptyStateIllustrated';
 
@@ -313,17 +313,6 @@ const HistorialPagos = () => {
       doc.text('Este documento constituye comprobante válido de la operación financiera.', 20, finalY + 11);
       doc.text('Para consultas, comuníquese con RV Automóviles a través de los canales oficiales.', 20, finalY + 16);
     }
-    
-    // Footer profesional con datos de contacto
-    await addPDFFooter(doc, {
-      showContact: true,
-      contactInfo: {
-        telefono: '+598 99 123 456',
-        email: 'info@rvautomoviles.com',
-        web: 'www.rvautomoviles.com.uy',
-        direccion: 'Montevideo, Uruguay'
-      }
-    });
     
     // Guardar PDF con nombre descriptivo
     doc.save(getPDFFileName('Comprobante', `Cuota${pago.numeroCuota}_${pago.auto.cliente.nombre.replace(/\s+/g, '_')}`));

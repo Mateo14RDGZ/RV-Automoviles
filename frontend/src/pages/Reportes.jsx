@@ -5,7 +5,7 @@ import { exportToCSV, exportToJSON, formatDataForExport } from '../utils/export'
 import { formatCurrency, formatDate } from '../utils/format';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { addPDFHeader, addPDFFooter, getTableStyles, addSection, getPDFFileName, COLORS } from '../utils/pdfHelper';
+import { addPDFHeader, getTableStyles, addSection, getPDFFileName, COLORS } from '../utils/pdfHelper';
 import { 
   FileDown, 
   FileText, 
@@ -173,16 +173,6 @@ const Reportes = () => {
         doc.setTextColor(...COLORS.gray[600]);
         doc.text(`Total de clientes activos en el sistema: ${clientes.length}`, 18, finalY + 14);
       }
-      
-      // Agregar pie de página profesional
-      await addPDFFooter(doc, {
-        showContact: true,
-        contactInfo: {
-          telefono: '+598 XX XXX XXX',
-          email: 'info@example.com',
-          web: 'www.example.com'
-        }
-      });
       
       // Guardar con nombre profesional
       doc.save(getPDFFileName('Clientes', 'Base'));
@@ -436,16 +426,6 @@ const Reportes = () => {
         currentY = doc.lastAutoTable.finalY + 10;
       });
 
-      // Agregar pie de página profesional
-      await addPDFFooter(doc, {
-        showContact: true,
-        contactInfo: {
-          telefono: '+598 XX XXX XXX',
-          email: 'cobranzas@example.com',
-          web: 'www.example.com'
-        }
-      });
-
       // Guardar con nombre profesional
       doc.save(getPDFFileName('Pagos', 'Historial'));
       showToast('Historial de pagos generado exitosamente', 'success');
@@ -563,16 +543,6 @@ const Reportes = () => {
       doc.setFont(undefined, 'italic');
       doc.text(`Estado: ${estadoFinanciero}`, 105, currentY + 35, { align: 'center' });
       
-      // Agregar pie de página profesional
-      await addPDFFooter(doc, {
-        showContact: true,
-        contactInfo: {
-          telefono: '+598 XX XXX XXX',
-          email: 'info@example.com',
-          web: 'www.example.com'
-        }
-      });
-      
       // Guardar con nombre profesional
       doc.save(getPDFFileName('ReporteGeneral', 'Sistema'));
       showToast('PDF de reporte general exportado exitosamente', 'success');
@@ -671,16 +641,6 @@ const Reportes = () => {
               data.cell.styles.textColor = COLORS.warning;
             }
           }
-        }
-      });
-      
-      // Agregar pie de página profesional
-      await addPDFFooter(doc, {
-        showContact: true,
-        contactInfo: {
-          telefono: '+598 XX XXX XXX',
-          email: 'info@example.com',
-          web: 'www.example.com'
         }
       });
       
