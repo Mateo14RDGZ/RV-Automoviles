@@ -51,6 +51,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Cargar Prisma client (mock o real según configuración)
 const prisma = require('./lib/prisma');
+const { enviarConfirmacionPago } = require('./lib/email');
 
 // Middleware de autenticación
 const authenticateToken = (req, res, next) => {
@@ -1427,13 +1428,35 @@ app.put('/api/comprobantes/:id/estado', authenticateToken, requireStaff, async (
 
     // Si se aprueba, actualizar el pago como pagado
     if (estado === 'aprobado' && comprobante.pago.estado === 'pendiente') {
-      await prisma.pago.update({
+      const pagoActualizado = await prisma.pago.update({
         where: { id: comprobante.pagoId },
         data: {
           estado: 'pagado',
           fechaPago: new Date()
+        },
+        include: {
+          auto: {
+            include: {
+              cliente: true
+            }
+          }
         }
       });
+
+      // Enviar email de confirmación al cliente
+      if (pagoActualizado.auto && pagoActualizado.auto.cliente) {
+        try {
+          await enviarConfirmacionPago(
+            pagoActualizado.auto.cliente,
+            pagoActualizado,
+            pagoActualizado.auto
+          );
+          console.log('✅ Email de confirmación enviado al cliente:', pagoActualizado.auto.cliente.email);
+        } catch (emailError) {
+          console.error('⚠️ Error al enviar email de confirmación:', emailError.message);
+          // No detener el proceso si falla el email
+        }
+      }
 
       // Verificar si todas las cuotas del auto están pagadas
       const todosPagos = await prisma.pago.findMany({
