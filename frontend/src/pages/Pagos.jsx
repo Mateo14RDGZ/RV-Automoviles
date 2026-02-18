@@ -2255,6 +2255,28 @@ const Pagos = () => {
                 </p>
               </div>
 
+              {/* Números de cuenta bancaria */}
+              <div className="mb-4 p-4 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                  <DollarSign className="w-4 h-4 text-green-600 dark:text-green-400" />
+                  Cuentas para transferencia
+                </h3>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between p-2 bg-white dark:bg-gray-800 rounded border border-green-100 dark:border-green-900">
+                    <span className="text-xs font-medium text-gray-700 dark:text-gray-300">BROU</span>
+                    <span className="text-sm font-mono font-semibold text-gray-900 dark:text-white">110908705-00002</span>
+                  </div>
+                  <div className="flex items-center justify-between p-2 bg-white dark:bg-gray-800 rounded border border-green-100 dark:border-green-900">
+                    <span className="text-xs font-medium text-gray-700 dark:text-gray-300">Santander</span>
+                    <span className="text-sm font-mono font-semibold text-gray-900 dark:text-white">005101225818</span>
+                  </div>
+                  <div className="flex items-center justify-between p-2 bg-white dark:bg-gray-800 rounded border border-green-100 dark:border-green-900">
+                    <span className="text-xs font-medium text-gray-700 dark:text-gray-300">BBVA</span>
+                    <span className="text-sm font-mono font-semibold text-gray-900 dark:text-white">25970275</span>
+                  </div>
+                </div>
+              </div>
+
               <form onSubmit={handleSubirComprobante} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
