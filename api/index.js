@@ -1167,17 +1167,10 @@ app.put('/api/pagos/:id', authenticateToken, async (req, res) => {
       updateData.fechaPago = new Date(updateData.fechaPago);
     }
 
-    // Remover montoPagado si viene en el updateData (funcionalidad pendiente de migración)
+    // Si se proporciona montoPagado, usarlo; de lo contrario, mantener el valor existente
     if (updateData.montoPagado !== undefined) {
-      console.log('⚠️ montoPagado detectado pero aún no migrado. Guardando en comentario.');
-      // Opcionalmente, agregar el monto al comentario
-      if (updateData.montoPagado) {
-        const montoInfo = `Monto pagado: $${parseFloat(updateData.montoPagado).toFixed(2)}`;
-        updateData.comentario = updateData.comentario 
-          ? `${updateData.comentario} | ${montoInfo}`
-          : montoInfo;
-      }
-      delete updateData.montoPagado; // Eliminar del update para evitar error
+      updateData.montoPagado = parseFloat(updateData.montoPagado);
+      console.log('💰 Monto pagado personalizado:', updateData.montoPagado);
     }
 
     const pago = await prisma.pago.update({
