@@ -1027,17 +1027,16 @@ app.post('/api/pagos/generar-cuotas', authenticateToken, requireStaff, async (re
     const pagos = [];
     const cuotasPagadasNum = parseInt(cuotasPagadas) || 0;
     
-    // Función auxiliar para obtener el monto de una cuota según los rangos personalizados
+    // Función auxiliar para obtener el monto de una cuota según los montos personalizados
     const obtenerMontoCuota = (numeroCuota) => {
       if (montosPersonalizados && Array.isArray(montosPersonalizados) && montosPersonalizados.length > 0) {
-        // Buscar en qué rango cae esta cuota
-        for (const rango of montosPersonalizados) {
-          if (numeroCuota >= rango.desdeCuota && numeroCuota <= rango.hastaCuota) {
-            return parseFloat(rango.monto);
-          }
+        // Buscar si esta cuota tiene un monto personalizado
+        const cuotaPersonalizada = montosPersonalizados.find(c => c.numeroCuota === numeroCuota);
+        if (cuotaPersonalizada) {
+          return parseFloat(cuotaPersonalizada.monto);
         }
       }
-      // Si no hay montos personalizados o la cuota no está en ningún rango, usar el monto por defecto
+      // Si no hay monto personalizado para esta cuota, usar el monto por defecto
       return parseFloat(montoPorCuota);
     };
     

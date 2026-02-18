@@ -332,20 +332,24 @@ const Pagos = () => {
       // Validar montos personalizados si están activados
       if (generateData.esFinanciamientoEnProgreso && generateData.usarMontosPersonalizados) {
         if (generateData.montosPersonalizados.length === 0) {
-          alert('Debe agregar al menos un rango de montos personalizados');
+          alert('Debe agregar al menos una cuota con monto personalizado');
           return;
         }
 
-        // Validar que todos los rangos tengan datos completos
-        for (const rango of generateData.montosPersonalizados) {
-          if (!rango.desdeCuota || !rango.hastaCuota || !rango.monto) {
-            alert('Todos los rangos deben tener valores completos (desde, hasta, monto)');
+        // Validar que todas las cuotas tengan datos completos
+        for (const cuota of generateData.montosPersonalizados) {
+          if (!cuota.numeroCuota || !cuota.monto) {
+            alert('Todas las cuotas deben tener número y monto completos');
             return;
           }
-          if (parseInt(rango.desdeCuota) > parseInt(rango.hastaCuota)) {
-            alert('El número de cuota "desde" no puede ser mayor que "hasta"');
-            return;
-          }
+        }
+
+        // Validar que no haya cuotas duplicadas
+        const numerosUsados = generateData.montosPersonalizados.map(c => parseInt(c.numeroCuota));
+        const duplicados = numerosUsados.filter((num, index) => numerosUsados.indexOf(num) !== index);
+        if (duplicados.length > 0) {
+          alert(`La cuota ${duplicados[0]} está repetida. Cada cuota debe aparecer solo una vez`);
+          return;
         }
       }
       
@@ -380,10 +384,9 @@ const Pagos = () => {
 
       // Agregar montos personalizados si están activados
       if (generateData.esFinanciamientoEnProgreso && generateData.usarMontosPersonalizados && generateData.montosPersonalizados.length > 0) {
-        dataParaBackend.montosPersonalizados = generateData.montosPersonalizados.map(rango => ({
-          desdeCuota: parseInt(rango.desdeCuota),
-          hastaCuota: parseInt(rango.hastaCuota),
-          monto: parseFloat(rango.monto)
+        dataParaBackend.montosPersonalizados = generateData.montosPersonalizados.map(cuota => ({
+          numeroCuota: parseInt(cuota.numeroCuota),
+          monto: parseFloat(cuota.monto)
         }));
       }
       
@@ -2169,79 +2172,61 @@ const Pagos = () => {
                             <div className="mt-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg p-3 border border-purple-200 dark:border-purple-900">
                               <div className="flex items-center justify-between mb-3">
                                 <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                  Rangos de Cuotas
+                                  Cuotas con Montos Personalizados
                                 </h4>
                                 <button
                                   type="button"
                                   onClick={() => {
                                     setGenerateData({
                                       ...generateData,
-                                      montosPersonalizados: [...generateData.montosPersonalizados, { desdeCuota: '', hastaCuota: '', monto: '' }]
+                                      montosPersonalizados: [...generateData.montosPersonalizados, { numeroCuota: '', monto: '' }]
                                     });
                                   }}
                                   className="px-3 py-1 bg-purple-500 hover:bg-purple-600 text-white text-xs rounded transition-all duration-200"
                                 >
-                                  + Agregar Rango
+                                  + Agregar Cuota
                                 </button>
                               </div>
 
                               {generateData.montosPersonalizados.length === 0 ? (
                                 <p className="text-xs text-gray-500 dark:text-gray-400 text-center py-2">
-                                  Haz clic en "Agregar Rango" para definir montos personalizados
+                                  Haz clic en "Agregar Cuota" para definir montos personalizados
                                 </p>
                               ) : (
                                 <div className="space-y-2">
-                                  {generateData.montosPersonalizados.map((rango, index) => (
+                                  {generateData.montosPersonalizados.map((cuota, index) => (
                                     <div key={index} className="flex gap-2 items-end bg-white dark:bg-gray-800 rounded p-2 border border-purple-200 dark:border-purple-800">
                                       <div className="flex-1">
                                         <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                                          Desde Cuota
+                                          Número de Cuota
                                         </label>
                                         <input
                                           type="number"
                                           min="1"
                                           max={generateData.numeroCuotas}
-                                          value={rango.desdeCuota}
+                                          value={cuota.numeroCuota}
                                           onChange={(e) => {
-                                            const nuevosRangos = [...generateData.montosPersonalizados];
-                                            nuevosRangos[index].desdeCuota = e.target.value;
-                                            setGenerateData({ ...generateData, montosPersonalizados: nuevosRangos });
+                                            const nuevasCuotas = [...generateData.montosPersonalizados];
+                                            nuevasCuotas[index].numeroCuota = e.target.value;
+                                            setGenerateData({ ...generateData, montosPersonalizados: nuevasCuotas });
                                           }}
                                           className="input text-sm text-center"
                                           placeholder="#"
                                         />
                                       </div>
-                                      <div className="flex-1">
+                                      <div className="flex-[2]">
                                         <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                                          Hasta Cuota
-                                        </label>
-                                        <input
-                                          type="number"
-                                          min="1"
-                                          max={generateData.numeroCuotas}
-                                          value={rango.hastaCuota}
-                                          onChange={(e) => {
-                                            const nuevosRangos = [...generateData.montosPersonalizados];
-                                            nuevosRangos[index].hastaCuota = e.target.value;
-                                            setGenerateData({ ...generateData, montosPersonalizados: nuevosRangos });
-                                          }}
-                                          className="input text-sm text-center"
-                                          placeholder="#"
-                                        />
-                                      </div>
-                                      <div className="flex-1">
-                                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                                          Monto
+                                          Monto de la Cuota
                                         </label>
                                         <input
                                           type="number"
                                           min="0"
                                           step="0.01"
-                                          value={rango.monto}
+                                          value={cuota.monto}
                                           onChange={(e) => {
-                                            const nuevosRangos = [...generateData.montosPersonalizados];
-                                            nuevosRangos[index].monto = e.target.value;
-                                            setGenerateData({ ...generateData, montosPersonalizados: nuevosRangos });
+                                            const nuevasCuotas = [...generateData.montosPersonalizados];
+                                            nuevasCuotas[index].monto = e.target.value;
+                                            setGenerateData({ ...generateData, montosPersonalizados: nuevasCuotas });
                                           }}
                                           className="input text-sm"
                                           placeholder="$0.00"
@@ -2250,11 +2235,11 @@ const Pagos = () => {
                                       <button
                                         type="button"
                                         onClick={() => {
-                                          const nuevosRangos = generateData.montosPersonalizados.filter((_, i) => i !== index);
-                                          setGenerateData({ ...generateData, montosPersonalizados: nuevosRangos });
+                                          const nuevasCuotas = generateData.montosPersonalizados.filter((_, i) => i !== index);
+                                          setGenerateData({ ...generateData, montosPersonalizados: nuevasCuotas });
                                         }}
                                         className="px-2 py-2 bg-red-500 hover:bg-red-600 text-white text-xs rounded transition-all duration-200"
-                                        title="Eliminar rango"
+                                        title="Eliminar cuota"
                                       >
                                         ✕
                                       </button>
@@ -2264,7 +2249,7 @@ const Pagos = () => {
                               )}
 
                               <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 italic">
-                                Ejemplo: Cuotas 1-5 con monto $500, Cuotas 6-12 con monto $200
+                                Ejemplo: Cuota 5 con $500, Cuota 8 con $800. El resto usarán el monto por defecto.
                               </p>
                             </div>
                           )}
