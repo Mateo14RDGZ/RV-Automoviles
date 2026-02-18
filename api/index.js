@@ -1167,6 +1167,12 @@ app.put('/api/pagos/:id', authenticateToken, async (req, res) => {
       updateData.fechaPago = new Date(updateData.fechaPago);
     }
 
+    // Si se proporciona montoPagado, usarlo; de lo contrario, mantener el valor existente
+    if (updateData.montoPagado !== undefined) {
+      updateData.montoPagado = parseFloat(updateData.montoPagado);
+      console.log('💰 Monto pagado personalizado:', updateData.montoPagado);
+    }
+
     const pago = await prisma.pago.update({
       where: { id: parseInt(id) },
       data: updateData,

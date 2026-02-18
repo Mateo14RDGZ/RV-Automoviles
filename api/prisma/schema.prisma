@@ -68,6 +68,7 @@ model Pago {
   auto              Auto      @relation(fields: [autoId], references: [id])
   numeroCuota       Int
   monto             Float
+  montoPagado       Float?    // Monto real pagado (si es diferente del monto de la cuota)
   fechaVencimiento  DateTime
   fechaPago         DateTime?
   estado            String    @default("pendiente") // pendiente, pagado, vencido

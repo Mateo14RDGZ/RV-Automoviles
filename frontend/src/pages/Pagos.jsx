@@ -36,6 +36,9 @@ const Pagos = () => {
   const [emailError, setEmailError] = useState(null);
   const [pagoSeleccionado, setPagoSeleccionado] = useState(null);
   const [pagoParaEmail, setPagoParaEmail] = useState(null);
+  // Estados para monto personalizado (admin/empleado)
+  const [modoPago, setModoPago] = useState('completo'); // 'completo' o 'personalizado'
+  const [montoPersonalizado, setMontoPersonalizado] = useState('');
   // Estados para subir comprobante (clientes)
   const [showComprobanteModal, setShowComprobanteModal] = useState(false);
   const [pagoParaComprobante, setPagoParaComprobante] = useState(null);
@@ -368,6 +371,8 @@ const Pagos = () => {
 
   const handleMarcarPagado = async (pagoId) => {
     setPagoSeleccionado(pagoId);
+    setModoPago('completo'); // Resetear a modo completo
+    setMontoPersonalizado(''); // Limpiar monto personalizado
     setShowConfirmModal(true);
   };
 
@@ -430,7 +435,16 @@ const Pagos = () => {
   };
 
   const confirmarMarcarPagado = async () => {
-    console.log('🔄 Confirmando pago...', { pagoSeleccionado });
+    console.log('🔄 Confirmando pago...', { pagoSeleccionado, modoPago, montoPersonalizado });
+    
+    // Validar monto personalizado si está en ese modo
+    if (modoPago === 'personalizado') {
+      const monto = parseFloat(montoPersonalizado);
+      if (!montoPersonalizado || isNaN(monto) || monto <= 0) {
+        alert('Por favor, ingresa un monto válido mayor a 0');
+        return;
+      }
+    }
     
     try {
       setLoading(true);
@@ -461,12 +475,21 @@ const Pagos = () => {
       
       console.log('✅ Pago encontrado:', pagoAActualizar);
       
-      // Actualizar el estado del pago
-      console.log('📤 Actualizando pago en el servidor...');
-      const resultado = await pagosService.update(pagoSeleccionado, { 
+      // Preparar datos de actualización
+      const updateData = { 
         estado: 'pagado',
         fechaPago: new Date().toISOString()
-      });
+      };
+      
+      // Si es monto personalizado, agregarlo a los datos de actualización
+      if (modoPago === 'personalizado') {
+        updateData.montoPagado = parseFloat(montoPersonalizado);
+        console.log('💰 Usando monto personalizado:', updateData.montoPagado);
+      }
+      
+      // Actualizar el estado del pago
+      console.log('📤 Actualizando pago en el servidor...', updateData);
+      const resultado = await pagosService.update(pagoSeleccionado, updateData);
       
       console.log('✅ Pago actualizado exitosamente:', resultado);
       
@@ -474,7 +497,8 @@ const Pagos = () => {
       setPagoParaEmail({
         ...pagoAActualizar,
         estado: 'pagado',
-        fechaPago: new Date().toISOString()
+        fechaPago: new Date().toISOString(),
+        montoPagado: modoPago === 'personalizado' ? parseFloat(montoPersonalizado) : undefined
       });
       
       setShowConfirmModal(false);
@@ -493,6 +517,8 @@ const Pagos = () => {
       }
       
       setPagoSeleccionado(null);
+      setModoPago('completo'); // Resetear modo
+      setMontoPersonalizado(''); // Limpiar monto
       setLoading(false);
       console.log('✅ Proceso completado');
     } catch (error) {
@@ -501,6 +527,8 @@ const Pagos = () => {
       // No mostrar el modal de notificación si hay error
       setShowConfirmModal(false);
       setPagoSeleccionado(null);
+      setModoPago('completo');
+      setMontoPersonalizado('');
       setLoading(false);
     }
   };
@@ -2074,29 +2102,139 @@ const Pagos = () => {
 
       {/* Modal de confirmación para marcar pagado */}
       {showConfirmModal && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-70 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
           <div className="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4">
             <div className="p-6">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                Confirmar Acción
+                Marcar Cuota como Pagada
               </h3>
-              <p className="text-gray-600 dark:text-gray-300 mb-6">
-                ¿Estás seguro de marcar esta cuota como pagada?
-              </p>
-              <div className="flex gap-3">
+              
+              {/* Información del pago */}
+              {(() => {
+                let pago = pagos.find(p => p.id === pagoSeleccionado);
+                if (!pago) {
+                  for (const clienteData of clientesConPagos) {
+                    const pagoEncontrado = clienteData.pagos.find(p => p.id === pagoSeleccionado);
+                    if (pagoEncontrado) {
+                      pago = pagoEncontrado;
+                      break;
+                    }
+                  }
+                }
+                
+                return pago ? (
+                  <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">
+                      Cuota #{pago.numeroCuota}
+                    </p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {pago.auto.marca} {pago.auto.modelo}
+                    </p>
+                    <p className="text-lg font-bold text-blue-600 dark:text-blue-400 mt-1">
+                      Monto: {formatCurrency(pago.monto)}
+                    </p>
+                  </div>
+                ) : null;
+              })()}
+
+              {/* Selector de modo de pago */}
+              <div className="mb-4 space-y-3">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Selecciona el tipo de pago:
+                </label>
+                
+                <button
+                  onClick={() => setModoPago('completo')}
+                  className={`w-full p-4 rounded-lg border-2 transition-all duration-200 text-left ${
+                    modoPago === 'completo'
+                      ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
+                      : 'border-gray-300 dark:border-gray-600 hover:border-green-300 dark:hover:border-green-700'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                      modoPago === 'completo'
+                        ? 'border-green-500 bg-green-500'
+                        : 'border-gray-400 dark:border-gray-500'
+                    }`}>
+                      {modoPago === 'completo' && (
+                        <CheckCircle className="w-4 h-4 text-white" />
+                      )}
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-900 dark:text-white">Pago Completo</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">El cliente paga el monto total de la cuota</p>
+                    </div>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => setModoPago('personalizado')}
+                  className={`w-full p-4 rounded-lg border-2 transition-all duration-200 text-left ${
+                    modoPago === 'personalizado'
+                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                      : 'border-gray-300 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-700'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                      modoPago === 'personalizado'
+                        ? 'border-blue-500 bg-blue-500'
+                        : 'border-gray-400 dark:border-gray-500'
+                    }`}>
+                      {modoPago === 'personalizado' && (
+                        <CheckCircle className="w-4 h-4 text-white" />
+                      )}
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-900 dark:text-white">Monto Personalizado</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Ingresar un monto diferente al de la cuota</p>
+                    </div>
+                  </div>
+                </button>
+              </div>
+
+              {/* Input para monto personalizado */}
+              {modoPago === 'personalizado' && (
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Monto Entregado *
+                  </label>
+                  <div className="relative">
+                    <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={montoPersonalizado}
+                      onChange={(e) => setMontoPersonalizado(e.target.value)}
+                      placeholder="Ej: 5000.00"
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                      autoFocus
+                    />
+                  </div>
+                  <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                    Ingresa el monto exacto que entregó el cliente
+                  </p>
+                </div>
+              )}
+
+              <div className="flex gap-3 pt-4">
                 <button
                   onClick={() => {
                     setShowConfirmModal(false);
                     setPagoSeleccionado(null);
+                    setModoPago('completo');
+                    setMontoPersonalizado('');
                   }}
                   disabled={loading}
-                  className="flex-1 bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white py-2.5 px-4 rounded-lg font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 py-2.5 px-4 rounded-lg font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={confirmarMarcarPagado}
-                  disabled={loading}
+                  disabled={loading || (modoPago === 'personalizado' && !montoPersonalizado)}
                   className="flex-1 bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white py-2.5 px-4 rounded-lg font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {loading ? (
@@ -2105,7 +2243,7 @@ const Pagos = () => {
                       Procesando...
                     </>
                   ) : (
-                    'Confirmar'
+                    'Confirmar Pago'
                   )}
                 </button>
               </div>
