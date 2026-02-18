@@ -1266,6 +1266,35 @@ app.put('/api/pagos/:id', authenticateToken, async (req, res) => {
         } else {
           console.log('⚠️ No hay siguiente cuota pendiente para aplicar el excedente');
         }
+      } else if (excedente < 0) {
+        // Déficit: se pagó menos de lo que corresponde
+        const deficit = Math.abs(excedente);
+        console.log(`⚠️ Déficit detectado: ${deficit}. Sumando a la siguiente cuota...`);
+        
+        // Buscar la siguiente cuota pendiente
+        const siguienteCuota = await prisma.pago.findFirst({
+          where: {
+            autoId: pago.autoId,
+            estado: 'pendiente',
+            numeroCuota: { gt: pago.numeroCuota }
+          },
+          orderBy: { numeroCuota: 'asc' }
+        });
+
+        if (siguienteCuota) {
+          const montoSiguienteCuota = parseFloat(siguienteCuota.monto);
+          const nuevoMonto = montoSiguienteCuota + deficit;
+          
+          await prisma.pago.update({
+            where: { id: siguienteCuota.id },
+            data: {
+              monto: nuevoMonto
+            }
+          });
+          console.log(`✅ Déficit de ${deficit} sumado a cuota #${siguienteCuota.numeroCuota}. Nuevo monto: ${nuevoMonto} (era ${montoSiguienteCuota})`);
+        } else {
+          console.log('⚠️ No hay siguiente cuota pendiente para sumar el déficit');
+        }
       }
     }
 
@@ -1577,6 +1606,30 @@ app.put('/api/comprobantes/:id/estado', authenticateToken, requireStaff, async (
               });
               console.log(`✅ Siguiente cuota #${siguienteCuota.numeroCuota} reducida de ${montoSiguienteCuota} a ${nuevoMonto}`);
             }
+          }
+        } else if (excedente < 0) {
+          // Déficit: se pagó menos de lo que corresponde
+          const deficit = Math.abs(excedente);
+          console.log(`⚠️ Déficit detectado en aprobación: ${deficit}. Sumando a la siguiente cuota...`);
+          
+          const siguienteCuota = await prisma.pago.findFirst({
+            where: {
+              autoId: comprobante.pago.autoId,
+              estado: 'pendiente',
+              numeroCuota: { gt: comprobante.pago.numeroCuota }
+            },
+            orderBy: { numeroCuota: 'asc' }
+          });
+
+          if (siguienteCuota) {
+            const montoSiguienteCuota = parseFloat(siguienteCuota.monto);
+            const nuevoMonto = montoSiguienteCuota + deficit;
+            
+            await prisma.pago.update({
+              where: { id: siguienteCuota.id },
+              data: { monto: nuevoMonto }
+            });
+            console.log(`✅ Déficit de ${deficit} sumado a cuota #${siguienteCuota.numeroCuota}. Nuevo monto: ${nuevoMonto} (era ${montoSiguienteCuota})`);
           }
         }
       }
