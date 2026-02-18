@@ -598,8 +598,7 @@ const Pagos = () => {
       mensaje += `🔑 Contraseña: ${cliente.passwordTemporal}\n\n`;
     }
     
-    mensaje += `*RV AUTOMÓVILES*\n`;
-    mensaje += `📞 Teléfono: 092 123 456`;
+    mensaje += `*RV AUTOMÓVILES*`;
 
     // Limpiar teléfono y generar URL de WhatsApp
     const telefonoLimpio = cliente.telefono.replace(/\D/g, '');
