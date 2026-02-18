@@ -592,9 +592,9 @@ const Pagos = () => {
     mensaje += `🌐 *Web:* https://rv-automoviles.vercel.app\n\n`;
     
     // Agregar credenciales si están disponibles
-    if (cliente.email && cliente.passwordTemporal) {
+    if (cliente.passwordTemporal) {
       mensaje += `*Sus credenciales de acceso:*\n`;
-      mensaje += `👤 Usuario: ${cliente.email}\n`;
+      mensaje += `👤 Usuario: ${cliente.passwordTemporal}\n`;
       mensaje += `🔑 Contraseña: ${cliente.passwordTemporal}\n\n`;
     }
     
