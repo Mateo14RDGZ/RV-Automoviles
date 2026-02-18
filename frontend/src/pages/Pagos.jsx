@@ -587,10 +587,19 @@ const Pagos = () => {
     });
 
     mensaje += `*TOTAL ADEUDADO: $${totalAdeudado.toFixed(2)}*\n\n`;
-    mensaje += `Le solicitamos regularizar su situación a la brevedad. Para coordinar el pago, puede comunicarse con nosotros.\n\n`;
+    mensaje += `Le solicitamos regularizar su situación a la brevedad.\n\n`;
+    mensaje += `Puede consultar el estado de sus cuotas y realizar pagos ingresando a nuestra plataforma web:\n\n`;
+    mensaje += `🌐 *Web:* https://rv-automoviles.vercel.app\n\n`;
+    
+    // Agregar credenciales si están disponibles
+    if (cliente.email && cliente.passwordTemporal) {
+      mensaje += `*Sus credenciales de acceso:*\n`;
+      mensaje += `👤 Usuario: ${cliente.email}\n`;
+      mensaje += `🔑 Contraseña: ${cliente.passwordTemporal}\n\n`;
+    }
+    
     mensaje += `*RV AUTOMÓVILES*\n`;
-    mensaje += `📞 Teléfono: 092 123 456\n`;
-    mensaje += `📧 Email: info@rvautomoviles.com`;
+    mensaje += `📞 Teléfono: 092 123 456`;
 
     // Limpiar teléfono y generar URL de WhatsApp
     const telefonoLimpio = cliente.telefono.replace(/\D/g, '');
