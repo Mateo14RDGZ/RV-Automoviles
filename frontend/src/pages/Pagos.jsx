@@ -549,6 +549,58 @@ const Pagos = () => {
     }
   };
 
+  // Función para enviar recordatorio de cuotas vencidas por WhatsApp
+  const enviarRecordatorioWhatsApp = (cliente, cuotasVencidas) => {
+    if (!cliente.telefono || !cuotasVencidas || cuotasVencidas.length === 0) {
+      showToast('No hay información suficiente para enviar el mensaje', 'error');
+      return;
+    }
+
+    // Ordenar cuotas por fecha de vencimiento
+    const cuotasOrdenadas = [...cuotasVencidas].sort((a, b) => 
+      new Date(a.fechaVencimiento) - new Date(b.fechaVencimiento)
+    );
+
+    // Calcular total adeudado
+    const totalAdeudado = cuotasOrdenadas.reduce((sum, cuota) => 
+      sum + parseFloat(cuota.monto), 0
+    );
+
+    // Generar mensaje
+    let mensaje = `*RECORDATORIO DE CUOTAS VENCIDAS - RV AUTOMÓVILES*\n\n`;
+    mensaje += `Estimado/a ${cliente.nombre},\n\n`;
+    mensaje += `Le informamos que tiene *${cuotasOrdenadas.length} cuota${cuotasOrdenadas.length > 1 ? 's' : ''} vencida${cuotasOrdenadas.length > 1 ? 's' : ''}* pendiente${cuotasOrdenadas.length > 1 ? 's' : ''} de pago:\n\n`;
+
+    // Listar cada cuota vencida con su información
+    cuotasOrdenadas.forEach((cuota, index) => {
+      const fechaVencimiento = new Date(cuota.fechaVencimiento).toLocaleDateString('es-UY', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric'
+      });
+      
+      mensaje += `*${index + 1}.* ${cuota.auto.marca} ${cuota.auto.modelo}\n`;
+      mensaje += `   📋 Matrícula: ${cuota.auto.matricula}\n`;
+      mensaje += `   🔢 Cuota N° ${cuota.numeroCuota}\n`;
+      mensaje += `   💰 Monto: $${parseFloat(cuota.monto).toFixed(2)}\n`;
+      mensaje += `   📅 Venció: ${fechaVencimiento}\n\n`;
+    });
+
+    mensaje += `*TOTAL ADEUDADO: $${totalAdeudado.toFixed(2)}*\n\n`;
+    mensaje += `Le solicitamos regularizar su situación a la brevedad. Para coordinar el pago, puede comunicarse con nosotros.\n\n`;
+    mensaje += `*RV AUTOMÓVILES*\n`;
+    mensaje += `📞 Teléfono: 092 123 456\n`;
+    mensaje += `📧 Email: info@rvautomoviles.com`;
+
+    // Limpiar teléfono y generar URL de WhatsApp
+    const telefonoLimpio = cliente.telefono.replace(/\D/g, '');
+    const urlWhatsApp = `https://wa.me/598${telefonoLimpio}?text=${encodeURIComponent(mensaje)}`;
+    
+    // Abrir WhatsApp en una nueva ventana
+    window.open(urlWhatsApp, '_blank');
+    showToast(`Abriendo WhatsApp para enviar recordatorio a ${cliente.nombre}`, 'success');
+  };
+
   const confirmarMarcarPagado = async () => {
     console.log('🔄 Confirmando pago...', { pagoSeleccionado, modoPago, montoPersonalizado });
     
@@ -1095,7 +1147,7 @@ const Pagos = () => {
                     </div>
                     
                     {/* Resumen de pagos - Responsive */}
-                    <div className="flex flex-wrap md:flex-nowrap gap-3 md:gap-6 justify-start md:justify-end">
+                    <div className="flex flex-wrap md:flex-nowrap gap-3 md:gap-6 justify-start md:justify-end items-center">
                       <div className="text-center">
                         <div className={`text-xl md:text-2xl font-bold ${
                           filter === 'vencidos' ? 'text-red-600 dark:text-red-400' :
@@ -1114,6 +1166,21 @@ const Pagos = () => {
                            'Pendientes'} ({clienteData.count})
                         </div>
                       </div>
+                      
+                      {/* Botón WhatsApp para cuotas vencidas */}
+                      {filter === 'vencidos' && clienteData.cliente.telefono && clienteData.count > 0 && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            enviarRecordatorioWhatsApp(clienteData.cliente, clienteData.pagos);
+                          }}
+                          className="flex items-center gap-2 px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
+                          title="Enviar recordatorio por WhatsApp"
+                        >
+                          <MessageSquare className="w-4 h-4" />
+                          <span className="hidden sm:inline">WhatsApp</span>
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
