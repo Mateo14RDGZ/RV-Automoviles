@@ -567,7 +567,7 @@ const Pagos = () => {
     );
 
     // Generar mensaje
-    let mensaje = `*RECORDATORIO DE CUOTAS VENCIDAS - RV AUTOMÓVILES*\n\n`;
+    let mensaje = `*RECORDATORIO DE CUOTAS VENCIDAS - RV AUTOMOVILES*\n\n`;
     mensaje += `Estimado/a ${cliente.nombre},\n\n`;
     mensaje += `Le informamos que tiene *${cuotasOrdenadas.length} cuota${cuotasOrdenadas.length > 1 ? 's' : ''} vencida${cuotasOrdenadas.length > 1 ? 's' : ''}* pendiente${cuotasOrdenadas.length > 1 ? 's' : ''} de pago:\n\n`;
 
@@ -581,12 +581,12 @@ const Pagos = () => {
       
       mensaje += `*${index + 1}. ${cuota.auto.marca} ${cuota.auto.modelo}* (${cuota.auto.matricula})\n`;
       mensaje += `   Cuota N° ${cuota.numeroCuota}\n`;
-      mensaje += `   💰 Monto: $${parseFloat(cuota.monto).toFixed(2)}\n`;
-      mensaje += `   📅 Vencimiento: ${fechaVencimiento}\n\n`;
+      mensaje += `   Monto: $${parseFloat(cuota.monto).toFixed(2)}\n`;
+      mensaje += `   Vencimiento: ${fechaVencimiento}\n\n`;
     });
 
-    mensaje += `💵 *TOTAL ADEUDADO: $${totalAdeudado.toFixed(2)}*\n\n`;
-    mensaje += `Le solicitamos regularizar su situación a la brevedad.\n\n`;
+    mensaje += `*TOTAL ADEUDADO: $${totalAdeudado.toFixed(2)}*\n\n`;
+    mensaje += `Le solicitamos regularizar su situacion a la brevedad.\n\n`;
     mensaje += `Puede consultar el estado de sus cuotas y realizar pagos ingresando a nuestra plataforma web:\n\n`;
     mensaje += `*Web:* https://rv-automoviles.vercel.app\n\n`;
     
@@ -594,10 +594,10 @@ const Pagos = () => {
     if (cliente.cedula && cliente.passwordTemporal) {
       mensaje += `*Sus credenciales de acceso:*\n`;
       mensaje += `Usuario: ${cliente.cedula}\n`;
-      mensaje += `Contraseña: ${cliente.passwordTemporal}\n\n`;
+      mensaje += `Contrasena: ${cliente.passwordTemporal}\n\n`;
     }
     
-    mensaje += `*RV AUTOMÓVILES*`;
+    mensaje += `*RV AUTOMOVILES*`;
 
     // Limpiar teléfono y generar URL de WhatsApp
     const telefonoLimpio = cliente.telefono.replace(/\D/g, '');
