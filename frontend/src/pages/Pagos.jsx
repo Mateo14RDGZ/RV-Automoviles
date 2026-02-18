@@ -64,6 +64,9 @@ const Pagos = () => {
     intervaloMeses: 1,
     esFinanciamientoEnProgreso: false,
     cuotasPagadas: 0,
+    // Montos personalizados por cuota
+    usarMontosPersonalizados: false,
+    montosPersonalizados: [],
     // Pago al contado
     esPagoContado: false,
     // Estados para permutas
@@ -326,6 +329,26 @@ const Pagos = () => {
         }
       }
       
+      // Validar montos personalizados si están activados
+      if (generateData.esFinanciamientoEnProgreso && generateData.usarMontosPersonalizados) {
+        if (generateData.montosPersonalizados.length === 0) {
+          alert('Debe agregar al menos un rango de montos personalizados');
+          return;
+        }
+
+        // Validar que todos los rangos tengan datos completos
+        for (const rango of generateData.montosPersonalizados) {
+          if (!rango.desdeCuota || !rango.hastaCuota || !rango.monto) {
+            alert('Todos los rangos deben tener valores completos (desde, hasta, monto)');
+            return;
+          }
+          if (parseInt(rango.desdeCuota) > parseInt(rango.hastaCuota)) {
+            alert('El número de cuota "desde" no puede ser mayor que "hasta"');
+            return;
+          }
+        }
+      }
+      
       // Calcular monto para pago al contado
       let montoCuotaFinal = parseFloat(generateData.montoCuota);
       if (generateData.esPagoContado) {
@@ -354,6 +377,15 @@ const Pagos = () => {
         cuotasPagadas: generateData.esPagoContado ? 1 : (generateData.esFinanciamientoEnProgreso ? parseInt(generateData.cuotasPagadas) || 0 : 0),
         esPagoContado: generateData.esPagoContado
       };
+
+      // Agregar montos personalizados si están activados
+      if (generateData.esFinanciamientoEnProgreso && generateData.usarMontosPersonalizados && generateData.montosPersonalizados.length > 0) {
+        dataParaBackend.montosPersonalizados = generateData.montosPersonalizados.map(rango => ({
+          desdeCuota: parseInt(rango.desdeCuota),
+          hastaCuota: parseInt(rango.hastaCuota),
+          monto: parseFloat(rango.monto)
+        }));
+      }
       
       // Agregar datos de permuta si existe
       if (generateData.tienePermuta && generateData.tipoPermuta) {
@@ -792,6 +824,9 @@ const Pagos = () => {
       intervaloMeses: 1,
       esFinanciamientoEnProgreso: false,
       cuotasPagadas: 0,
+      // Montos personalizados por cuota
+      usarMontosPersonalizados: false,
+      montosPersonalizados: [],
       esPagoContado: false,
       // Estados para permutas
       tienePermuta: false,
@@ -2103,6 +2138,137 @@ const Pagos = () => {
                           Estas cuotas se marcarán automáticamente como pagadas.
                           Quedarán {(parseInt(generateData.numeroCuotas) || 0) - (parseInt(generateData.cuotasPagadas) || 0)} cuotas pendientes.
                         </p>
+
+                        {/* Checkbox para montos personalizados */}
+                        <div className="mt-4 pt-4 border-t border-blue-200 dark:border-blue-800">
+                          <label className="flex items-center gap-3 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={generateData.usarMontosPersonalizados}
+                              onChange={(e) => {
+                                setGenerateData({ 
+                                  ...generateData, 
+                                  usarMontosPersonalizados: e.target.checked,
+                                  montosPersonalizados: e.target.checked ? [] : []
+                                });
+                              }}
+                              className="w-4 h-4 text-purple-500 border-gray-300 dark:border-gray-600 rounded focus:ring-purple-400"
+                            />
+                            <div>
+                              <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                                Montos personalizados por cuota
+                              </span>
+                              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                Definir montos diferentes para distintas cuotas
+                              </p>
+                            </div>
+                          </label>
+
+                          {/* Interfaz de montos personalizados */}
+                          {generateData.usarMontosPersonalizados && (
+                            <div className="mt-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg p-3 border border-purple-200 dark:border-purple-900">
+                              <div className="flex items-center justify-between mb-3">
+                                <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                                  Rangos de Cuotas
+                                </h4>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setGenerateData({
+                                      ...generateData,
+                                      montosPersonalizados: [...generateData.montosPersonalizados, { desdeCuota: '', hastaCuota: '', monto: '' }]
+                                    });
+                                  }}
+                                  className="px-3 py-1 bg-purple-500 hover:bg-purple-600 text-white text-xs rounded transition-all duration-200"
+                                >
+                                  + Agregar Rango
+                                </button>
+                              </div>
+
+                              {generateData.montosPersonalizados.length === 0 ? (
+                                <p className="text-xs text-gray-500 dark:text-gray-400 text-center py-2">
+                                  Haz clic en "Agregar Rango" para definir montos personalizados
+                                </p>
+                              ) : (
+                                <div className="space-y-2">
+                                  {generateData.montosPersonalizados.map((rango, index) => (
+                                    <div key={index} className="flex gap-2 items-end bg-white dark:bg-gray-800 rounded p-2 border border-purple-200 dark:border-purple-800">
+                                      <div className="flex-1">
+                                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                                          Desde Cuota
+                                        </label>
+                                        <input
+                                          type="number"
+                                          min="1"
+                                          max={generateData.numeroCuotas}
+                                          value={rango.desdeCuota}
+                                          onChange={(e) => {
+                                            const nuevosRangos = [...generateData.montosPersonalizados];
+                                            nuevosRangos[index].desdeCuota = e.target.value;
+                                            setGenerateData({ ...generateData, montosPersonalizados: nuevosRangos });
+                                          }}
+                                          className="input text-sm text-center"
+                                          placeholder="#"
+                                        />
+                                      </div>
+                                      <div className="flex-1">
+                                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                                          Hasta Cuota
+                                        </label>
+                                        <input
+                                          type="number"
+                                          min="1"
+                                          max={generateData.numeroCuotas}
+                                          value={rango.hastaCuota}
+                                          onChange={(e) => {
+                                            const nuevosRangos = [...generateData.montosPersonalizados];
+                                            nuevosRangos[index].hastaCuota = e.target.value;
+                                            setGenerateData({ ...generateData, montosPersonalizados: nuevosRangos });
+                                          }}
+                                          className="input text-sm text-center"
+                                          placeholder="#"
+                                        />
+                                      </div>
+                                      <div className="flex-1">
+                                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                                          Monto
+                                        </label>
+                                        <input
+                                          type="number"
+                                          min="0"
+                                          step="0.01"
+                                          value={rango.monto}
+                                          onChange={(e) => {
+                                            const nuevosRangos = [...generateData.montosPersonalizados];
+                                            nuevosRangos[index].monto = e.target.value;
+                                            setGenerateData({ ...generateData, montosPersonalizados: nuevosRangos });
+                                          }}
+                                          className="input text-sm"
+                                          placeholder="$0.00"
+                                        />
+                                      </div>
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          const nuevosRangos = generateData.montosPersonalizados.filter((_, i) => i !== index);
+                                          setGenerateData({ ...generateData, montosPersonalizados: nuevosRangos });
+                                        }}
+                                        className="px-2 py-2 bg-red-500 hover:bg-red-600 text-white text-xs rounded transition-all duration-200"
+                                        title="Eliminar rango"
+                                      >
+                                        ✕
+                                      </button>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+
+                              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 italic">
+                                Ejemplo: Cuotas 1-5 con monto $500, Cuotas 6-12 con monto $200
+                              </p>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     )}
                   </div>

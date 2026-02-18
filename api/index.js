@@ -962,9 +962,9 @@ app.get('/api/pagos/:id', authenticateToken, async (req, res) => {
 
 app.post('/api/pagos/generar-cuotas', authenticateToken, requireStaff, async (req, res) => {
   try {
-    const { autoId, numeroCuotas, montoPorCuota, fechaPrimeraCuota, permuta, cuotasPagadas = 0, esPagoContado = false } = req.body;
+    const { autoId, numeroCuotas, montoPorCuota, fechaPrimeraCuota, permuta, cuotasPagadas = 0, esPagoContado = false, montosPersonalizados } = req.body;
 
-    console.log('💳 Generando plan de cuotas:', { autoId, numeroCuotas, montoPorCuota, fechaPrimeraCuota, cuotasPagadas, esPagoContado });
+    console.log('💳 Generando plan de cuotas:', { autoId, numeroCuotas, montoPorCuota, fechaPrimeraCuota, cuotasPagadas, esPagoContado, montosPersonalizados });
 
     const auto = await prisma.auto.findUnique({ 
       where: { id: parseInt(autoId) },
@@ -1027,6 +1027,20 @@ app.post('/api/pagos/generar-cuotas', authenticateToken, requireStaff, async (re
     const pagos = [];
     const cuotasPagadasNum = parseInt(cuotasPagadas) || 0;
     
+    // Función auxiliar para obtener el monto de una cuota según los rangos personalizados
+    const obtenerMontoCuota = (numeroCuota) => {
+      if (montosPersonalizados && Array.isArray(montosPersonalizados) && montosPersonalizados.length > 0) {
+        // Buscar en qué rango cae esta cuota
+        for (const rango of montosPersonalizados) {
+          if (numeroCuota >= rango.desdeCuota && numeroCuota <= rango.hastaCuota) {
+            return parseFloat(rango.monto);
+          }
+        }
+      }
+      // Si no hay montos personalizados o la cuota no está en ningún rango, usar el monto por defecto
+      return parseFloat(montoPorCuota);
+    };
+    
     for (let i = 1; i <= numeroCuotas; i++) {
       const fechaVencimiento = new Date(fechaPrimeraCuota);
       fechaVencimiento.setMonth(fechaVencimiento.getMonth() + (i - 1));
@@ -1034,10 +1048,13 @@ app.post('/api/pagos/generar-cuotas', authenticateToken, requireStaff, async (re
       // Si esta cuota está dentro de las cuotas ya pagadas
       const esCuotaPagada = i <= cuotasPagadasNum;
       
+      // Obtener el monto correspondiente a esta cuota
+      const montoCuotaActual = obtenerMontoCuota(i);
+      
       const pagoData = {
         autoId: parseInt(autoId),
         numeroCuota: i,
-        monto: parseFloat(montoPorCuota),
+        monto: montoCuotaActual,
         fechaVencimiento,
         estado: esCuotaPagada ? 'pagado' : 'pendiente'
       };
