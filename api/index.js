@@ -1039,13 +1039,26 @@ app.post('/api/pagos/generar-cuotas', authenticateToken, requireStaff, async (re
       // Si no hay monto personalizado para esta cuota, usar el monto por defecto
       return parseFloat(montoPorCuota);
     };
+
+    // Función auxiliar para determinar si una cuota debe estar pagada
+    const esCuotaPagadaPersonalizada = (numeroCuota) => {
+      if (montosPersonalizados && Array.isArray(montosPersonalizados) && montosPersonalizados.length > 0) {
+        const cuotaPersonalizada = montosPersonalizados.find(c => c.numeroCuota === numeroCuota);
+        if (cuotaPersonalizada) {
+          // Si tiene monto personalizado, usar su estado de pagada
+          return cuotaPersonalizada.pagada === true;
+        }
+      }
+      // Si no tiene monto personalizado, usar la lógica normal de cuotasPagadas
+      return numeroCuota <= cuotasPagadasNum;
+    };
     
     for (let i = 1; i <= numeroCuotas; i++) {
       const fechaVencimiento = new Date(fechaPrimeraCuota);
       fechaVencimiento.setMonth(fechaVencimiento.getMonth() + (i - 1));
 
-      // Si esta cuota está dentro de las cuotas ya pagadas
-      const esCuotaPagada = i <= cuotasPagadasNum;
+      // Determinar si esta cuota está pagada (lógica personalizada o estándar)
+      const esCuotaPagada = esCuotaPagadaPersonalizada(i);
       
       // Obtener el monto correspondiente a esta cuota
       const montoCuotaActual = obtenerMontoCuota(i);

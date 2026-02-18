@@ -386,7 +386,8 @@ const Pagos = () => {
       if (generateData.esFinanciamientoEnProgreso && generateData.usarMontosPersonalizados && generateData.montosPersonalizados.length > 0) {
         dataParaBackend.montosPersonalizados = generateData.montosPersonalizados.map(cuota => ({
           numeroCuota: parseInt(cuota.numeroCuota),
-          monto: parseFloat(cuota.monto)
+          monto: parseFloat(cuota.monto),
+          pagada: cuota.pagada || false
         }));
       }
       
@@ -2138,8 +2139,9 @@ const Pagos = () => {
                           placeholder="0"
                         />
                         <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">
-                          Estas cuotas se marcarán automáticamente como pagadas.
-                          Quedarán {(parseInt(generateData.numeroCuotas) || 0) - (parseInt(generateData.cuotasPagadas) || 0)} cuotas pendientes.
+                          Estas cuotas con monto normal se marcarán automáticamente como pagadas.
+                          {!generateData.usarMontosPersonalizados && `Quedarán ${(parseInt(generateData.numeroCuotas) || 0) - (parseInt(generateData.cuotasPagadas) || 0)} cuotas pendientes.`}
+                          {generateData.usarMontosPersonalizados && ' Las cuotas personalizadas tienen su propio estado.'}
                         </p>
 
                         {/* Checkbox para montos personalizados */}
@@ -2179,7 +2181,7 @@ const Pagos = () => {
                                   onClick={() => {
                                     setGenerateData({
                                       ...generateData,
-                                      montosPersonalizados: [...generateData.montosPersonalizados, { numeroCuota: '', monto: '' }]
+                                      montosPersonalizados: [...generateData.montosPersonalizados, { numeroCuota: '', monto: '', pagada: false }]
                                     });
                                   }}
                                   className="px-3 py-1 bg-purple-500 hover:bg-purple-600 text-white text-xs rounded transition-all duration-200"
@@ -2232,6 +2234,21 @@ const Pagos = () => {
                                           placeholder="$0.00"
                                         />
                                       </div>
+                                      <div className="flex flex-col items-center justify-end pb-2">
+                                        <label className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
+                                          Pagada
+                                        </label>
+                                        <input
+                                          type="checkbox"
+                                          checked={cuota.pagada || false}
+                                          onChange={(e) => {
+                                            const nuevasCuotas = [...generateData.montosPersonalizados];
+                                            nuevasCuotas[index].pagada = e.target.checked;
+                                            setGenerateData({ ...generateData, montosPersonalizados: nuevasCuotas });
+                                          }}
+                                          className="w-4 h-4 text-green-500 border-gray-300 dark:border-gray-600 rounded focus:ring-green-400"
+                                        />
+                                      </div>
                                       <button
                                         type="button"
                                         onClick={() => {
@@ -2249,7 +2266,7 @@ const Pagos = () => {
                               )}
 
                               <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 italic">
-                                Ejemplo: Cuota 5 con $500, Cuota 8 con $800. El resto usarán el monto por defecto.
+                                Ejemplo: Cuota 5 con $500, Cuota 8 con $800. El resto usarán el monto por defecto. Marca como "Pagada" las que ya fueron abonadas.
                               </p>
                             </div>
                           )}
