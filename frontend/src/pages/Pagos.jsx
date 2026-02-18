@@ -566,14 +566,25 @@ const Pagos = () => {
         year: 'numeric'
       });
       
+      // Determinar el monto a mostrar
+      const montoCuota = parseFloat(pagoParaEmail.monto);
+      const montoPagadoReal = pagoParaEmail.montoPagado ? parseFloat(pagoParaEmail.montoPagado) : montoCuota;
+      const esMontoParcial = pagoParaEmail.montoPagado && montoPagadoReal !== montoCuota;
+      
       const mensaje = `*CONFIRMACIÓN DE PAGO - RV AUTOMÓVILES*\n\n` +
         `Estimado/a ${cliente.nombre},\n\n` +
         `Le confirmamos la recepción de su pago correspondiente a:\n\n` +
         `🚗 *Vehículo:* ${auto.marca} ${auto.modelo} ${auto.anio}\n` +
         `📋 *Matrícula:* ${auto.matricula}\n` +
         `💳 *Cuota N°:* ${pagoParaEmail.numeroCuota}\n` +
-        `💵 *Monto Pagado:* ${formatCurrency(parseFloat(pagoParaEmail.monto))}\n` +
+        (esMontoParcial 
+          ? `💵 *Monto de Cuota:* ${formatCurrency(montoCuota)}\n` +
+            `💰 *Monto Pagado:* ${formatCurrency(montoPagadoReal)}\n`
+          : `💵 *Monto Pagado:* ${formatCurrency(montoPagadoReal)}\n`) +
         `📅 *Fecha de Pago:* ${fechaPago}\n\n` +
+        (esMontoParcial 
+          ? `ℹ️ Se registró un pago parcial. Saldo pendiente: ${formatCurrency(montoCuota - montoPagadoReal)}\n\n`
+          : '') +
         `Agradecemos su puntualidad en el cumplimiento de sus obligaciones.\n\n` +
         `━━━━━━━━━━━━━━━━━━━━\n` +
         `*📱 ACCESO A TU PORTAL DE CUOTAS*\n` +
@@ -788,8 +799,9 @@ const Pagos = () => {
 
   const getEstadoBadge = (pago) => {
     if (pago.estado === 'pagado') {
-      return <span className="badge badge-success flex items-center gap-1">
-        <CheckCircle className="w-3 h-3" /> Pagado
+      const tieneMontoParcial = pago.montoPagado && parseFloat(pago.montoPagado) !== parseFloat(pago.monto);
+      return <span className={`badge ${tieneMontoParcial ? 'badge-warning' : 'badge-success'} flex items-center gap-1`}>
+        <CheckCircle className="w-3 h-3" /> {tieneMontoParcial ? 'Pago Parcial' : 'Pagado'}
       </span>;
     }
     
@@ -992,12 +1004,15 @@ const Pagos = () => {
                             .map(pago => {
                               const esVencido = pago.estado !== 'pagado' && new Date(pago.fechaVencimiento) < new Date();
                               const esPagado = pago.estado === 'pagado';
+                              const tieneMontoParcial = esPagado && pago.montoPagado && parseFloat(pago.montoPagado) !== parseFloat(pago.monto);
                               
                               return (
                                 <div 
                                   key={pago.id} 
                                   className={`rounded-lg p-2.5 md:p-4 hover:shadow-md transition-shadow border-2 ${
-                                    esPagado 
+                                    tieneMontoParcial
+                                      ? 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-400 dark:border-yellow-700'
+                                      : esPagado 
                                       ? 'bg-white dark:bg-gray-800 border-green-200 dark:border-green-900' 
                                       : esVencido
                                       ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-900'
@@ -1011,8 +1026,8 @@ const Pagos = () => {
                                           {pago.auto.marca} {pago.auto.modelo} - Cuota #{pago.numeroCuota}
                                         </div>
                                         {esPagado && (
-                                          <span className="badge badge-success text-xs flex items-center gap-1">
-                                            <CheckCircle className="w-3 h-3" /> PAGADO
+                                          <span className={`badge ${tieneMontoParcial ? 'badge-warning' : 'badge-success'} text-xs flex items-center gap-1`}>
+                                            <CheckCircle className="w-3 h-3" /> {tieneMontoParcial ? 'PAGO PARCIAL' : 'PAGADO'}
                                           </span>
                                         )}
                                         {esVencido && (
@@ -1037,14 +1052,27 @@ const Pagos = () => {
                                       </div>
                                     </div>
                                     <div className="flex items-center justify-between gap-3">
-                                      <div className={`text-lg md:text-xl font-bold ${
-                                        esPagado 
-                                          ? 'text-green-600 dark:text-green-400' 
-                                          : esVencido
-                                          ? 'text-red-700 dark:text-red-400'
-                                          : 'text-yellow-700 dark:text-yellow-400'
-                                      }`}>
-                                        {formatCurrency(pago.monto)}
+                                      <div className="flex flex-col gap-1">
+                                        {tieneMontoParcial && (
+                                          <div className="text-xs text-gray-500 dark:text-gray-400 line-through">
+                                            Cuota: {formatCurrency(pago.monto)}
+                                          </div>
+                                        )}
+                                        <div className={`text-lg md:text-xl font-bold ${
+                                          tieneMontoParcial
+                                            ? 'text-yellow-700 dark:text-yellow-400'
+                                            : esPagado 
+                                            ? 'text-green-600 dark:text-green-400' 
+                                            : esVencido
+                                            ? 'text-red-700 dark:text-red-400'
+                                            : 'text-yellow-700 dark:text-yellow-400'
+                                        }`}>
+                                          {tieneMontoParcial ? (
+                                            <span>Pagó: {formatCurrency(pago.montoPagado)}</span>
+                                          ) : (
+                                            formatCurrency(pago.monto)
+                                          )}
+                                        </div>
                                       </div>
                                       {!esPagado && (
                                         isStaff ? (
@@ -1224,11 +1252,16 @@ const Pagos = () => {
 
               {/* Vista Mobile - Cards */}
               <div className="md:hidden space-y-4 p-4">
-                {pagos.map((pago) => (
+                {pagos.map((pago) => {
+                  const tieneMontoParcial = pago.estado === 'pagado' && pago.montoPagado && parseFloat(pago.montoPagado) !== parseFloat(pago.monto);
+                  
+                  return (
                   <div 
                     key={pago.id} 
                     className={`rounded-lg p-4 border-2 transition-all ${
-                      isVencido(pago) 
+                      tieneMontoParcial
+                        ? 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-400 dark:border-yellow-700'
+                        : isVencido(pago) 
                         ? 'bg-red-50 dark:bg-red-900/20 border-red-300 dark:border-red-800' 
                         : pago.estado === 'pagado'
                         ? 'bg-green-50 dark:bg-green-900/20 border-green-300 dark:border-green-800'
@@ -1262,9 +1295,23 @@ const Pagos = () => {
                       
                       <div className="flex justify-between items-center">
                         <span className="text-sm text-gray-600 dark:text-gray-400">Monto</span>
-                        <span className="font-bold text-lg text-gray-900 dark:text-white">
-                          {formatCurrency(pago.monto)}
-                        </span>
+                        <div className="text-right">
+                          {tieneMontoParcial && (
+                            <div className="text-xs text-gray-500 dark:text-gray-400 line-through">
+                              {formatCurrency(pago.monto)}
+                            </div>
+                          )}
+                          <span className={`font-bold text-lg ${
+                            tieneMontoParcial ? 'text-yellow-700 dark:text-yellow-400' : 'text-gray-900 dark:text-white'
+                          }`}>
+                            {tieneMontoParcial ? formatCurrency(pago.montoPagado) : formatCurrency(pago.monto)}
+                          </span>
+                          {tieneMontoParcial && (
+                            <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                              Pagado
+                            </div>
+                          )}
+                        </div>
                       </div>
                       
                       <div className="flex justify-between items-center">
@@ -1346,7 +1393,8 @@ const Pagos = () => {
                       </div>
                     )}
                   </div>
-                ))}
+                );
+                })}
               </div>
             </>
           )}

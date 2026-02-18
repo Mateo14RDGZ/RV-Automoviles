@@ -35,7 +35,11 @@ const ClienteDashboard = () => {
       console.log('⏰ Pendientes:', pendientes.length);
       console.log('🚨 Vencidos:', vencidos.length);
 
-      const totalPagado = pagados.reduce((sum, p) => sum + parseFloat(p.monto), 0);
+      const totalPagado = pagados.reduce((sum, p) => {
+        // Usar montoPagado si existe, de lo contrario usar monto
+        const montoReal = p.montoPagado ? parseFloat(p.montoPagado) : parseFloat(p.monto);
+        return sum + montoReal;
+      }, 0);
       const totalPendiente = [...pendientes, ...vencidos].reduce((sum, p) => sum + parseFloat(p.monto), 0);
       const totalCredito = totalPagado + totalPendiente;
 
