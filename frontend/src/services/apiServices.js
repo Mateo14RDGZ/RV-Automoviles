@@ -147,8 +147,12 @@ export const comprobantesService = {
     return response.data;
   },
 
-  actualizarEstado: async (id, estado, notas = null) => {
-    const response = await api.put(`/comprobantes/${id}/estado`, { estado, notas });
+  actualizarEstado: async (id, estado, notas = null, montoPagado = null) => {
+    const body = { estado, notas };
+    if (montoPagado !== null) {
+      body.montoPagado = montoPagado;
+    }
+    const response = await api.put(`/comprobantes/${id}/estado`, body);
     return response.data;
   },
 

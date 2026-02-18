@@ -10,7 +10,9 @@ import {
   CheckCircle, 
   XCircle,
   Filter,
-  RefreshCw
+  RefreshCw,
+  DollarSign,
+  AlertCircle
 } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 import Loading from '../components/Loading';
@@ -24,6 +26,8 @@ const Comprobantes = () => {
   const [mostrarComprobante, setMostrarComprobante] = useState(false);
   const [mostrarModalWhatsApp, setMostrarModalWhatsApp] = useState(false);
   const [pagoAprobado, setPagoAprobado] = useState(null);
+  const [mostrarModalAprobacion, setMostrarModalAprobacion] = useState(false);
+  const [montoPersonalizado, setMontoPersonalizado] = useState('');
 
   useEffect(() => {
     loadComprobantes();
@@ -54,18 +58,21 @@ const Comprobantes = () => {
     }
   };
 
-  const aprobarComprobante = async (id, notas = '') => {
+  const aprobarComprobante = async (id, notas = '', montoPagado = null) => {
     try {
-      const resultado = await comprobantesService.actualizarEstado(id, 'aprobado', notas);
+      const resultado = await comprobantesService.actualizarEstado(id, 'aprobado', notas, montoPagado);
       showToast('Comprobante aprobado exitosamente', 'success');
       setMostrarComprobante(false);
+      setMostrarModalAprobacion(false);
+      setMontoPersonalizado('');
       
       // Guardar información del pago para el modal de WhatsApp
       if (comprobanteSeleccionado && comprobanteSeleccionado.pago) {
         setPagoAprobado({
           ...comprobanteSeleccionado.pago,
           estado: 'pagado',
-          fechaPago: new Date().toISOString()
+          fechaPago: new Date().toISOString(),
+          montoPagado: montoPagado || comprobanteSeleccionado.pago.monto
         });
         setMostrarModalWhatsApp(true);
       }
@@ -100,6 +107,12 @@ const Comprobantes = () => {
         month: 'long',
         year: 'numeric'
       });
+
+      // Determinar montos
+      const montoCuota = parseFloat(pagoAprobado.monto);
+      const montoPagadoReal = pagoAprobado.montoPagado ? parseFloat(pagoAprobado.montoPagado) : montoCuota;
+      const esMontoDiferente = montoPagadoReal !== montoCuota;
+      const excedente = montoPagadoReal - montoCuota;
       
       const mensaje = `*CONFIRMACIÓN DE PAGO - RV AUTOMÓVILES*\n\n` +
         `Estimado/a ${cliente.nombre},\n\n` +
@@ -107,8 +120,16 @@ const Comprobantes = () => {
         `🚗 *Vehículo:* ${auto.marca} ${auto.modelo} ${auto.anio}\n` +
         `📋 *Matrícula:* ${auto.matricula}\n` +
         `💳 *Cuota N°:* ${pagoAprobado.numeroCuota}\n` +
-        `💵 *Monto Pagado:* ${formatCurrency(parseFloat(pagoAprobado.monto))}\n` +
+        (esMontoDiferente 
+          ? `💵 *Monto de Cuota:* ${formatCurrency(montoCuota)}\n` +
+            `💰 *Monto Pagado:* ${formatCurrency(montoPagadoReal)}\n`
+          : `💵 *Monto Pagado:* ${formatCurrency(montoPagadoReal)}\n`) +
         `📅 *Fecha de Pago:* ${fechaPago}\n\n` +
+        (excedente > 0
+          ? `ℹ️ El excedente de ${formatCurrency(excedente)} se aplicó automáticamente a su próxima cuota.\n\n`
+          : excedente < 0
+          ? `ℹ️ Pago parcial registrado. Saldo pendiente: ${formatCurrency(Math.abs(excedente))}\n\n`
+          : '') +
         `Agradecemos su puntualidad en el cumplimiento de sus obligaciones.\n\n` +
         `━━━━━━━━━━━━━━━━━━━━\n` +
         `*📱 ACCESO A TU PORTAL DE CUOTAS*\n` +
@@ -521,7 +542,10 @@ const Comprobantes = () => {
               {comprobanteSeleccionado.estado === 'pendiente' && (
                 <div className="flex flex-col md:flex-row gap-2 md:gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
                   <button
-                    onClick={() => aprobarComprobante(comprobanteSeleccionado.id)}
+                    onClick={() => {
+                      setMontoPersonalizado('');
+                      setMostrarModalAprobacion(true);
+                    }}
                     className="btn btn-success flex-1 flex items-center justify-center gap-2 text-sm md:text-base py-2.5"
                   >
                     <Check className="w-4 h-4" />
@@ -536,6 +560,116 @@ const Comprobantes = () => {
                   </button>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de confirmación de aprobación con monto personalizado */}
+      {mostrarModalAprobacion && comprobanteSeleccionado && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-70 z-50 flex items-center justify-center p-4" onClick={() => setMostrarModalAprobacion(false)}>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+            <div className="p-6">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                Aprobar Comprobante de Pago
+              </h3>
+
+              <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  Cuota #{comprobanteSeleccionado.pago.numeroCuota}
+                </p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  {comprobanteSeleccionado.pago.auto.marca} {comprobanteSeleccionado.pago.auto.modelo}
+                </p>
+                <p className="text-lg font-bold text-blue-600 dark:text-blue-400 mt-1">
+                  Monto: {formatCurrency(comprobanteSeleccionado.pago.monto)}
+                </p>
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Monto Pagado (Opcional)
+                </label>
+                <div className="relative">
+                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={montoPersonalizado}
+                    onChange={(e) => setMontoPersonalizado(e.target.value)}
+                    placeholder={`Por defecto: ${formatCurrency(comprobanteSeleccionado.pago.monto)}`}
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+                <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                  Deja vacío para usar el monto de la cuota. Ingresa un monto diferente si el cliente pagó más o menos.
+                </p>
+              </div>
+
+              {/* Alerta de excedente */}
+              {montoPersonalizado && (() => {
+                const montoPagado = parseFloat(montoPersonalizado);
+                const montoCuota = parseFloat(comprobanteSeleccionado.pago.monto);
+                const excedente = montoPagado - montoCuota;
+
+                if (excedente > 0) {
+                  return (
+                    <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                      <div className="flex items-start gap-2">
+                        <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-sm font-semibold text-green-800 dark:text-green-300">
+                            Excedente: {formatCurrency(excedente)}
+                          </p>
+                          <p className="text-xs text-green-700 dark:text-green-400 mt-1">
+                            Este monto se aplicará automáticamente a la siguiente cuota pendiente
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                } else if (excedente < 0) {
+                  return (
+                    <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                      <div className="flex items-start gap-2">
+                        <AlertCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-sm font-semibold text-yellow-800 dark:text-yellow-300">
+                            Pago parcial: {formatCurrency(Math.abs(excedente))} pendiente
+                          </p>
+                          <p className="text-xs text-yellow-700 dark:text-yellow-400 mt-1">
+                            El cliente debe el saldo restante de esta cuota
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+                return null;
+              })()}
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  onClick={() => {
+                    setMostrarModalAprobacion(false);
+                    setMontoPersonalizado('');
+                  }}
+                  className="flex-1 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 py-2.5 px-4 rounded-lg font-semibold transition-all duration-200"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={() => {
+                    const monto = montoPersonalizado ? parseFloat(montoPersonalizado) : null;
+                    aprobarComprobante(comprobanteSeleccionado.id, '', monto);
+                  }}
+                  className="flex-1 bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white py-2.5 px-4 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center gap-2"
+                >
+                  <Check className="w-5 h-5" />
+                  Confirmar Aprobación
+                </button>
+              </div>
             </div>
           </div>
         </div>

@@ -962,9 +962,9 @@ app.get('/api/pagos/:id', authenticateToken, async (req, res) => {
 
 app.post('/api/pagos/generar-cuotas', authenticateToken, requireStaff, async (req, res) => {
   try {
-    const { autoId, numeroCuotas, montoPorCuota, fechaPrimeraCuota, permuta, cuotasPagadas = 0 } = req.body;
+    const { autoId, numeroCuotas, montoPorCuota, fechaPrimeraCuota, permuta, cuotasPagadas = 0, esPagoContado = false } = req.body;
 
-    console.log('💳 Generando plan de cuotas:', { autoId, numeroCuotas, montoPorCuota, fechaPrimeraCuota, cuotasPagadas });
+    console.log('💳 Generando plan de cuotas:', { autoId, numeroCuotas, montoPorCuota, fechaPrimeraCuota, cuotasPagadas, esPagoContado });
 
     const auto = await prisma.auto.findUnique({ 
       where: { id: parseInt(autoId) },
@@ -1059,13 +1059,44 @@ app.post('/api/pagos/generar-cuotas', authenticateToken, requireStaff, async (re
 
     console.log('✅ Cuotas creadas exitosamente:', createdPagos.length);
 
-    // Marcar auto como financiado (plan de cuotas en progreso)
+    // Marcar auto como financiado o pagado (si es pago al contado)
+    const estadoAuto = esPagoContado ? 'pagado' : 'financiado';
     await prisma.auto.update({
       where: { id: parseInt(autoId) },
-      data: { estado: 'financiado' }
+      data: { estado: estadoAuto }
     });
 
-    console.log('✅ Auto marcado como financiado (plan en progreso)');
+    console.log(`✅ Auto marcado como ${estadoAuto}`);
+
+    // Enviar mensaje de WhatsApp si es pago al contado
+    if (esPagoContado) {
+      try {
+        const cliente = auto.cliente;
+        if (cliente && cliente.telefono) {
+          const mensaje = `*¡FELICITACIONES! - RV AUTOMÓVILES*\n\n` +
+            `Estimado/a ${cliente.nombre},\n\n` +
+            `¡Es un placer felicitarle por su compra!\n\n` +
+            `Hemos recibido el pago completo de su vehículo:\n\n` +
+            `🚗 *Vehículo:* ${auto.marca} ${auto.modelo} ${auto.anio}\n` +
+            `📋 *Matrícula:* ${auto.matricula}\n` +
+            `💰 *Monto Total Pagado:* $${parseFloat(montoPorCuota).toFixed(2)}\n` +
+            `📅 *Fecha:* ${new Date().toLocaleDateString('es-UY', { day: '2-digit', month: 'long', year: 'numeric' })}\n\n` +
+            `Su vehículo está completamente pago. Agradecemos su confianza en nosotros.\n\n` +
+            `Para cualquier consulta, estamos a su disposición.\n\n` +
+            `*RV AUTOMÓVILES*\n` +
+            `📞 Teléfono: 092 123 456\n` +
+            `📧 Email: info@rvautomoviles.com`;
+
+          const telefonoLimpio = cliente.telefono.replace(/\D/g, '');
+          const urlWhatsApp = `https://wa.me/598${telefonoLimpio}?text=${encodeURIComponent(mensaje)}`;
+          
+          console.log('📱 Mensaje de pago al contado generado para WhatsApp:', urlWhatsApp);
+        }
+      } catch (whatsappError) {
+        console.error('⚠️ Error al preparar mensaje de WhatsApp:', whatsappError);
+        // No bloqueamos el proceso si falla el WhatsApp
+      }
+    }
 
     const response = {
       pagos: createdPagos,
@@ -1074,7 +1105,8 @@ app.post('/api/pagos/generar-cuotas', authenticateToken, requireStaff, async (re
         tipo: permutaCreada.tipo,
         valorEstimado: permutaCreada.valorEstimado,
         guardada: true
-      } : null
+      } : null,
+      esPagoContado: esPagoContado
     };
 
     res.status(201).json(response);
@@ -1180,6 +1212,62 @@ app.put('/api/pagos/:id', authenticateToken, async (req, res) => {
     });
 
     console.log('✅ Pago actualizado:', pago);
+
+    // Si se marcó como pagado con excedente, aplicar a la siguiente cuota
+    if (updateData.estado === 'pagado' && pago.autoId && updateData.montoPagado) {
+      const montoPagado = parseFloat(updateData.montoPagado);
+      const montoCuota = parseFloat(pago.monto);
+      const excedente = montoPagado - montoCuota;
+
+      if (excedente > 0) {
+        console.log(`💰 Excedente detectado: ${excedente}. Buscando siguiente cuota...`);
+        
+        // Buscar la siguiente cuota pendiente
+        const siguienteCuota = await prisma.pago.findFirst({
+          where: {
+            autoId: pago.autoId,
+            estado: 'pendiente',
+            numeroCuota: { gt: pago.numeroCuota }
+          },
+          orderBy: { numeroCuota: 'asc' }
+        });
+
+        if (siguienteCuota) {
+          const montoSiguienteCuota = parseFloat(siguienteCuota.monto);
+          
+          if (excedente >= montoSiguienteCuota) {
+            // El excedente cubre toda la siguiente cuota
+            await prisma.pago.update({
+              where: { id: siguienteCuota.id },
+              data: {
+                estado: 'pagado',
+                fechaPago: new Date(),
+                montoPagado: montoSiguienteCuota
+              }
+            });
+            console.log(`✅ Siguiente cuota #${siguienteCuota.numeroCuota} pagada completamente con excedente`);
+            
+            // Si aún queda excedente, podría aplicarse recursivamente
+            const excedenteRestante = excedente - montoSiguienteCuota;
+            if (excedenteRestante > 0) {
+              console.log(`💰 Excedente restante: ${excedenteRestante} (se puede aplicar manualmente a más cuotas)`);
+            }
+          } else {
+            // El excedente cubre parcialmente la siguiente cuota
+            const nuevoMonto = montoSiguienteCuota - excedente;
+            await prisma.pago.update({
+              where: { id: siguienteCuota.id },
+              data: {
+                monto: nuevoMonto
+              }
+            });
+            console.log(`✅ Siguiente cuota #${siguienteCuota.numeroCuota} reducida de ${montoSiguienteCuota} a ${nuevoMonto}`);
+          }
+        } else {
+          console.log('⚠️ No hay siguiente cuota pendiente para aplicar el excedente');
+        }
+      }
+    }
 
     // Si se marcó como pagado, verificar si todas las cuotas están pagadas
     if (updateData.estado === 'pagado' && pago.autoId) {
@@ -1417,7 +1505,7 @@ app.put('/api/comprobantes/:id/visto', authenticateToken, requireStaff, async (r
 app.put('/api/comprobantes/:id/estado', authenticateToken, requireStaff, async (req, res) => {
   try {
     const { id } = req.params;
-    const { estado, notas } = req.body;
+    const { estado, notas, montoPagado } = req.body;
 
     if (!estado || !['pendiente', 'aprobado', 'rechazado'].includes(estado)) {
       return res.status(400).json({ error: 'Estado inválido' });
@@ -1434,13 +1522,64 @@ app.put('/api/comprobantes/:id/estado', authenticateToken, requireStaff, async (
 
     // Si se aprueba, actualizar el pago como pagado
     if (estado === 'aprobado' && comprobante.pago.estado === 'pendiente') {
+      const updateData = {
+        estado: 'pagado',
+        fechaPago: new Date()
+      };
+
+      // Si se proporciona montoPagado, agregarlo
+      if (montoPagado !== undefined) {
+        updateData.montoPagado = parseFloat(montoPagado);
+        console.log('💰 Monto pagado especificado al aprobar comprobante:', updateData.montoPagado);
+      }
+
       await prisma.pago.update({
         where: { id: comprobante.pagoId },
-        data: {
-          estado: 'pagado',
-          fechaPago: new Date()
-        }
+        data: updateData
       });
+
+      // Si hay excedente, aplicarlo a la siguiente cuota
+      if (montoPagado) {
+        const montoPagadoNum = parseFloat(montoPagado);
+        const montoCuota = parseFloat(comprobante.pago.monto);
+        const excedente = montoPagadoNum - montoCuota;
+
+        if (excedente > 0) {
+          console.log(`💰 Excedente detectado en aprobación: ${excedente}. Buscando siguiente cuota...`);
+          
+          const siguienteCuota = await prisma.pago.findFirst({
+            where: {
+              autoId: comprobante.pago.autoId,
+              estado: 'pendiente',
+              numeroCuota: { gt: comprobante.pago.numeroCuota }
+            },
+            orderBy: { numeroCuota: 'asc' }
+          });
+
+          if (siguienteCuota) {
+            const montoSiguienteCuota = parseFloat(siguienteCuota.monto);
+            
+            if (excedente >= montoSiguienteCuota) {
+              await prisma.pago.update({
+                where: { id: siguienteCuota.id },
+                data: {
+                  estado: 'pagado',
+                  fechaPago: new Date(),
+                  montoPagado: montoSiguienteCuota
+                }
+              });
+              console.log(`✅ Siguiente cuota #${siguienteCuota.numeroCuota} pagada completamente con excedente`);
+            } else {
+              const nuevoMonto = montoSiguienteCuota - excedente;
+              await prisma.pago.update({
+                where: { id: siguienteCuota.id },
+                data: { monto: nuevoMonto }
+              });
+              console.log(`✅ Siguiente cuota #${siguienteCuota.numeroCuota} reducida de ${montoSiguienteCuota} a ${nuevoMonto}`);
+            }
+          }
+        }
+      }
 
       // Verificar si todas las cuotas del auto están pagadas
       const todosPagos = await prisma.pago.findMany({

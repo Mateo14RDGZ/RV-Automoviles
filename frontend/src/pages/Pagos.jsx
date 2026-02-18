@@ -65,6 +65,8 @@ const Pagos = () => {
     intervaloMeses: 1,
     esFinanciamientoEnProgreso: false,
     cuotasPagadas: 0,
+    // Pago al contado
+    esPagoContado: false,
     // Estados para permutas
     tienePermuta: false,
     tipoPermuta: '', // 'auto', 'moto', 'otros'
@@ -325,13 +327,33 @@ const Pagos = () => {
         }
       }
       
+      // Calcular monto para pago al contado
+      let montoCuotaFinal = parseFloat(generateData.montoCuota);
+      if (generateData.esPagoContado) {
+        const precioTotal = parseFloat(generateData.precioTotal || 0);
+        const entregaInicial = parseFloat(generateData.entregaInicial || 0);
+        const valorPermuta = generateData.tienePermuta && generateData.tipoPermuta ? parseFloat(
+          generateData.tipoPermuta === 'auto' ? generateData.permutaAuto.precio :
+          generateData.tipoPermuta === 'moto' ? generateData.permutaMoto.precio :
+          generateData.permutaOtros.precio
+        ) || 0 : 0;
+        
+        montoCuotaFinal = precioTotal - entregaInicial - valorPermuta;
+        
+        if (montoCuotaFinal <= 0) {
+          alert('El monto a pagar debe ser mayor a cero después de descontar la entrega inicial y la permuta');
+          return;
+        }
+      }
+      
       // Mapear los datos del formulario a lo que espera el backend
       const dataParaBackend = {
         autoId: generateData.autoId,
-        numeroCuotas: parseInt(generateData.numeroCuotas),
-        montoPorCuota: parseFloat(generateData.montoCuota),
+        numeroCuotas: generateData.esPagoContado ? 1 : parseInt(generateData.numeroCuotas),
+        montoPorCuota: montoCuotaFinal,
         fechaPrimeraCuota: generateData.fechaInicio,
-        cuotasPagadas: generateData.esFinanciamientoEnProgreso ? parseInt(generateData.cuotasPagadas) || 0 : 0
+        cuotasPagadas: generateData.esPagoContado ? 1 : (generateData.esFinanciamientoEnProgreso ? parseInt(generateData.cuotasPagadas) || 0 : 0),
+        esPagoContado: generateData.esPagoContado
       };
       
       // Agregar datos de permuta si existe
@@ -352,9 +374,37 @@ const Pagos = () => {
       
       console.log('🚀 Generando plan de cuotas:', dataParaBackend);
       
-      await pagosService.generarCuotas(dataParaBackend);
+      const resultado = await pagosService.generarCuotas(dataParaBackend);
       
       console.log('✅ Plan de cuotas generado exitosamente');
+      
+      // Si es pago al contado, mostrar mensaje de WhatsApp
+      if (generateData.esPagoContado) {
+        const autoSeleccionado = autos.find(a => a.id === parseInt(generateData.autoId));
+        if (autoSeleccionado && autoSeleccionado.cliente?.telefono) {
+          const cliente = autoSeleccionado.cliente;
+          const mensaje = `*¡FELICITACIONES! - RV AUTOMÓVILES*\n\n` +
+            `Estimado/a ${cliente.nombre},\n\n` +
+            `¡Es un placer felicitarle por su compra!\n\n` +
+            `Hemos recibido el pago completo de su vehículo:\n\n` +
+            `🚗 *Vehículo:* ${autoSeleccionado.marca} ${autoSeleccionado.modelo} ${autoSeleccionado.anio}\n` +
+            `📋 *Matrícula:* ${autoSeleccionado.matricula}\n` +
+            `💰 *Monto Total Pagado:* ${formatCurrency(montoCuotaFinal)}\n` +
+            `📅 *Fecha:* ${new Date().toLocaleDateString('es-UY', { day: '2-digit', month: 'long', year: 'numeric' })}\n\n` +
+            `Su vehículo está completamente pago. Agradecemos su confianza en nosotros.\n\n` +
+            `Para cualquier consulta, estamos a su disposición.\n\n` +
+            `*RV AUTOMÓVILES*\n` +
+            `📞 Teléfono: 092 123 456\n` +
+            `📧 Email: info@rvautomoviles.com`;
+
+          const telefonoLimpio = cliente.telefono.replace(/\D/g, '');
+          const urlWhatsApp = `https://wa.me/598${telefonoLimpio}?text=${encodeURIComponent(mensaje)}`;
+          
+          // Abrir WhatsApp en una nueva ventana
+          window.open(urlWhatsApp, '_blank');
+          showToast('¡Pago al contado registrado! Abriendo WhatsApp para enviar mensaje de agradecimiento', 'success');
+        }
+      }
       
       setShowGenerateModal(false);
       resetGenerateForm();
@@ -744,6 +794,7 @@ const Pagos = () => {
       intervaloMeses: 1,
       esFinanciamientoEnProgreso: false,
       cuotasPagadas: 0,
+      esPagoContado: false,
       // Estados para permutas
       tienePermuta: false,
       tipoPermuta: '',
@@ -1976,7 +2027,37 @@ const Pagos = () => {
                     </div>
                   </div>
 
+                {/* Sección de Pago al Contado */}
+                <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg p-4 border-2 border-green-300 dark:border-green-700">
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={generateData.esPagoContado}
+                      onChange={(e) => {
+                        setGenerateData({ 
+                          ...generateData, 
+                          esPagoContado: e.target.checked,
+                          numeroCuotas: e.target.checked ? 1 : 12,
+                          esFinanciamientoEnProgreso: false,
+                          cuotasPagadas: 0
+                        });
+                      }}
+                      className="w-5 h-5 text-green-600 border-gray-300 dark:border-gray-600 rounded focus:ring-green-500"
+                    />
+                    <div className="flex-1">
+                      <span className="text-base font-bold text-green-700 dark:text-green-400 flex items-center gap-2">
+                        <DollarSign className="w-5 h-5" />
+                        Pago al Contado
+                      </span>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                        El cliente pagó el vehículo completo en un solo pago
+                      </p>
+                    </div>
+                  </label>
+                </div>
+
                 {/* Sección 3: Configuración de Cuotas */}
+                {!generateData.esPagoContado && (
                 <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-300 dark:border-gray-600">
                   <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">
                     Configuración del Plan
@@ -2078,38 +2159,52 @@ const Pagos = () => {
                     )}
                   </div>
                 </div>
+                )}
 
                 {/* Sección 4: Resultado - Monto por Cuota */}
                 <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-300 dark:border-gray-600">
-                  <div className="flex items-center justify-between mb-2">
-                    <label className="text-sm font-bold text-gray-700 dark:text-gray-300">
-                      Monto por Cuota *
-                    </label>
-                    <button
-                      type="button"
-                      onClick={calcularMontoCuota}
-                      className="px-3 py-1.5 bg-gray-700 hover:bg-gray-800 dark:bg-gray-600 dark:hover:bg-gray-500 text-white text-xs font-medium rounded transition-all duration-200"
-                    >
-                      Calcular
-                    </button>
-                  </div>
-                  
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">$</span>
-                    <input
-                      type="number"
-                      required
-                      min="0"
-                      step="0.01"
-                      value={generateData.montoCuota}
-                      onChange={(e) => setGenerateData({ ...generateData, montoCuota: e.target.value })}
-                      className="input pl-8 text-lg font-semibold text-center"
-                      placeholder="0.00"
-                    />
-                  </div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 text-center">
-                    Valor de cada cuota mensual
-                  </p>
+                  {generateData.esPagoContado ? (
+                    <div className="text-center">
+                      <h3 className="text-sm font-bold text-green-700 dark:text-green-400 mb-2">
+                        Pago Único Completo
+                      </h3>
+                      <p className="text-gray-600 dark:text-gray-400 text-sm">
+                        El vehículo será registrado como pagado en su totalidad
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="text-sm font-bold text-gray-700 dark:text-gray-300">
+                          Monto por Cuota *
+                        </label>
+                        <button
+                          type="button"
+                          onClick={calcularMontoCuota}
+                          className="px-3 py-1.5 bg-gray-700 hover:bg-gray-800 dark:bg-gray-600 dark:hover:bg-gray-500 text-white text-xs font-medium rounded transition-all duration-200"
+                        >
+                          Calcular
+                        </button>
+                      </div>
+                      
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">$</span>
+                        <input
+                          type="number"
+                          required
+                          min="0"
+                          step="0.01"
+                          value={generateData.montoCuota}
+                          onChange={(e) => setGenerateData({ ...generateData, montoCuota: e.target.value })}
+                          className="input pl-8 text-lg font-semibold text-center"
+                          placeholder="0.00"
+                        />
+                      </div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 text-center">
+                        Valor de cada cuota mensual
+                      </p>
+                    </>
+                  )}
                 </div>
 
                 {/* Resumen del Plan (si hay financiamiento en progreso) */}
@@ -2263,27 +2358,84 @@ const Pagos = () => {
 
               {/* Input para monto personalizado */}
               {modoPago === 'personalizado' && (
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Monto Entregado *
-                  </label>
-                  <div className="relative">
-                    <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <input
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      value={montoPersonalizado}
-                      onChange={(e) => setMontoPersonalizado(e.target.value)}
-                      placeholder="Ej: 5000.00"
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                      autoFocus
-                    />
+                <>
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Monto Entregado *
+                    </label>
+                    <div className="relative">
+                      <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={montoPersonalizado}
+                        onChange={(e) => setMontoPersonalizado(e.target.value)}
+                        placeholder="Ej: 5000.00"
+                        className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                        autoFocus
+                      />
+                    </div>
+                    <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                      Ingresa el monto exacto que entregó el cliente
+                    </p>
                   </div>
-                  <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                    Ingresa el monto exacto que entregó el cliente
-                  </p>
-                </div>
+
+                  {/* Alerta de excedente */}
+                  {(() => {
+                    let pago = pagos.find(p => p.id === pagoSeleccionado);
+                    if (!pago) {
+                      for (const clienteData of clientesConPagos) {
+                        const pagoEncontrado = clienteData.pagos.find(p => p.id === pagoSeleccionado);
+                        if (pagoEncontrado) {
+                          pago = pagoEncontrado;
+                          break;
+                        }
+                      }
+                    }
+
+                    if (pago && montoPersonalizado) {
+                      const montoPagado = parseFloat(montoPersonalizado);
+                      const montoCuota = parseFloat(pago.monto);
+                      const excedente = montoPagado - montoCuota;
+
+                      if (excedente > 0) {
+                        return (
+                          <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                            <div className="flex items-start gap-2">
+                              <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+                              <div>
+                                <p className="text-sm font-semibold text-green-800 dark:text-green-300">
+                                  Excedente: {formatCurrency(excedente)}
+                                </p>
+                                <p className="text-xs text-green-700 dark:text-green-400 mt-1">
+                                  Este monto se aplicará automáticamente a la siguiente cuota pendiente
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      } else if (excedente < 0) {
+                        return (
+                          <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                            <div className="flex items-start gap-2">
+                              <AlertCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
+                              <div>
+                                <p className="text-sm font-semibold text-yellow-800 dark:text-yellow-300">
+                                  Pago parcial: {formatCurrency(Math.abs(excedente))} pendiente
+                                </p>
+                                <p className="text-xs text-yellow-700 dark:text-yellow-400 mt-1">
+                                  El cliente debe el saldo restante de esta cuota
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      }
+                    }
+                    return null;
+                  })()}
+                </>
               )}
 
               <div className="flex gap-3 pt-4">

@@ -418,7 +418,9 @@ const Dashboard = () => {
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-semibold text-green-700 dark:text-green-400">{formatCurrency(pago.monto)}</p>
+                    <p className="font-semibold text-green-700 dark:text-green-400">
+                      {formatCurrency(pago.montoPagado ? parseFloat(pago.montoPagado) : parseFloat(pago.monto))}
+                    </p>
                     <p className="text-xs text-gray-600 dark:text-gray-400">{formatDate(pago.fechaPago)}</p>
                   </div>
                 </div>
