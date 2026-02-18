@@ -579,23 +579,22 @@ const Pagos = () => {
         year: 'numeric'
       });
       
-      mensaje += `*${index + 1}.* ${cuota.auto.marca} ${cuota.auto.modelo}\n`;
-      mensaje += `   📋 Matrícula: ${cuota.auto.matricula}\n`;
-      mensaje += `   🔢 Cuota N° ${cuota.numeroCuota}\n`;
+      mensaje += `*${index + 1}. ${cuota.auto.marca} ${cuota.auto.modelo}* (${cuota.auto.matricula})\n`;
+      mensaje += `   Cuota N° ${cuota.numeroCuota}\n`;
       mensaje += `   💰 Monto: $${parseFloat(cuota.monto).toFixed(2)}\n`;
-      mensaje += `   📅 Venció: ${fechaVencimiento}\n\n`;
+      mensaje += `   📅 Vencimiento: ${fechaVencimiento}\n\n`;
     });
 
-    mensaje += `*TOTAL ADEUDADO: $${totalAdeudado.toFixed(2)}*\n\n`;
+    mensaje += `💵 *TOTAL ADEUDADO: $${totalAdeudado.toFixed(2)}*\n\n`;
     mensaje += `Le solicitamos regularizar su situación a la brevedad.\n\n`;
     mensaje += `Puede consultar el estado de sus cuotas y realizar pagos ingresando a nuestra plataforma web:\n\n`;
-    mensaje += `🌐 *Web:* https://rv-automoviles.vercel.app\n\n`;
+    mensaje += `*Web:* https://rv-automoviles.vercel.app\n\n`;
     
     // Agregar credenciales si están disponibles
     if (cliente.cedula && cliente.passwordTemporal) {
       mensaje += `*Sus credenciales de acceso:*\n`;
-      mensaje += `👤 Usuario: ${cliente.cedula}\n`;
-      mensaje += `🔑 Contraseña: ${cliente.passwordTemporal}\n\n`;
+      mensaje += `Usuario: ${cliente.cedula}\n`;
+      mensaje += `Contraseña: ${cliente.passwordTemporal}\n\n`;
     }
     
     mensaje += `*RV AUTOMÓVILES*`;
