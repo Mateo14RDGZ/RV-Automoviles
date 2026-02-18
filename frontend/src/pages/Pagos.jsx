@@ -115,6 +115,36 @@ const Pagos = () => {
     }
   }, [user, filter]);
 
+  // Recalcular monto por cuota cuando cambien las cuotas personalizadas
+  useEffect(() => {
+    // Solo recalcular si:
+    // 1. Hay montos personalizados activos
+    // 2. Hay al menos una cuota personalizada con monto válido
+    // 3. Los campos necesarios están completos
+    if (
+      generateData.usarMontosPersonalizados && 
+      generateData.montosPersonalizados.length > 0 &&
+      generateData.precioTotal &&
+      generateData.numeroCuotas
+    ) {
+      // Verificar que al menos una cuota personalizada tenga monto válido
+      const tieneMontosValidos = generateData.montosPersonalizados.some(
+        c => c.monto && parseFloat(c.monto) > 0
+      );
+      
+      if (tieneMontosValidos) {
+        console.log('🔄 Recalculando monto por cuota debido a cambios en cuotas personalizadas');
+        calcularMontoCuota();
+      }
+    }
+  }, [
+    generateData.usarMontosPersonalizados,
+    generateData.montosPersonalizados,
+    generateData.precioTotal,
+    generateData.numeroCuotas,
+    generateData.entregaInicial
+  ]);
+
   const loadInitialData = async (initialFilter = 'pendientes') => {
     try {
       setLoading(true);
@@ -863,13 +893,36 @@ const Pagos = () => {
     const cuotas = parseInt(generateData.numeroCuotas) || 1;
     
     if (precio > 0 && cuotas > 0) {
-      const saldoFinanciar = precio - entrega;
-      const montoPorCuota = saldoFinanciar / cuotas;
+      let saldoFinanciar = precio - entrega;
       
-      setGenerateData(prev => ({
-        ...prev,
-        montoCuota: montoPorCuota.toFixed(2)
-      }));
+      // Si hay cuotas personalizadas, descontar su suma del saldo total
+      if (generateData.usarMontosPersonalizados && generateData.montosPersonalizados.length > 0) {
+        const sumaPersonalizadas = generateData.montosPersonalizados.reduce(
+          (sum, c) => sum + parseFloat(c.monto || 0), 
+          0
+        );
+        const cuotasRestantes = cuotas - generateData.montosPersonalizados.length;
+        
+        if (cuotasRestantes <= 0) {
+          alert('El número de cuotas personalizadas no puede ser igual o mayor al total de cuotas');
+          return;
+        }
+        
+        const montoPorCuota = (saldoFinanciar - sumaPersonalizadas) / cuotasRestantes;
+        
+        setGenerateData(prev => ({
+          ...prev,
+          montoCuota: montoPorCuota.toFixed(2)
+        }));
+      } else {
+        // Cálculo estándar sin cuotas personalizadas
+        const montoPorCuota = saldoFinanciar / cuotas;
+        
+        setGenerateData(prev => ({
+          ...prev,
+          montoCuota: montoPorCuota.toFixed(2)
+        }));
+      }
     }
   };
 
@@ -2345,7 +2398,28 @@ const Pagos = () => {
                       <div className="bg-blue-50 dark:bg-blue-900/30 rounded p-2 border border-blue-200 dark:border-blue-900">
                         <div className="text-blue-700 dark:text-blue-400 text-xs">Monto Pendiente</div>
                         <div className="font-bold text-blue-700 dark:text-blue-400 text-lg">
-                          {formatCurrency((parseInt(generateData.numeroCuotas) - parseInt(generateData.cuotasPagadas)) * parseFloat(generateData.montoCuota || 0))}
+                          {(() => {
+                            const cuotasPendientes = parseInt(generateData.numeroCuotas) - parseInt(generateData.cuotasPagadas);
+                            const montoPorCuotaEstandar = parseFloat(generateData.montoCuota || 0);
+                            
+                            // Si hay cuotas personalizadas, calcular el monto pendiente correctamente
+                            if (generateData.usarMontosPersonalizados && generateData.montosPersonalizados.length > 0) {
+                              // Sumar montos de cuotas personalizadas que no están pagadas
+                              const montosPersonalizadosPendientes = generateData.montosPersonalizados
+                                .filter(c => !c.pagada)
+                                .reduce((sum, c) => sum + parseFloat(c.monto || 0), 0);
+                              
+                              // Contar cuántas cuotas estándar están pendientes
+                              const numerosPersonalizados = generateData.montosPersonalizados.map(c => parseInt(c.numeroCuota));
+                              const cuotasEstandarPendientes = cuotasPendientes - generateData.montosPersonalizados.filter(c => !c.pagada).length;
+                              
+                              const montoCuotasEstandar = cuotasEstandarPendientes * montoPorCuotaEstandar;
+                              return formatCurrency(montoCuotasEstandar + montosPersonalizadosPendientes);
+                            }
+                            
+                            // Sin cuotas personalizadas, cálculo estándar
+                            return formatCurrency(cuotasPendientes * montoPorCuotaEstandar);
+                          })()}
                         </div>
                       </div>
                     </div>
