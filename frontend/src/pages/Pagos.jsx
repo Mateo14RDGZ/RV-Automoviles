@@ -58,7 +58,6 @@ const Pagos = () => {
     autoId: '',
     precioTotal: '',
     entregaInicial: '',
-    porcentajeInteres: '',
     numeroCuotas: 12,
     montoCuota: '',
     fechaInicio: new Date().toISOString().split('T')[0],
@@ -787,7 +786,6 @@ const Pagos = () => {
       autoId: '',
       precioTotal: '',
       entregaInicial: '',
-      porcentajeInteres: '',
       numeroCuotas: 12,
       montoCuota: '',
       fechaInicio: new Date().toISOString().split('T')[0],
@@ -819,18 +817,15 @@ const Pagos = () => {
     });
   };
 
-  // Calcular monto de cuota automáticamente con intereses
+  // Calcular monto de cuota automáticamente
   const calcularMontoCuota = () => {
     const precio = parseFloat(generateData.precioTotal) || 0;
     const entrega = parseFloat(generateData.entregaInicial) || 0;
-    const porcentaje = parseFloat(generateData.porcentajeInteres) || 0;
     const cuotas = parseInt(generateData.numeroCuotas) || 1;
     
     if (precio > 0 && cuotas > 0) {
       const saldoFinanciar = precio - entrega;
-      const interes = saldoFinanciar * (porcentaje / 100);
-      const totalConInteres = saldoFinanciar + interes;
-      const montoPorCuota = totalConInteres / cuotas;
+      const montoPorCuota = saldoFinanciar / cuotas;
       
       setGenerateData(prev => ({
         ...prev,
@@ -1670,30 +1665,6 @@ const Pagos = () => {
                       </div>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Pago inicial del cliente</p>
                     </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Interés (%)
-                      </label>
-                      <div className="relative">
-                        <input
-                          type="number"
-                          min="0"
-                          max="100"
-                          step="0.1"
-                          value={generateData.porcentajeInteres}
-                          onChange={(e) => {
-                            setGenerateData({ ...generateData, porcentajeInteres: e.target.value });
-                          }}
-                          onBlur={calcularMontoCuota}
-                          className="input pr-8"
-                          placeholder="0.0"
-                        />
-                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">%</span>
-                      </div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Tasa de interés anual</p>
-                    </div>
-
                   </div>
 
                   {/* Resumen Financiero Dinámico */}
@@ -1707,37 +1678,14 @@ const Pagos = () => {
                           </span>
                         </div>
                         
-                        {generateData.porcentajeInteres && parseFloat(generateData.porcentajeInteres) > 0 && (
-                          <>
-                            <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-600 animate-fade-in">
-                              <span className="text-sm text-gray-600 dark:text-gray-400">
-                                Interés ({generateData.porcentajeInteres}%):
-                              </span>
-                              <span className="font-semibold text-gray-900 dark:text-white">
-                                +{formatCurrency(((parseFloat(generateData.precioTotal) || 0) - (parseFloat(generateData.entregaInicial) || 0)) * (parseFloat(generateData.porcentajeInteres) / 100))}
-                              </span>
-                            </div>
-                            <div className="flex justify-between items-center py-2 bg-gray-100 dark:bg-gray-700 rounded px-2">
-                              <span className="font-bold text-gray-900 dark:text-white">
-                                TOTAL A PAGAR:
-                              </span>
-                              <span className="font-bold text-gray-900 dark:text-white text-lg">
-                                {formatCurrency(((parseFloat(generateData.precioTotal) || 0) - (parseFloat(generateData.entregaInicial) || 0)) * (1 + parseFloat(generateData.porcentajeInteres) / 100))}
-                              </span>
-                            </div>
-                          </>
-                        )}
-                        
-                        {(!generateData.porcentajeInteres || parseFloat(generateData.porcentajeInteres) === 0) && (
-                          <div className="flex justify-between items-center py-2 bg-gray-100 dark:bg-gray-700 rounded px-2">
-                            <span className="font-bold text-gray-900 dark:text-white">
-                              TOTAL A PAGAR:
-                            </span>
-                            <span className="font-bold text-gray-900 dark:text-white text-lg">
-                              {formatCurrency((parseFloat(generateData.precioTotal) || 0) - (parseFloat(generateData.entregaInicial) || 0))}
-                            </span>
-                          </div>
-                        )}
+                        <div className="flex justify-between items-center py-2 bg-gray-100 dark:bg-gray-700 rounded px-2">
+                          <span className="font-bold text-gray-900 dark:text-white">
+                            TOTAL A PAGAR:
+                          </span>
+                          <span className="font-bold text-gray-900 dark:text-white text-lg">
+                            {formatCurrency((parseFloat(generateData.precioTotal) || 0) - (parseFloat(generateData.entregaInicial) || 0))}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   )}
