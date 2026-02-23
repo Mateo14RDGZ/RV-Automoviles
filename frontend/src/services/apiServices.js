@@ -109,6 +109,11 @@ export const pagosService = {
     return response.data;
   },
 
+  devolverCuota: async (id) => {
+    const response = await api.put(`/pagos/${id}/devolver-cuota`);
+    return response.data;
+  },
+
   enviarEmail: async (id) => {
     const response = await api.post(`/pagos/${id}/enviar-email`);
     return response.data;

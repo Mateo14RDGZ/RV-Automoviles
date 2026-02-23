@@ -1383,6 +1383,90 @@ app.put('/api/pagos/:id', authenticateToken, async (req, res) => {
   }
 });
 
+// Devolver cuota por error (cambiar de pagado a pendiente/vencido)
+app.put('/api/pagos/:id/devolver-cuota', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const pagoId = parseInt(req.params.id);
+    
+    // Buscar el pago actual
+    const pagoActual = await prisma.pago.findUnique({
+      where: { id: pagoId },
+      include: { 
+        auto: { include: { cliente: true } },
+        comprobantes: true 
+      }
+    });
+
+    if (!pagoActual) {
+      return res.status(404).json({ error: 'Pago no encontrado' });
+    }
+
+    // Validar que el pago esté marcado como pagado
+    if (pagoActual.estado !== 'pagado') {
+      return res.status(400).json({ error: 'Solo se pueden devolver cuotas que estén pagadas' });
+    }
+
+    console.log('🔄 Devolviendo cuota por error:', { 
+      pagoId, 
+      numeroCuota: pagoActual.numeroCuota,
+      estadoActual: pagoActual.estado 
+    });
+
+    // Eliminar comprobantes asociados si existen
+    if (pagoActual.comprobantes && pagoActual.comprobantes.length > 0) {
+      await prisma.comprobantePago.deleteMany({
+        where: { pagoId: pagoId }
+      });
+      console.log(`✅ Eliminados ${pagoActual.comprobantes.length} comprobante(s) asociado(s)`);
+    }
+
+    // Determinar el nuevo estado según la fecha de vencimiento
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0); // Normalizar a inicio del día
+    
+    const fechaVencimiento = new Date(pagoActual.fechaVencimiento);
+    fechaVencimiento.setHours(0, 0, 0, 0);
+    
+    const nuevoEstado = fechaVencimiento < hoy ? 'vencido' : 'pendiente';
+    
+    console.log('📅 Determinando nuevo estado:', {
+      fechaVencimiento: fechaVencimiento.toISOString(),
+      hoy: hoy.toISOString(),
+      nuevoEstado
+    });
+
+    // Actualizar el pago
+    const pagoActualizado = await prisma.pago.update({
+      where: { id: pagoId },
+      data: {
+        estado: nuevoEstado,
+        fechaPago: null,
+        montoPagado: null
+      },
+      include: { 
+        auto: { include: { cliente: true } },
+        comprobantes: true 
+      }
+    });
+
+    console.log('✅ Cuota devuelta exitosamente:', {
+      pagoId,
+      estadoAnterior: 'pagado',
+      estadoNuevo: nuevoEstado
+    });
+
+    res.json({
+      message: 'Cuota devuelta exitosamente',
+      pago: pagoActualizado,
+      estadoAnterior: 'pagado',
+      estadoNuevo: nuevoEstado
+    });
+  } catch (error) {
+    console.error('❌ Error al devolver cuota:', error);
+    res.status(500).json({ error: 'Error al devolver cuota', details: error.message });
+  }
+});
+
 app.delete('/api/pagos/:id', authenticateToken, requireStaff, async (req, res) => {
   try {
     await prisma.pago.delete({

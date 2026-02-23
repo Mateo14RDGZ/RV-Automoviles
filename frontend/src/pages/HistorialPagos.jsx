@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
-import { CheckCircle, AlertCircle, Clock, Search, Download, Calendar } from 'lucide-react';
+import { CheckCircle, AlertCircle, Clock, Search, Download, Calendar, RotateCcw } from 'lucide-react';
 import { pagosService } from '../services/apiServices';
 import { formatCurrency, formatDate } from '../utils/format';
+import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { addPDFHeader, COLORS, getPDFFileName, getTableStyles } from '../utils/pdfHelper';
@@ -9,12 +11,19 @@ import { SkeletonTable } from '../components/SkeletonLoader';
 import { EmptyFilter } from '../components/EmptyStateIllustrated';
 
 const HistorialPagos = () => {
+  const { user } = useAuth();
+  const { showToast } = useToast();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [pagos, setPagos] = useState([]);
   const [filteredPagos, setFilteredPagos] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterEstado, setFilterEstado] = useState('todos');
+  const [showConfirmDevolverModal, setShowConfirmDevolverModal] = useState(false);
+  const [pagoParaDevolver, setPagoParaDevolver] = useState(null);
+
+  // Helper para verificar si es staff (admin o empleado)
+  const isStaff = user?.rol === 'admin' || user?.rol === 'empleado';
 
   useEffect(() => {
     loadHistorial();
@@ -69,6 +78,42 @@ const HistorialPagos = () => {
     }
 
     setFilteredPagos(filtered);
+  };
+
+  const handleDevolverCuota = (pago) => {
+    setPagoParaDevolver(pago);
+    setShowConfirmDevolverModal(true);
+  };
+
+  const confirmarDevolverCuota = async () => {
+    if (!pagoParaDevolver) return;
+
+    try {
+      setLoading(true);
+      console.log('🔄 Devolviendo cuota:', pagoParaDevolver.id);
+      
+      const result = await pagosService.devolverCuota(pagoParaDevolver.id);
+      
+      console.log('✅ Cuota devuelta:', result);
+      showToast(
+        `Cuota #${pagoParaDevolver.numeroCuota} devuelta exitosamente. Estado: ${result.estadoNuevo}`,
+        'success'
+      );
+      
+      // Recargar datos
+      await loadHistorial();
+      
+    } catch (error) {
+      console.error('❌ Error al devolver cuota:', error);
+      showToast(
+        error.response?.data?.error || 'Error al devolver la cuota',
+        'error'
+      );
+    } finally {
+      setLoading(false);
+      setShowConfirmDevolverModal(false);
+      setPagoParaDevolver(null);
+    }
   };
 
   const descargarComprobante = async (pago) => {
@@ -518,14 +563,26 @@ const HistorialPagos = () => {
                   </div>
                   
                   {pago.estado === 'pagado' && (
-                    <button
-                      onClick={() => descargarComprobante(pago)}
-                      className="btn btn-secondary flex items-center gap-2"
-                      title="Descargar comprobante"
-                    >
-                      <Download className="w-4 h-4" />
-                      <span className="hidden md:inline">Comprobante</span>
-                    </button>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => descargarComprobante(pago)}
+                        className="btn btn-secondary flex items-center gap-2"
+                        title="Descargar comprobante"
+                      >
+                        <Download className="w-4 h-4" />
+                        <span className="hidden md:inline">Comprobante</span>
+                      </button>
+                      {user?.rol === 'admin' && (
+                        <button
+                          onClick={() => handleDevolverCuota(pago)}
+                          className="btn bg-orange-500 hover:bg-orange-600 text-white flex items-center gap-2"
+                          title="Devolver cuota por error"
+                        >
+                          <RotateCcw className="w-4 h-4" />
+                          <span className="hidden md:inline">Devolver</span>
+                        </button>
+                      )}
+                    </div>
                   )}
                 </div>
               </div>
@@ -555,6 +612,58 @@ const HistorialPagos = () => {
               <p className="text-2xl font-bold text-green-600 dark:text-green-400">
                 {filteredPagos.filter(p => p.estado === 'pagado').length}
               </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de confirmación para devolver cuota */}
+      {showConfirmDevolverModal && pagoParaDevolver && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6">
+            <div className="flex items-start gap-4 mb-4">
+              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
+                <AlertCircle className="w-6 h-6 text-orange-600 dark:text-orange-400" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+                  ¿Devolver cuota por error?
+                </h3>
+                <div className="text-sm text-gray-600 dark:text-gray-400 space-y-2">
+                  <p>
+                    Está a punto de devolver la <strong>Cuota #{pagoParaDevolver.numeroCuota}</strong> de{' '}
+                    <strong>{pagoParaDevolver.auto.marca} {pagoParaDevolver.auto.modelo}</strong>
+                  </p>
+                  <p className="font-semibold">Esta acción:</p>
+                  <ul className="list-disc list-inside space-y-1 ml-2">
+                    <li>Cambiará el estado a {new Date(pagoParaDevolver.fechaVencimiento) < new Date() ? 'VENCIDO' : 'PENDIENTE'}</li>
+                    <li>Eliminará la fecha de pago</li>
+                    <li>Eliminará los comprobantes asociados</li>
+                  </ul>
+                  <p className="font-semibold text-orange-600 dark:text-orange-400 mt-3">
+                    ⚠️ Esta acción no se puede deshacer
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => {
+                  setShowConfirmDevolverModal(false);
+                  setPagoParaDevolver(null);
+                }}
+                className="btn btn-secondary"
+                disabled={loading}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={confirmarDevolverCuota}
+                className="btn bg-orange-500 hover:bg-orange-600 text-white"
+                disabled={loading}
+              >
+                {loading ? 'Devolviendo...' : 'Sí, devolver cuota'}
+              </button>
             </div>
           </div>
         </div>
