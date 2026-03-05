@@ -499,6 +499,16 @@ const Clientes = () => {
                   <Copy className="w-4 h-4" />
                   Copiar Credenciales
                 </button>
+
+                <button
+                  onClick={() => {
+                    setShowCredentialsModal(false);
+                    setNewClientCredentials(null);
+                  }}
+                  className="w-full flex items-center justify-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 py-2 text-sm transition-colors"
+                >
+                  Cerrar sin enviar credenciales
+                </button>
               </div>
 
               <p className="text-xs text-center text-gray-500 dark:text-gray-400 mt-4">
