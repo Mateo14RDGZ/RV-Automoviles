@@ -1109,7 +1109,7 @@ app.post('/api/pagos/generar-cuotas', authenticateToken, requireStaff, async (re
     const estadoAuto = esPagoContado ? 'vendido' : 'financiado';
     await prisma.auto.update({
       where: { id: parseInt(autoId) },
-      data: { estado: estadoAuto, ...(esPagoContado && { activo: false }) }
+      data: { estado: estadoAuto }
     });
 
     console.log(`✅ Auto marcado como ${estadoAuto}`);
@@ -1190,10 +1190,10 @@ app.put('/api/pagos/:id/registrar-pago', authenticateToken, requireStaff, async 
       });
 
       if (auto) {
-        // 1. Marcar auto como vendido (NO eliminarlo)
+        // 1. Marcar auto como vendido (permanece visible en la app como vendido)
         await prisma.auto.update({
           where: { id: pago.autoId },
-          data: { estado: 'vendido', activo: false }
+          data: { estado: 'vendido' }
         });
         console.log('✅ Auto marcado como vendido');
 
@@ -1781,12 +1781,12 @@ app.put('/api/comprobantes/:id/estado', authenticateToken, requireStaff, async (
         });
 
         if (auto) {
-          // 1. Marcar auto como vendido y archivado
+          // 1. Marcar auto como vendido (permanece visible en la app como vendido)
           await prisma.auto.update({
             where: { id: comprobante.pago.autoId },
-            data: { estado: 'vendido', activo: false }
+            data: { estado: 'vendido' }
           });
-          console.log('✅ Auto archivado - ya no aparecerá en el stock');
+          console.log('✅ Auto marcado como vendido');
 
           // 2. Eliminar cliente y su usuario asociado
           if (auto.clienteId) {
