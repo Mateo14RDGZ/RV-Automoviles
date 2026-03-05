@@ -1105,11 +1105,11 @@ app.post('/api/pagos/generar-cuotas', authenticateToken, requireStaff, async (re
 
     console.log('✅ Cuotas creadas exitosamente:', createdPagos.length);
 
-    // Marcar auto como financiado o pagado (si es pago al contado)
-    const estadoAuto = esPagoContado ? 'pagado' : 'financiado';
+    // Marcar auto como vendido (pago contado) o financiado (plan de cuotas)
+    const estadoAuto = esPagoContado ? 'vendido' : 'financiado';
     await prisma.auto.update({
       where: { id: parseInt(autoId) },
-      data: { estado: estadoAuto }
+      data: { estado: estadoAuto, ...(esPagoContado && { activo: false }) }
     });
 
     console.log(`✅ Auto marcado como ${estadoAuto}`);
