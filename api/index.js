@@ -354,9 +354,15 @@ app.get('/api/health', async (req, res) => {
 app.get('/api/autos', authenticateToken, async (req, res) => {
   try {
     const { estado, clienteId } = req.query;
-    const where = { activo: true }; // Solo mostrar autos activos en el stock
-
-    if (estado) where.estado = estado;
+    const where = {};
+    // Stock: solo activos. Vendidos: incluir también archivados (se mostraban antes como ocultos)
+    if (estado === 'vendido') {
+      where.estado = 'vendido';
+      // No filtrar por activo: mostrar todos los vendidos (activos y archivados)
+    } else {
+      where.activo = true;
+      if (estado) where.estado = estado;
+    }
     if (clienteId) where.clienteId = parseInt(clienteId);
 
     console.log('🚗 Consultando autos. Usuario:', req.user.email, 'Filtros:', where);
