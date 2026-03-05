@@ -462,8 +462,8 @@ const Pagos = () => {
             `Su vehículo está completamente pago. Agradecemos su confianza en nosotros.\n\n` +
             `Para cualquier consulta, estamos a su disposición.\n\n` +
             `*RV AUTOMÓVILES*\n` +
-            `📞 Teléfono: 092 123 456\n` +
-            `📧 Email: info@rvautomoviles.com`;
+            `${(import.meta.env.VITE_EMPRESA_CONTACTO || 'Atención al Cliente').toString()}\n` +
+            `📞 Teléfono: ${(import.meta.env.VITE_EMPRESA_TELEFONO || '092 870 198').toString()}`;
 
           const telefonoLimpio = cliente.telefono.replace(/\D/g, '');
           const urlWhatsApp = `https://wa.me/598${telefonoLimpio}?text=${encodeURIComponent(mensaje)}`;
