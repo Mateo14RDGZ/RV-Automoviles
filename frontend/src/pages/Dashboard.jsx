@@ -277,6 +277,36 @@ const Dashboard = () => {
         </div>
       </div>
 
+      {/* Cobro Esperado del Mes */}
+      {stats.cobroEsperadoMes && (
+        <div className="card p-4 md:p-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-900 animate-fadeInUp" style={{animationDelay: '0.55s'}}>
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex-1">
+              <h3 className="text-base md:text-lg font-semibold text-blue-900 dark:text-blue-300 flex items-center gap-2">
+                <Calendar className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                Cobro Esperado - {stats.cobroEsperadoMes.mes}
+              </h3>
+              <p className="text-2xl md:text-3xl font-bold text-blue-900 dark:text-blue-100 mt-2">
+                {formatCurrency(stats.cobroEsperadoMes.total)}
+              </p>
+              <p className="text-xs md:text-sm text-blue-700 dark:text-blue-400 mt-1">
+                {stats.cobroEsperadoMes.cantidadCuotas} {stats.cobroEsperadoMes.cantidadCuotas === 1 ? 'cuota' : 'cuotas'} que vencen este mes
+              </p>
+              <div className="flex flex-wrap gap-3 mt-3">
+                <span className="inline-flex items-center gap-1 text-sm text-green-700 dark:text-green-400">
+                  <CheckCircle className="w-4 h-4" />
+                  Cobrado: {formatCurrency(stats.cobroEsperadoMes.cobrado)}
+                </span>
+                <span className="inline-flex items-center gap-1 text-sm text-amber-700 dark:text-amber-400">
+                  <Calendar className="w-4 h-4" />
+                  Pendiente: {formatCurrency(stats.cobroEsperadoMes.pendiente)}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Estado de Pagos */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-6 px-2 md:px-0">
         <div className="card p-4 md:p-6 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-900 hover-lift animate-fadeInUp" style={{animationDelay: '0.6s'}}>

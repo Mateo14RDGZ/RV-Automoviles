@@ -2064,6 +2064,33 @@ app.get('/api/dashboard/stats', authenticateToken, requireAdmin, async (req, res
       take: 5
     });
 
+    // Cobro esperado por mes: suma de cuotas que vencen en el mes actual
+    const now = new Date();
+    const inicioMesActual = new Date(now.getFullYear(), now.getMonth(), 1);
+    const finMesActual = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+
+    const cuotasMesActual = await prisma.pago.findMany({
+      where: {
+        fechaVencimiento: {
+          gte: inicioMesActual,
+          lte: finMesActual
+        }
+      },
+      select: { monto: true, estado: true, montoPagado: true }
+    });
+
+    const cobroEsperadoMes = {
+      mes: inicioMesActual.toLocaleDateString('es-UY', { month: 'long', year: 'numeric' }),
+      total: cuotasMesActual.reduce((sum, p) => sum + parseFloat(p.monto), 0),
+      cobrado: cuotasMesActual
+        .filter(p => p.estado === 'pagado')
+        .reduce((sum, p) => sum + parseFloat(p.montoPagado || p.monto), 0),
+      pendiente: cuotasMesActual
+        .filter(p => p.estado === 'pendiente')
+        .reduce((sum, p) => sum + parseFloat(p.monto), 0),
+      cantidadCuotas: cuotasMesActual.length
+    };
+
     res.json({
       clientes: {
         total: totalClientes
@@ -2082,7 +2109,8 @@ app.get('/api/dashboard/stats', authenticateToken, requireAdmin, async (req, res
         totalRecaudado: totalRecaudado._sum.monto || 0
       },
       proximosVencimientos,
-      pagosRecientes
+      pagosRecientes,
+      cobroEsperadoMes
     });
   } catch (error) {
     console.error('Error obteniendo estadísticas:', error);
