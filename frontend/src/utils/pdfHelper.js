@@ -158,32 +158,27 @@ export const addPDFHeader = async (doc, title, subtitle = null, type = 'DOCUMENT
   
   yPos += 2;
   
-  // Caja con fondo suave
+  // Caja con fondo suave y borde profesional
   doc.setFillColor(...COLORS.gray[50]);
   doc.setDrawColor(...COLORS.gray[200]);
-  doc.setLineWidth(0.5);
-  doc.roundedRect(15, yPos, pageWidth - 30, 18, 3, 3, 'FD');
+  doc.setLineWidth(0.3);
+  doc.roundedRect(15, yPos, pageWidth - 30, 16, 2, 2, 'FD');
   
-  // Icono y texto de información
-  doc.setFontSize(8);
-  doc.setTextColor(...COLORS.gray[700]);
+  doc.setFontSize(7.5);
+  doc.setTextColor(...COLORS.gray[600]);
   doc.setFont(undefined, 'normal');
+  doc.text('Documento generado automáticamente por RV Automóviles - Sistema de Gestión. Conserve como comprobante oficial.', 20, yPos + 7);
   
-  const infoY = yPos + 7;
-  doc.text('Este documento ha sido generado automáticamente por el Sistema de Gestión de', 20, infoY);
-  doc.text('RV Automóviles. Conserve este documento como comprobante oficial.', 20, infoY + 5);
-  
-  // Sello digital
-  doc.setFillColor(...COLORS.info);
-  doc.roundedRect(pageWidth - 45, yPos + 4, 30, 10, 2, 2, 'F');
-  doc.setFontSize(7);
+  // Sello de autenticidad
+  const selloTexto = 'DOCUMENTO OFICIAL';
+  doc.setFillColor(...COLORS.primary);
+  doc.roundedRect(pageWidth - 48, yPos + 3, 33, 10, 2, 2, 'F');
+  doc.setFontSize(6.5);
   doc.setFont(undefined, 'bold');
   doc.setTextColor(...COLORS.white);
-  const selloTexto = 'DOCUMENTO OFICIAL';
-  const selloWidth = doc.getTextWidth(selloTexto);
-  doc.text(selloTexto, pageWidth - 30 - selloWidth/2, yPos + 10);
+  doc.text(selloTexto, pageWidth - 48 + (33 - doc.getTextWidth(selloTexto)) / 2, yPos + 9);
   
-  yPos += 23;
+  yPos += 21;
   
   // Línea separadora elegante
   doc.setDrawColor(...COLORS.gray[300]);
@@ -328,28 +323,28 @@ export const getTableStyles = (color = 'primary') => {
       fontStyle: 'bold',
       halign: 'center',
       valign: 'middle',
-      lineWidth: 0.2,
-      lineColor: COLORS.white,
-      cellPadding: { top: 5, right: 4, bottom: 5, left: 4 }
+      lineWidth: 0.15,
+      lineColor: [255, 255, 255],
+      cellPadding: { top: 6, right: 5, bottom: 6, left: 5 }
     },
     bodyStyles: { 
       fontSize: 9,
-      cellPadding: { top: 4, right: 3, bottom: 4, left: 3 },
-      lineWidth: 0.2,
+      cellPadding: { top: 5, right: 4, bottom: 5, left: 4 },
+      lineWidth: 0.15,
       lineColor: COLORS.gray[200],
       textColor: COLORS.gray[800]
     },
     alternateRowStyles: { 
-      fillColor: COLORS.gray[50]
+      fillColor: [250, 251, 252]
     },
     styles: {
       overflow: 'linebreak',
       cellWidth: 'wrap',
-      minCellHeight: 8
+      minCellHeight: 9
     },
     margin: { left: 15, right: 15 },
     tableLineColor: COLORS.gray[300],
-    tableLineWidth: 0.2
+    tableLineWidth: 0.15
   };
 };
 

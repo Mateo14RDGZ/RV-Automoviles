@@ -12,8 +12,6 @@ import {
   Menu,
   X,
   TrendingUp,
-  History,
-  MessageCircle,
   AlertCircle,
   Receipt
 } from 'lucide-react';
@@ -155,21 +153,6 @@ const Layout = () => {
             )}
           </nav>
 
-          {/* Botón de soporte - Solo para admin y empleado */}
-          {(user?.rol === 'admin' || user?.rol === 'empleado') && (
-            <div className="px-4 pb-4">
-              <a
-                href="https://wa.me/59892870198"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center px-4 py-3 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm hover:shadow-md gap-2"
-              >
-                <MessageCircle className="h-5 w-5" />
-                Contactar Soporte
-              </a>
-            </div>
-          )}
-
           <div className="flex-shrink-0 px-4 py-4 border-t border-gray-200">
             <div className="flex items-center px-4 py-3 bg-gray-50 rounded-lg mb-3">
               <div className="flex-1 min-w-0">
@@ -271,22 +254,6 @@ const Layout = () => {
                 </button>
               )}
             </nav>
-
-            {/* Botón de soporte mobile - Solo para admin y empleado */}
-            {(user?.rol === 'admin' || user?.rol === 'empleado') && (
-              <div className="px-4 pb-4">
-                <a
-                  href="https://wa.me/59892870198"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => setSidebarOpen(false)}
-                  className="flex items-center justify-center px-4 py-3 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm hover:shadow-md gap-2"
-                >
-                  <MessageCircle className="h-5 w-5" />
-                  Contactar Soporte
-                </a>
-              </div>
-            )}
 
             <div className="flex-shrink-0 px-4 py-4 border-t border-gray-200">
               <div className="flex items-center px-4 py-3 bg-gray-50 rounded-lg mb-3">

@@ -879,10 +879,10 @@ app.delete('/api/clientes/:id', authenticateToken, requireStaff, async (req, res
 
 app.get('/api/pagos', authenticateToken, async (req, res) => {
   try {
-    const { estado, vencidos, autoId } = req.query;
+    const { estado, vencidos, autoId, fechaDesde, fechaHasta } = req.query;
     const where = {};
 
-    console.log('📥 GET /api/pagos - Query params:', { estado, vencidos, autoId, rol: req.user.rol, clienteId: req.user.clienteId });
+    console.log('📥 GET /api/pagos - Query params:', { estado, vencidos, autoId, fechaDesde, fechaHasta, rol: req.user.rol, clienteId: req.user.clienteId });
 
     if (req.user.rol === 'cliente' && req.user.clienteId) {
       where.auto = { clienteId: req.user.clienteId };
@@ -890,10 +890,27 @@ app.get('/api/pagos', authenticateToken, async (req, res) => {
 
     if (autoId) where.autoId = parseInt(autoId);
 
+    // Filtro estricto por rango de fechas (fechaVencimiento)
+    if (fechaDesde || fechaHasta) {
+      where.fechaVencimiento = {};
+      if (fechaDesde) {
+        const desde = new Date(fechaDesde);
+        desde.setHours(0, 0, 0, 0);
+        where.fechaVencimiento.gte = desde;
+      }
+      if (fechaHasta) {
+        const hasta = new Date(fechaHasta);
+        hasta.setHours(23, 59, 59, 999);
+        where.fechaVencimiento.lte = hasta;
+      }
+    }
+
     if (vencidos === 'true') {
       // Vencidas: estado pendiente Y fecha vencida
       where.estado = 'pendiente';
-      where.fechaVencimiento = { lt: new Date() };
+      where.fechaVencimiento = where.fechaVencimiento
+        ? { ...where.fechaVencimiento, lt: new Date() }
+        : { lt: new Date() };
     } else if (estado === 'pendiente') {
       // Pendientes: estado pendiente PERO fecha NO vencida
       where.estado = 'pendiente';

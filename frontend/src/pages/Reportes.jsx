@@ -5,7 +5,7 @@ import { exportToCSV, exportToJSON, formatDataForExport } from '../utils/export'
 import { formatCurrency, formatDate } from '../utils/format';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { addPDFHeader, getTableStyles, addSection, getPDFFileName, COLORS } from '../utils/pdfHelper';
+import { addPDFHeader, addPDFFooter, getTableStyles, addSection, getPDFFileName, COLORS } from '../utils/pdfHelper';
 import { 
   FileDown, 
   FileText, 
@@ -174,7 +174,7 @@ const Reportes = () => {
         doc.text(`Total de clientes activos en el sistema: ${clientes.length}`, 18, finalY + 14);
       }
       
-      // Guardar con nombre profesional
+      await addPDFFooter(doc);
       doc.save(getPDFFileName('Clientes', 'Base'));
       showToast('PDF de clientes generado exitosamente', 'success');
     } catch (error) {
@@ -185,14 +185,22 @@ const Reportes = () => {
 
   const handleExportPagosPDF = async () => {
     try {
-      const pagos = await pagosService.getAll();
+      const pagos = await pagosService.getAll({
+        fechaDesde: dateRange.start,
+        fechaHasta: dateRange.end
+      });
+      if (!pagos || pagos.length === 0) {
+        showToast('No hay pagos en el rango de fechas seleccionado', 'warning');
+        return;
+      }
       const doc = new jsPDF();
+      const periodoStr = `${new Date(dateRange.start).toLocaleDateString('es-UY', { day: '2-digit', month: 'long', year: 'numeric' })} - ${new Date(dateRange.end).toLocaleDateString('es-UY', { day: '2-digit', month: 'long', year: 'numeric' })}`;
       
-      // Agregar encabezado profesional
+      // Agregar encabezado profesional con rango de fechas estricto
       const startY = await addPDFHeader(
         doc,
         'Historial de Pagos',
-        `Total: ${pagos.length} cuotas registradas`,
+        `Período: ${periodoStr} | ${pagos.length} cuota(s) en rango`,
         'Historial de Pagos'
       );
 
@@ -426,7 +434,7 @@ const Reportes = () => {
         currentY = doc.lastAutoTable.finalY + 10;
       });
 
-      // Guardar con nombre profesional
+      await addPDFFooter(doc);
       doc.save(getPDFFileName('Pagos', 'Historial'));
       showToast('Historial de pagos generado exitosamente', 'success');
     } catch (error) {
@@ -543,7 +551,7 @@ const Reportes = () => {
       doc.setFont(undefined, 'italic');
       doc.text(`Estado: ${estadoFinanciero}`, 105, currentY + 35, { align: 'center' });
       
-      // Guardar con nombre profesional
+      await addPDFFooter(doc);
       doc.save(getPDFFileName('ReporteGeneral', 'Sistema'));
       showToast('PDF de reporte general exportado exitosamente', 'success');
     } catch (error) {
@@ -559,15 +567,25 @@ const Reportes = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      const permutas = await response.json();
+      let permutas = await response.json();
+      // Filtro estricto por rango de fechas (fechaRecepcion)
+      const desde = new Date(dateRange.start);
+      desde.setHours(0, 0, 0, 0);
+      const hasta = new Date(dateRange.end);
+      hasta.setHours(23, 59, 59, 999);
+      permutas = permutas.filter(p => {
+        const fecha = new Date(p.fechaRecepcion || p.createdAt);
+        return fecha >= desde && fecha <= hasta;
+      });
       
       const doc = new jsPDF();
+      const periodoStr = `${new Date(dateRange.start).toLocaleDateString('es-UY', { day: '2-digit', month: 'long', year: 'numeric' })} - ${new Date(dateRange.end).toLocaleDateString('es-UY', { day: '2-digit', month: 'long', year: 'numeric' })}`;
       
-      // Agregar encabezado profesional
+      // Agregar encabezado profesional con rango de fechas estricto
       const startY = await addPDFHeader(
         doc,
         'Reporte de Permutas',
-        `Total de operaciones: ${permutas.length}`,
+        `Período: ${periodoStr} | ${permutas.length} operación(es) en rango`,
         'Permutas'
       );
       
@@ -644,7 +662,7 @@ const Reportes = () => {
         }
       });
       
-      // Guardar con nombre profesional
+      await addPDFFooter(doc);
       doc.save(getPDFFileName('Permutas', 'Reporte'));
       showToast('PDF de permutas exportado exitosamente', 'success');
     } catch (error) {
@@ -728,6 +746,9 @@ const Reportes = () => {
             />
           </div>
         </div>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+          El rango de fechas se aplica estrictamente a los PDFs de Historial de Pagos (por fecha de vencimiento) y Permutas (por fecha de recepción).
+        </p>
       </div>
 
       {/* Exportaciones */}
