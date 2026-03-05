@@ -129,7 +129,7 @@ const Autos = () => {
       auto.modelo.toLowerCase().includes(searchLower) ||
       auto.matricula.toLowerCase().includes(searchLower);
     
-    const matchesEstado = !estadoFilter || auto.estado === estadoFilter;
+    const matchesEstado = !estadoFilter || auto.estado === estadoFilter || (estadoFilter === 'vendido' && auto.estado === 'pagado');
     
     return matchesSearch && matchesEstado;
   });
@@ -228,9 +228,14 @@ const Autos = () => {
     const badges = {
       disponible: 'badge badge-success',
       vendido: 'badge badge-info',
+      pagado: 'badge badge-info', // pagado = vendido
       reservado: 'badge badge-warning',
     };
     return badges[estado] || 'badge badge-gray';
+  };
+
+  const getEstadoLabel = (estado) => {
+    return estado === 'pagado' ? 'Vendido' : (estado || '').charAt(0).toUpperCase() + (estado || '').slice(1);
   };
 
   return (
@@ -354,7 +359,7 @@ const Autos = () => {
                     </td>
                     <td className="px-6 py-4">
                       <span className={getEstadoBadge(auto.estado)}>
-                        {auto.estado}
+                        {getEstadoLabel(auto.estado)}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right text-sm font-medium">
@@ -479,7 +484,7 @@ const Autos = () => {
                   </div>
                 </div>
                 <span className={`${getEstadoBadge(auto.estado)} text-[10px] px-2 py-1 whitespace-nowrap ml-2`}>
-                  {auto.estado}
+                  {getEstadoLabel(auto.estado)}
                 </span>
               </div>
 
@@ -899,7 +904,7 @@ const Autos = () => {
                       <div className="flex justify-between text-xs md:text-sm">
                         <span className="text-gray-600 dark:text-gray-400">Estado:</span>
                         <span className={`${getEstadoBadge(autoDetalles.estado)} text-[10px] md:text-xs px-1.5 py-0.5 md:px-2 md:py-1`}>
-                          {autoDetalles.estado}
+                          {getEstadoLabel(autoDetalles.estado)}
                         </span>
                       </div>
                       {autoDetalles.cliente && (

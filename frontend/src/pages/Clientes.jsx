@@ -262,8 +262,8 @@ const Clientes = () => {
                         <span className="text-gray-700 dark:text-gray-300 truncate flex-1">
                           {auto.marca} {auto.modelo}
                         </span>
-                        <span className={`badge badge-${auto.estado === 'disponible' ? 'success' : auto.estado === 'vendido' ? 'info' : 'warning'} text-[10px] px-1.5 py-0.5 ml-2 flex-shrink-0`}>
-                          {auto.estado}
+                        <span className={`badge badge-${auto.estado === 'disponible' ? 'success' : (auto.estado === 'vendido' || auto.estado === 'pagado') ? 'info' : 'warning'} text-[10px] px-1.5 py-0.5 ml-2 flex-shrink-0`}>
+                          {auto.estado === 'pagado' ? 'Vendido' : auto.estado}
                         </span>
                       </div>
                     ))}

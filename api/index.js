@@ -357,7 +357,8 @@ app.get('/api/autos', authenticateToken, async (req, res) => {
     const where = {};
     // Stock: solo activos. Vendidos: incluir también archivados (se mostraban antes como ocultos)
     if (estado === 'vendido') {
-      where.estado = 'vendido';
+      // Incluir vendido y pagado (autos totalmente pagos = vendidos)
+      where.estado = { in: ['vendido', 'pagado'] };
       // No filtrar por activo: mostrar todos los vendidos (activos y archivados)
     } else {
       where.activo = true;
@@ -2014,7 +2015,7 @@ app.get('/api/dashboard/stats', authenticateToken, requireAdmin, async (req, res
     const totalClientes = await prisma.cliente.count({ where: { activo: true } });
     const totalAutos = await prisma.auto.count();
     const autosDisponibles = await prisma.auto.count({ where: { estado: 'disponible' } });
-    const autosVendidos = await prisma.auto.count({ where: { estado: 'vendido' } });
+    const autosVendidos = await prisma.auto.count({ where: { estado: { in: ['vendido', 'pagado'] } } });
     const autosReservados = await prisma.auto.count({ where: { estado: 'reservado' } });
 
     const pagosPendientes = await prisma.pago.count({ where: { estado: 'pendiente' } });
@@ -2155,7 +2156,7 @@ app.get('/api/dashboard/stats-empleado', authenticateToken, requireStaff, async 
     const totalClientes = await prisma.cliente.count({ where: { activo: true } });
     const totalAutos = await prisma.auto.count();
     const autosDisponibles = await prisma.auto.count({ where: { estado: 'disponible' } });
-    const autosVendidos = await prisma.auto.count({ where: { estado: 'vendido' } });
+    const autosVendidos = await prisma.auto.count({ where: { estado: { in: ['vendido', 'pagado'] } } });
     const autosFinanciados = await prisma.auto.count({ where: { estado: 'financiado' } });
 
     const pagosPendientes = await prisma.pago.count({ where: { estado: 'pendiente' } });
