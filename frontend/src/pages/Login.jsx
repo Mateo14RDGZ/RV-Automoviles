@@ -295,13 +295,14 @@ const Login = () => {
           )}
         </div>
 
-        {/* Footer - Powered by RF Digital Studio */}
+        {/* Footer - Desarrollado por RF Digital Studio */}
         <div className="text-center mt-6 animate-fadeInUp" style={{animationDelay: '0.3s'}}>
           <button
             onClick={() => setShowRFModal(true)}
-            className="text-sm text-gray-500 hover:text-blue-400 transition-colors duration-200 inline-flex items-center gap-1 cursor-pointer"
+            className="text-sm text-gray-500 hover:text-blue-400 transition-colors duration-200 inline-flex flex-col items-center gap-0.5 cursor-pointer"
           >
-            Powered by <span className="font-semibold">RF Digital Studio</span>
+            Desarrollado por <span className="font-semibold">RF Digital Studio</span>
+            <span className="text-[10px] md:text-xs text-gray-400 font-normal">v 1.14</span>
           </button>
         </div>
       </div>

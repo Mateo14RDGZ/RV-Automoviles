@@ -172,13 +172,13 @@ const Layout = () => {
               </button>
             </div>
             
-            {/* Powered by RF Digital Studio */}
+            {/* Desarrollado por RF Digital Studio */}
             <div className="text-center">
               <button
                 onClick={() => setShowRFModal(true)}
                 className="text-xs text-gray-400 hover:text-blue-500 transition-colors duration-200 inline-flex items-center gap-1 cursor-pointer"
               >
-                Powered by <span className="font-semibold">RF Digital Studio</span>
+                Desarrollado por <span className="font-semibold">RF Digital Studio</span>
               </button>
             </div>
           </div>
@@ -274,13 +274,13 @@ const Layout = () => {
                 </button>
               </div>
               
-              {/* Powered by RF Digital Studio */}
+              {/* Desarrollado por RF Digital Studio */}
               <div className="text-center">
                 <button
                   onClick={() => setShowRFModal(true)}
                   className="text-xs text-gray-400 hover:text-blue-500 transition-colors duration-200 inline-flex items-center gap-1 cursor-pointer"
                 >
-                  Powered by <span className="font-semibold">RF Digital Studio</span>
+                  Desarrollado por <span className="font-semibold">RF Digital Studio</span>
                 </button>
               </div>
             </div>

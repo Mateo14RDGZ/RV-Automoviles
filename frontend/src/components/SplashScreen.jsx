@@ -62,10 +62,10 @@ function SplashScreen({ onFinish }) {
 
       {/* Contenido principal */}
       <div className="relative z-10 text-center px-8 w-full">
-        {/* "Powered by" - entra y sale por la izquierda */}
+        {/* "Desarrollado por" - entra y sale por la izquierda */}
         <div className="slide-left">
           <p className="text-sm md:text-base font-light text-white/70 tracking-[0.3em] uppercase mb-3">
-            Powered by
+            Desarrollado por
           </p>
         </div>
 
