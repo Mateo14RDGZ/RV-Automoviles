@@ -301,7 +301,7 @@ const Login = () => {
             onClick={() => setShowRFModal(true)}
             className="text-sm text-gray-500 hover:text-blue-400 transition-colors duration-200 inline-flex flex-col items-center gap-0.5 cursor-pointer"
           >
-            Desarrollado por <span className="font-semibold">RF Digital Studio</span>
+            <span className="whitespace-nowrap">Desarrollado por <span className="font-semibold">RF Digital Studio</span></span>
             <span className="text-[10px] md:text-xs text-gray-400 font-normal">v 1.14</span>
           </button>
         </div>
