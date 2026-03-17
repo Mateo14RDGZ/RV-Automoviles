@@ -782,6 +782,62 @@ app.post('/api/clientes', authenticateToken, requireStaff, async (req, res) => {
   }
 });
 
+// Obtener credenciales para enviar por WhatsApp - SOLO si el cliente tiene financiación en progreso
+app.get('/api/clientes/:id/credenciales-para-envio', authenticateToken, requireStaff, async (req, res) => {
+  try {
+    const clienteId = parseInt(req.params.id);
+    const cliente = await prisma.cliente.findUnique({
+      where: { id: clienteId },
+      include: { autos: { select: { estado: true } } }
+    });
+
+    if (!cliente) {
+      return res.status(404).json({ error: 'Cliente no encontrado' });
+    }
+
+    const tieneFinanciacionEnProgreso = cliente.autos && cliente.autos.some(a => a.estado === 'financiado');
+    if (!tieneFinanciacionEnProgreso) {
+      return res.status(403).json({
+        error: 'Solo se pueden enviar credenciales a clientes con un financiamiento en progreso'
+      });
+    }
+
+    let passwordTemporal = cliente.passwordTemporal;
+    if (!passwordTemporal) {
+      const generatePassword = () => {
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+        let p = '';
+        for (let i = 0; i < 8; i++) p += chars.charAt(Math.floor(Math.random() * chars.length));
+        return p;
+      };
+      passwordTemporal = generatePassword();
+      const hashedPassword = await bcrypt.hash(passwordTemporal, 10);
+      const usuario = await prisma.usuario.findFirst({ where: { clienteId } });
+      if (usuario) {
+        await prisma.usuario.update({
+          where: { id: usuario.id },
+          data: { password: hashedPassword }
+        });
+      }
+      await prisma.cliente.update({
+        where: { id: clienteId },
+        data: { passwordTemporal }
+      });
+      console.log('🔑 Contraseña temporal generada para envío de credenciales:', cliente.nombre);
+    }
+
+    res.json({
+      nombre: cliente.nombre,
+      cedula: cliente.cedula,
+      telefono: cliente.telefono,
+      passwordTemporal
+    });
+  } catch (error) {
+    console.error('Error obteniendo credenciales para envío:', error);
+    res.status(500).json({ error: 'Error al obtener credenciales', details: error.message });
+  }
+});
+
 app.put('/api/clientes/:id', authenticateToken, requireStaff, async (req, res) => {
   try {
     const { nombre, cedula, telefono, direccion, email, activo } = req.body;

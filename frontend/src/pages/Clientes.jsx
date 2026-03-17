@@ -16,6 +16,7 @@ const Clientes = () => {
   const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, clienteId: null });
   const [showCredentialsModal, setShowCredentialsModal] = useState(false);
   const [newClientCredentials, setNewClientCredentials] = useState(null);
+  const [enviandoCredencialesId, setEnviandoCredencialesId] = useState(null);
   const [formData, setFormData] = useState({
     nombre: '',
     cedula: '',
@@ -134,6 +135,30 @@ const Clientes = () => {
     navigator.clipboard.writeText(texto).then(() => {
       showToast('📋 Credenciales copiadas al portapapeles', 'success');
     });
+  };
+
+  const tieneFinanciacionEnProgreso = (cliente) => {
+    return cliente.autos && cliente.autos.some(a => a.estado === 'financiado');
+  };
+
+  const handleEnviarCredenciales = async (cliente) => {
+    if (!tieneFinanciacionEnProgreso(cliente)) return;
+    setEnviandoCredencialesId(cliente.id);
+    try {
+      const creds = await clientesService.getCredencialesParaEnvio(cliente.id);
+      let telefono = (creds.telefono || '').replace(/[^0-9]/g, '');
+      if (telefono.startsWith('0')) telefono = telefono.substring(1);
+      const urlWeb = window.location.origin;
+      const mensaje = `*RV AUTOMÓVILES - Acceso al portal*\n\nUsuario (Cédula): ${creds.cedula}\nContraseña: ${creds.passwordTemporal}\nLink: ${urlWeb}`;
+      const url = `https://wa.me/598${telefono}?text=${encodeURIComponent(mensaje)}`;
+      window.open(url, '_blank');
+      showToast('Abriendo WhatsApp para enviar credenciales', 'success');
+    } catch (err) {
+      const msg = err.response?.data?.error || err.message || 'Error al obtener credenciales';
+      showToast(msg, 'error');
+    } finally {
+      setEnviandoCredencialesId(null);
+    }
   };
 
   const handleDelete = async (id) => {
@@ -271,17 +296,28 @@ const Clientes = () => {
                 </div>
               )}
 
-              <div className="flex gap-2 pt-3 md:pt-4 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex flex-wrap gap-2 pt-3 md:pt-4 border-t border-gray-200 dark:border-gray-700">
                 <button
                   onClick={() => handleEdit(cliente)}
-                  className="flex-1 btn btn-secondary text-xs md:text-sm py-2 flex items-center justify-center gap-1.5"
+                  className="flex-1 min-w-0 btn btn-secondary text-xs md:text-sm py-2 flex items-center justify-center gap-1.5"
                 >
                   <Edit2 className="w-3.5 h-3.5 md:w-4 md:h-4" />
                   Editar
                 </button>
+                {tieneFinanciacionEnProgreso(cliente) && (
+                  <button
+                    onClick={() => handleEnviarCredenciales(cliente)}
+                    disabled={enviandoCredencialesId === cliente.id}
+                    title="Enviar credenciales por WhatsApp (solo con financiación en progreso)"
+                    className="flex-1 min-w-0 btn btn-primary text-xs md:text-sm py-2 flex items-center justify-center gap-1.5"
+                  >
+                    <MessageCircle className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                    {enviandoCredencialesId === cliente.id ? '...' : 'Enviar credenciales'}
+                  </button>
+                )}
                 <button
                   onClick={() => handleDelete(cliente.id)}
-                  className="flex-1 btn btn-danger text-xs md:text-sm py-2 flex items-center justify-center gap-1.5"
+                  className="flex-1 min-w-0 btn btn-danger text-xs md:text-sm py-2 flex items-center justify-center gap-1.5"
                 >
                   <Trash2 className="w-3.5 h-3.5 md:w-4 md:h-4" />
                   Eliminar

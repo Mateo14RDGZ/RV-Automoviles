@@ -60,6 +60,11 @@ export const clientesService = {
     return response.data;
   },
 
+  getCredencialesParaEnvio: async (id) => {
+    const response = await api.get(`/clientes/${id}/credenciales-para-envio`);
+    return response.data;
+  },
+
   create: async (data) => {
     const response = await api.post('/clientes', data);
     return response.data;
