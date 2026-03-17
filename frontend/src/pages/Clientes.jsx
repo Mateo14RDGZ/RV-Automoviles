@@ -330,8 +330,8 @@ const Clientes = () => {
 
       {/* Modal de formulario */}
       {showModal && (
-        <div className="fixed inset-0 bg-black dark:bg-black bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center p-2 md:p-4 z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-2xl w-full max-h-[95vh] overflow-y-auto border border-gray-300 dark:border-gray-700">
+        <div className="fixed inset-0 z-50 overflow-y-auto overflow-x-hidden bg-black/50 dark:bg-black/70 flex items-start md:items-center justify-center p-2 md:p-4 min-h-screen">
+          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-2xl w-full my-4 md:my-0 max-h-[calc(100vh-2rem)] overflow-y-auto border border-gray-300 dark:border-gray-700">
             <div className="p-4 md:p-6">
               <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-4 md:mb-6">
                 {editingCliente ? 'Editar Cliente' : 'Nuevo Cliente'}
@@ -438,7 +438,7 @@ const Clientes = () => {
 
       {/* Modal obligatorio para enviar credenciales por WhatsApp */}
       {showCredentialsModal && newClientCredentials && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 z-50 overflow-y-auto overflow-x-hidden bg-black/75 flex items-center justify-center p-4 min-h-screen">
           <div className="bg-white dark:bg-gray-800 rounded-lg max-w-lg w-full border-4 border-green-500 shadow-2xl">
             <div className="p-6">
               <div className="text-center mb-6">

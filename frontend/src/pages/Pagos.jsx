@@ -1688,8 +1688,8 @@ const Pagos = () => {
 
       {/* Modal crear cuota individual */}
       {showModal && (
-        <div className="fixed inset-0 bg-black dark:bg-black bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center p-4 z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full">
+        <div className="fixed inset-0 z-50 overflow-y-auto overflow-x-hidden bg-black/50 dark:bg-black/70 flex items-center justify-center p-4 min-h-screen">
+          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full my-4 max-h-[calc(100vh-2rem)] overflow-y-auto">
             <div className="p-6">
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Nueva Cuota</h2>
               
@@ -1776,12 +1776,12 @@ const Pagos = () => {
         </div>
       )}
 
-      {/* Modal generar cuotas */}
+      {/* Modal generar cuotas - estático en mobile con scroll interno */}
       {showGenerateModal && (
-        <div className="fixed inset-0 bg-black dark:bg-black bg-opacity-60 dark:bg-opacity-70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
-          <div className="bg-white dark:bg-gray-800 rounded-xl max-w-2xl w-full shadow-xl border border-gray-300 dark:border-gray-700 animate-scale-in max-h-[90vh] flex flex-col">
+        <div className="fixed inset-0 z-50 flex flex-col md:flex-row md:items-center md:justify-center bg-black/60 dark:bg-black/70 backdrop-blur-sm animate-fade-in overflow-hidden p-0 md:p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-t-2xl md:rounded-xl max-w-2xl w-full shadow-xl border border-gray-300 dark:border-gray-700 animate-scale-in flex flex-col h-[95vh] md:h-auto md:max-h-[90vh]">
             {/* Header - Fijo */}
-            <div className="bg-gray-800 dark:bg-gray-900 p-4 rounded-t-xl flex-shrink-0">
+            <div className="bg-gray-800 dark:bg-gray-900 p-4 rounded-t-2xl md:rounded-t-xl flex-shrink-0">
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-lg font-bold text-white">
@@ -1795,16 +1795,17 @@ const Pagos = () => {
                     setShowGenerateModal(false);
                     resetGenerateForm();
                   }}
-                  className="text-white hover:bg-gray-700 rounded-lg p-2 transition-all duration-200"
+                  className="text-white hover:bg-gray-700 rounded-lg p-2 transition-all duration-200 touch-manipulation"
+                  aria-label="Cerrar"
                 >
                   <span className="text-2xl leading-none">×</span>
                 </button>
               </div>
             </div>
             
-            {/* Contenedor con scroll */}
-            <div className="overflow-y-auto flex-1 custom-scrollbar">
-              <form onSubmit={handleGenerateCuotas} className="p-5 space-y-4">
+            {/* Contenedor con scroll - solo esta zona hace scroll */}
+            <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden custom-scrollbar overscroll-contain">
+              <form id="generate-cuotas-form" onSubmit={handleGenerateCuotas} className="p-5 space-y-4">
                 {/* Sección 1: Selección de Auto */}
                 <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-300 dark:border-gray-600">
                   <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
@@ -2553,37 +2554,36 @@ const Pagos = () => {
                     </div>
                   </div>
                 )}
-
-                {/* Botones de Acción */}
-                <div className="flex gap-3 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowGenerateModal(false);
-                      resetGenerateForm();
-                    }}
-                    className="px-6 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-medium rounded-lg transition-all duration-200"
-                  >
-                    Cancelar
-                  </button>
-                  <button 
-                    type="submit" 
-                    className="flex-1 bg-blue-400 hover:bg-blue-500 dark:bg-blue-500 dark:hover:bg-blue-600 text-white py-2.5 px-4 rounded-lg font-semibold transition-all duration-200"
-                  >
-                    Generar Plan de Cuotas
-                  </button>
-                </div>
               </form>
             </div>
-            {/* Fin del contenedor con scroll */}
+            {/* Footer fijo - botones siempre visibles en mobile */}
+            <div className="flex-shrink-0 p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-b-2xl md:rounded-b-xl flex gap-3 safe-area-pb">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowGenerateModal(false);
+                  resetGenerateForm();
+                }}
+                className="flex-1 md:flex-none px-6 py-3 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-medium rounded-lg transition-all duration-200 touch-manipulation"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                form="generate-cuotas-form"
+                className="flex-1 bg-blue-400 hover:bg-blue-500 dark:bg-blue-500 dark:hover:bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold transition-all duration-200 touch-manipulation"
+              >
+                Generar Plan de Cuotas
+              </button>
+            </div>
           </div>
         </div>
       )}
 
       {/* Modal de confirmación para marcar pagado */}
       {showConfirmModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-70 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
-          <div className="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4">
+        <div className="fixed inset-0 z-50 overflow-y-auto overflow-x-hidden bg-black/50 dark:bg-black/70 flex items-center justify-center p-4 min-h-screen">
+          <div className="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full my-4 max-h-[calc(100vh-2rem)] overflow-y-auto">
             <div className="p-6">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                 Marcar Cuota como Pagada
@@ -2791,7 +2791,7 @@ const Pagos = () => {
 
       {/* Modal de confirmación para devolver cuota */}
       {showConfirmDevolverModal && pagoParaDevolver && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 z-50 overflow-y-auto overflow-x-hidden bg-black/50 flex items-center justify-center p-4 min-h-screen">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6">
             <div className="flex items-start gap-4 mb-4">
               <div className="flex-shrink-0 w-12 h-12 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
@@ -2843,7 +2843,7 @@ const Pagos = () => {
 
       {/* Modal de confirmación de email */}
       {showEmailModal && pagoParaEmail && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 overflow-y-auto overflow-x-hidden bg-black/50 h-full w-full flex items-center justify-center p-4 min-h-screen">
           <div className="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4">
             <div className="p-6">
               <div className="flex items-center justify-center mb-4">
@@ -2955,8 +2955,8 @@ const Pagos = () => {
 
       {/* Modal para subir comprobante de pago (Clientes) */}
       {showComprobanteModal && pagoParaComprobante && (
-        <div className="fixed inset-0 bg-black dark:bg-black bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center p-4 z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full border border-gray-300 dark:border-gray-700">
+        <div className="fixed inset-0 z-50 overflow-y-auto overflow-x-hidden bg-black/50 dark:bg-black/70 flex items-center justify-center p-4 min-h-screen">
+          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full border border-gray-300 dark:border-gray-700 my-4 max-h-[calc(100vh-2rem)] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white">

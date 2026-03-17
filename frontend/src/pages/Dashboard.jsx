@@ -530,8 +530,8 @@ const Dashboard = () => {
 
       {/* Modal para ver comprobante */}
       {mostrarComprobante && comprobanteSeleccionado && (
-        <div className="fixed inset-0 bg-black dark:bg-black bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center p-4 z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto border border-gray-300 dark:border-gray-700">
+        <div className="fixed inset-0 z-50 overflow-y-auto overflow-x-hidden bg-black/50 dark:bg-black/70 flex items-center justify-center p-4 min-h-screen">
+          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-3xl w-full my-4 max-h-[calc(100vh-2rem)] overflow-y-auto border border-gray-300 dark:border-gray-700">
             <div className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white">
@@ -652,7 +652,7 @@ const Dashboard = () => {
 
       {/* Modal de WhatsApp después de aprobar comprobante */}
       {mostrarModalWhatsApp && pagoAprobado && (
-        <div className="fixed inset-0 bg-black dark:bg-black bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 z-50 overflow-y-auto overflow-x-hidden bg-black/50 dark:bg-black/70 flex items-center justify-center p-4 min-h-screen">
           <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full border border-gray-300 dark:border-gray-700">
             <div className="p-6">
               <div className="flex items-center justify-center mb-4">

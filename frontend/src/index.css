@@ -495,6 +495,10 @@
   }
 
   /* Scrollbar personalizada para modal */
+  .custom-scrollbar {
+    -webkit-overflow-scrolling: touch; /* Scroll suave en iOS */
+  }
+
   .custom-scrollbar::-webkit-scrollbar {
     width: 10px;
   }
@@ -710,6 +714,11 @@
     .modal-mobile {
       max-height: 95vh !important;
       margin: 0.5rem !important;
+    }
+
+    /* Safe area para botones en modales (notch/home indicator) */
+    .safe-area-pb {
+      padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
     }
   }
 

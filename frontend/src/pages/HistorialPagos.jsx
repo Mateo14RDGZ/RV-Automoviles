@@ -620,7 +620,7 @@ const HistorialPagos = () => {
 
       {/* Modal de confirmación para devolver cuota */}
       {showConfirmDevolverModal && pagoParaDevolver && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 z-50 overflow-y-auto overflow-x-hidden bg-black/50 flex items-center justify-center p-4 min-h-screen">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6">
             <div className="flex items-start gap-4 mb-4">
               <div className="flex-shrink-0 w-12 h-12 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">

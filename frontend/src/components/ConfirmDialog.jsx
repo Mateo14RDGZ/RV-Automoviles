@@ -32,8 +32,8 @@ const ConfirmDialog = ({ isOpen, onClose, onConfirm, title, message, confirmText
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full animate-scaleIn">
+    <div className="fixed inset-0 z-50 overflow-y-auto overflow-x-hidden flex items-center justify-center p-4 min-h-screen bg-black/50 backdrop-blur-sm animate-fadeIn">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full my-4 animate-scaleIn">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b dark:border-gray-700">
           <div className="flex items-center gap-3">
