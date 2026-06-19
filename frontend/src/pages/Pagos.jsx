@@ -241,8 +241,9 @@ const Pagos = () => {
         params.estado = 'pagado';
       } else if (filterType === 'vencidos') {
         params.vencidos = 'true';
+      } else if (filterType === 'todos') {
+        // Si es 'todos', params queda vacío para obtener todos los pagos
       }
-      // Si es 'todos', params queda vacío para obtener todos los pagos
       
       console.log('🔍 handleFilter - Rol:', user?.rol, 'Filtro:', filterType, 'Params:', params);
       const data = await pagosService.getAll(params);
@@ -1140,6 +1141,12 @@ const Pagos = () => {
           >
             Pagadas
           </button>
+          <button
+            onClick={() => handleFilter('todos')}
+            className={`btn ${filter === 'todos' ? 'btn-primary' : 'btn-secondary'}`}
+          >
+            Todas
+          </button>
         </div>
       </div>
 
@@ -1256,7 +1263,29 @@ const Pagos = () => {
                           </div>
                         ) : (
                           clienteData.pagos
-                            .sort((a, b) => a.numeroCuota - b.numeroCuota)
+                            .sort((a, b) => {
+                              // Si el filtro es 'todos', ordenar por estado: vencidas, pendientes, pagadas
+                              if (filter === 'todos') {
+                                const hoy = new Date();
+                                hoy.setHours(0, 0, 0, 0);
+                                
+                                const aVencido = a.estado !== 'pagado' && new Date(a.fechaVencimiento) < hoy;
+                                const bVencido = b.estado !== 'pagado' && new Date(b.fechaVencimiento) < hoy;
+                                const aPagado = a.estado === 'pagado';
+                                const bPagado = b.estado === 'pagado';
+                                
+                                // Orden: Vencidas (1), Pendientes (2), Pagadas (3)
+                                const prioridadA = aVencido ? 1 : (aPagado ? 3 : 2);
+                                const prioridadB = bVencido ? 1 : (bPagado ? 3 : 2);
+                                
+                                if (prioridadA !== prioridadB) {
+                                  return prioridadA - prioridadB;
+                                }
+                              }
+                              
+                              // Dentro del mismo estado, ordenar por numeroCuota
+                              return a.numeroCuota - b.numeroCuota;
+                            })
                             .map(pago => {
                               const esVencido = pago.estado !== 'pagado' && new Date(pago.fechaVencimiento) < new Date();
                               const esPagado = pago.estado === 'pagado';
