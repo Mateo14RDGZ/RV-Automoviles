@@ -92,12 +92,12 @@ function SplashScreen({ onFinish }) {
         {/* Halo de profundidad detrás del logo */}
         <div className="splash-aura absolute h-[min(82vw,25rem)] w-[min(82vw,25rem)] rounded-full bg-white/35 blur-3xl" />
 
-        {/* El archivo original se muestra completo, sin recortes ni retoques */}
-        <div className="splash-logo relative z-10 h-[min(72vw,20rem)] w-[min(72vw,20rem)] overflow-hidden bg-white shadow-[0_24px_70px_rgba(0,0,0,0.28)]">
+        {/* Logo transparente, mostrado en blanco para contrastar con el fondo */}
+        <div className="splash-logo relative z-10 h-[min(72vw,20rem)] w-[min(72vw,20rem)]">
           <img
-            src="/mr14-logo.jpg"
+            src="/mr14-logo.png"
             alt="MR14"
-            className="h-full w-full object-contain"
+            className="h-full w-full object-contain brightness-0 invert drop-shadow-[0_16px_32px_rgba(0,0,0,0.28)]"
             fetchPriority="high"
             draggable="false"
           />
