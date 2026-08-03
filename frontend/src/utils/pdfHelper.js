@@ -1,307 +1,129 @@
-// Sistema profesional de generación de PDFs para RV Automóviles
+// Utilidades compartidas para los reportes PDF de RV Automóviles.
 
-// Paleta de colores corporativa RV Automóviles
 const COLORS = {
-  // Azules corporativos
-  primary: [25, 55, 109], // Azul oscuro corporativo
-  secondary: [41, 98, 255], // Azul brillante
-  accent: [79, 70, 229], // Índigo moderno
-  
-  // Estados
-  success: [16, 185, 129], // Verde esmeralda
-  warning: [251, 146, 60], // Naranja cálido
-  danger: [239, 68, 68], // Rojo coral
-  info: [59, 130, 246], // Azul información
-  
-  // Grises premium
+  primary: [22, 48, 86],
+  secondary: [37, 99, 235],
+  accent: [30, 64, 175],
+  success: [21, 128, 61],
+  warning: [180, 83, 9],
+  danger: [185, 28, 28],
+  info: [37, 99, 235],
   gray: {
-    50: [250, 250, 250],
-    100: [245, 245, 245],
-    200: [230, 230, 230],
-    300: [212, 212, 212],
-    400: [163, 163, 163],
-    500: [115, 115, 115],
-    600: [82, 82, 82],
-    700: [64, 64, 64],
-    800: [38, 38, 38],
-    900: [23, 23, 23]
+    50: [248, 250, 252],
+    100: [241, 245, 249],
+    200: [226, 232, 240],
+    300: [203, 213, 225],
+    400: [148, 163, 184],
+    500: [100, 116, 139],
+    600: [71, 85, 105],
+    700: [51, 65, 85],
+    800: [30, 41, 59],
+    900: [15, 23, 42]
   },
-  
-  // Colores adicionales
   white: [255, 255, 255],
   black: [0, 0, 0]
 };
 
-/**
- * Dibuja el logo profesional de RV Automóviles
- * @param {jsPDF} doc - Instancia de jsPDF
- * @param {number} x - Posición X
- * @param {number} y - Posición Y
- * @param {number} size - Tamaño del logo
- */
-const drawRVLogo = (doc, x, y, size = 25) => {
-  const centerX = x + size/2;
-  const centerY = y + size/2;
-  const radius = size/2;
-  
-  // Fondo circular con gradiente simulado
+const formatGeneratedAt = (date = new Date()) =>
+  new Intl.DateTimeFormat('es-UY', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  }).format(date);
+
+const drawBrandMark = (doc, x, y) => {
   doc.setFillColor(...COLORS.primary);
-  doc.ellipse(centerX, centerY, radius, radius, 'F');
-  
-  // Círculo interior decorativo
-  doc.setFillColor(...COLORS.secondary);
-  doc.ellipse(centerX, centerY, radius/1.3, radius/1.3, 'F');
-  
-  // Letras RV en el centro
+  doc.roundedRect(x, y, 22, 22, 2.5, 2.5, 'F');
   doc.setTextColor(...COLORS.white);
-  doc.setFontSize(size * 0.45);
-  doc.setFont(undefined, 'bold');
-  // Usar coordenadas simples sin opciones de alineación para evitar errores
-  const textWidth = doc.getTextWidth('RV');
-  doc.text('RV', centerX - textWidth/2, centerY + (size * 0.12));
-  
-  // Círculo exterior decorativo
-  doc.setDrawColor(...COLORS.white);
-  doc.setLineWidth(0.6);
-  doc.ellipse(centerX, centerY, radius * 0.85, radius * 0.85, 'S');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(13);
+  doc.text('RV', x + 11, y + 14, { align: 'center' });
 };
 
 /**
- * Agrega header profesional con logo de RV Automóviles
- * @param {jsPDF} doc - Instancia de jsPDF
- * @param {string} title - Título del documento
- * @param {string} subtitle - Subtítulo opcional
- * @param {string} type - Tipo de documento
- * @returns {number} - Posición Y donde termina el header
+ * Encabezado limpio: marca, nombre del reporte, alcance y fecha de generación.
+ * No incluye eslóganes, contactos ni afirmaciones que no provengan del negocio.
  */
-export const addPDFHeader = async (doc, title, subtitle = null, type = 'DOCUMENTO') => {
+export const addPDFHeader = async (doc, title, subtitle = null, type = 'REPORTE') => {
   const pageWidth = doc.internal.pageSize.getWidth();
-  
-  // === SECCIÓN SUPERIOR CON LOGO Y MARCA ===
-  
-  // Banda superior con color corporativo
+  const margin = 15;
+
   doc.setFillColor(...COLORS.primary);
-  doc.rect(0, 0, pageWidth, 35, 'F');
-  
-  // Línea decorativa inferior
-  doc.setFillColor(...COLORS.secondary);
-  doc.rect(0, 35, pageWidth, 2, 'F');
-  
-  // Nombre de la empresa
-  doc.setTextColor(...COLORS.white);
-  doc.setFontSize(20);
-  doc.setFont(undefined, 'bold');
-  doc.text('RV Automóviles', 42, 18);
-  
-  // Slogan/Descripción
-  doc.setFontSize(9);
-  doc.setFont(undefined, 'normal');
-  doc.setTextColor(240, 240, 240);
-  doc.text('Tu concesionaria de confianza', 42, 26);
-  
-  // Información de la derecha (fecha y tipo)
-  const ahora = new Date();
-  const fecha = `${String(ahora.getDate()).padStart(2, '0')}/${String(ahora.getMonth() + 1).padStart(2, '0')}/${ahora.getFullYear()}`;
-  const hora = `${String(ahora.getHours()).padStart(2, '0')}:${String(ahora.getMinutes()).padStart(2, '0')}`;
-  const tipoDoc = (type || 'DOCUMENTO').toString().toUpperCase();
-  
-  // Caja de información en la esquina superior derecha
-  const infoBoxWidth = 50;
-  const infoBoxX = pageWidth - infoBoxWidth - 10;
-  
-  // Usar color sólido en lugar de transparencia
-  doc.setFillColor(45, 75, 125); // Azul semi-oscuro
-  doc.roundedRect(infoBoxX, 6, infoBoxWidth, 23, 2, 2, 'F');
-  
-  doc.setFontSize(7);
-  doc.setFont(undefined, 'bold');
-  doc.setTextColor(...COLORS.white);
-  doc.text('FECHA:', infoBoxX + 3, 11);
-  doc.text('HORA:', infoBoxX + 3, 17);
-  doc.text('DOCUMENTO:', infoBoxX + 3, 23);
-  
-  doc.setFont(undefined, 'normal');
-  doc.text(fecha, infoBoxX + 17, 11);
-  doc.text(hora, infoBoxX + 17, 17);
-  doc.text(tipoDoc, infoBoxX + 23, 23);
-  
-  // === SECCIÓN DE TÍTULO ===
-  
-  let yPos = 50;
-  
-  // Título principal del documento
-  doc.setTextColor(...COLORS.gray[900]);
-  doc.setFontSize(18);
-  doc.setFont(undefined, 'bold');
-  const tituloTexto = (title || 'Documento').toString();
-  doc.text(tituloTexto, 15, yPos);
-  
-  // Línea decorativa bajo el título
-  const titleWidth = doc.getTextWidth(tituloTexto);
-  doc.setDrawColor(...COLORS.secondary);
-  doc.setLineWidth(3);
-  doc.line(15, yPos + 2, 15 + Math.min(titleWidth, 80), yPos + 2);
-  
-  yPos += 8;
-  
-  // Subtítulo si existe
-  if (subtitle) {
-    doc.setFontSize(11);
-    doc.setFont(undefined, 'normal');
-    doc.setTextColor(...COLORS.gray[600]);
-    const subtituloTexto = subtitle.toString();
-    doc.text(subtituloTexto, 15, yPos);
-    yPos += 8;
-  }
-  
-  // === CAJA DE INFORMACIÓN ADICIONAL ===
-  
-  yPos += 2;
-  
-  // Caja con fondo suave y borde profesional
-  doc.setFillColor(...COLORS.gray[50]);
-  doc.setDrawColor(...COLORS.gray[200]);
-  doc.setLineWidth(0.3);
-  doc.roundedRect(15, yPos, pageWidth - 30, 16, 2, 2, 'FD');
-  
+  doc.rect(0, 0, pageWidth, 7, 'F');
+  drawBrandMark(doc, margin, 15);
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(11);
+  doc.setTextColor(...COLORS.primary);
+  doc.text('RV AUTOMÓVILES', 43, 22);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7.5);
+  doc.setTextColor(...COLORS.gray[500]);
+  doc.text('Sistema de gestión', 43, 28);
+
+  const reportLabel = String(type || 'REPORTE').toUpperCase();
+  doc.setFont('helvetica', 'bold');
   doc.setFontSize(7.5);
   doc.setTextColor(...COLORS.gray[600]);
-  doc.setFont(undefined, 'normal');
-  doc.text('Documento generado automáticamente por RV Automóviles - Sistema de Gestión. Conserve como comprobante oficial.', 20, yPos + 7);
-  
-  // Sello de autenticidad
-  const selloTexto = 'DOCUMENTO OFICIAL';
-  doc.setFillColor(...COLORS.primary);
-  doc.roundedRect(pageWidth - 48, yPos + 3, 33, 10, 2, 2, 'F');
-  doc.setFontSize(6.5);
-  doc.setFont(undefined, 'bold');
-  doc.setTextColor(...COLORS.white);
-  doc.text(selloTexto, pageWidth - 48 + (33 - doc.getTextWidth(selloTexto)) / 2, yPos + 9);
-  
-  yPos += 21;
-  
-  // Línea separadora elegante
-  doc.setDrawColor(...COLORS.gray[300]);
-  doc.setLineWidth(0.5);
-  doc.line(15, yPos, pageWidth - 15, yPos);
-  
-  return yPos + 5;
+  doc.text(reportLabel, pageWidth - margin, 20, { align: 'right' });
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7.5);
+  doc.setTextColor(...COLORS.gray[500]);
+  doc.text(`Generado: ${formatGeneratedAt()}`, pageWidth - margin, 27, { align: 'right' });
+
+  doc.setDrawColor(...COLORS.gray[200]);
+  doc.setLineWidth(0.4);
+  doc.line(margin, 43, pageWidth - margin, 43);
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(19);
+  doc.setTextColor(...COLORS.gray[900]);
+  const safeTitle = String(title || 'Reporte');
+  const titleLines = doc.splitTextToSize(safeTitle, pageWidth - margin * 2);
+  doc.text(titleLines, margin, 56);
+
+  let yPos = 56 + titleLines.length * 7;
+  if (subtitle) {
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9.5);
+    doc.setTextColor(...COLORS.gray[600]);
+    const subtitleLines = doc.splitTextToSize(String(subtitle), pageWidth - margin * 2);
+    doc.text(subtitleLines, margin, yPos + 1);
+    yPos += subtitleLines.length * 4.5 + 3;
+  }
+
+  doc.setFillColor(...COLORS.secondary);
+  doc.roundedRect(margin, yPos + 2, 28, 1.5, 0.75, 0.75, 'F');
+  return yPos + 11;
 };
 
-/**
- * Agrega footer profesional con información de contacto
- * @param {jsPDF} doc - Instancia de jsPDF
- * @param {Object} options - Opciones de configuración
- */
+/** Agrega numeración y marca al pie sin datos de contacto inventados. */
 export const addPDFFooter = async (doc, options = {}) => {
-  const {
-    showContact = true,
-    contactInfo = {
-      telefono: '+598 99 123 456',
-      email: 'contacto@rvautomoviles.com',
-      web: 'www.rvautomoviles.com.uy',
-      direccion: 'Montevideo, Uruguay'
-    }
-  } = options;
-  
+  const { label = 'Reporte de gestión' } = options;
   const pageCount = doc.internal.getNumberOfPages();
   const pageHeight = doc.internal.pageSize.getHeight();
   const pageWidth = doc.internal.pageSize.getWidth();
-  
-  for (let i = 1; i <= pageCount; i++) {
-    doc.setPage(i);
-    
-    const footerY = pageHeight - 25;
-    
-    // === LÍNEAS DECORATIVAS SUPERIORES ===
-    doc.setDrawColor(...COLORS.secondary);
-    doc.setLineWidth(1.5);
-    doc.line(15, footerY - 2, pageWidth - 15, footerY - 2);
-    
+
+  for (let page = 1; page <= pageCount; page += 1) {
+    doc.setPage(page);
+    const y = pageHeight - 13;
     doc.setDrawColor(...COLORS.gray[200]);
-    doc.setLineWidth(0.3);
-    doc.line(15, footerY - 1, pageWidth - 15, footerY - 1);
-    
-    // === FONDO DEL FOOTER ===
-    doc.setFillColor(...COLORS.gray[50]);
-    doc.rect(0, footerY, pageWidth, 25, 'F');
-    
-    // === INFORMACIÓN DE CONTACTO ===
-    if (showContact) {
-      const contactX = 35;
-      const contactY = footerY + 6;
-      
-      doc.setFontSize(7.5);
-      doc.setTextColor(...COLORS.gray[700]);
-      
-      // Asegurar que todos los valores sean strings
-      const tel = (contactInfo.telefono || '+598 99 123 456').toString();
-      const email = (contactInfo.email || 'contacto@rvautomoviles.com').toString();
-      const web = (contactInfo.web || 'www.rvautomoviles.com.uy').toString();
-      const dir = (contactInfo.direccion || 'Montevideo, Uruguay').toString();
-      
-      // Teléfono
-      doc.setFont(undefined, 'bold');
-      doc.text('Tel:', contactX, contactY);
-      doc.setFont(undefined, 'normal');
-      doc.text(tel, contactX + 8, contactY);
-      
-      // Email
-      doc.setFont(undefined, 'bold');
-      doc.text('Email:', contactX, contactY + 5);
-      doc.setFont(undefined, 'normal');
-      doc.text(email, contactX + 11, contactY + 5);
-      
-      // Web
-      doc.setFont(undefined, 'bold');
-      doc.text('Web:', contactX, contactY + 10);
-      doc.setFont(undefined, 'normal');
-      doc.text(web, contactX + 9, contactY + 10);
-      
-      // Dirección (a la derecha)
-      doc.setFont(undefined, 'bold');
-      doc.text('Dirección:', contactX + 70, contactY);
-      doc.setFont(undefined, 'normal');
-      doc.text(dir, contactX + 87, contactY);
-    }
-    
-    // === NÚMERO DE PÁGINA ELEGANTE ===
-    const pageBoxWidth = 22;
-    const pageBoxX = pageWidth - pageBoxWidth - 15;
-    const pageBoxY = footerY + 5;
-    
-    // Fondo del número de página
-    doc.setFillColor(...COLORS.primary);
-    doc.roundedRect(pageBoxX, pageBoxY, pageBoxWidth, 12, 2, 2, 'F');
-    
-    // Borde decorativo
-    doc.setDrawColor(...COLORS.secondary);
-    doc.setLineWidth(0.5);
-    doc.roundedRect(pageBoxX, pageBoxY, pageBoxWidth, 12, 2, 2, 'S');
-    
-    // Texto del número de página
-    doc.setFontSize(9);
-    doc.setFont(undefined, 'bold');
-    doc.setTextColor(...COLORS.white);
-    const pageText = `Pág. ${i}/${pageCount}`;
-    const pageTextWidth = doc.getTextWidth(pageText);
-    doc.text(pageText, pageBoxX + pageBoxWidth/2 - pageTextWidth/2, pageBoxY + 8);
-    
-    // === TEXTO LEGAL/INFORMATIVO ===
-    doc.setFontSize(6.5);
+    doc.setLineWidth(0.35);
+    doc.line(15, y - 4, pageWidth - 15, y - 4);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.5);
     doc.setTextColor(...COLORS.gray[500]);
-    doc.setFont(undefined, 'italic');
-    const legalText = 'Documento generado electrónicamente - Sistema RV Automóviles';
-    const legalTextWidth = doc.getTextWidth(legalText);
-    doc.text(legalText, pageWidth / 2 - legalTextWidth/2, pageHeight - 4);
+    doc.text(`RV Automóviles - ${label}`, 15, y);
+    doc.text(`Página ${page} de ${pageCount}`, pageWidth - 15, y, { align: 'right' });
   }
 };
 
-/**
- * Estilos profesionales para tablas en PDFs
- * @param {string} color - Color del tema (primary, success, warning, danger)
- * @returns {Object} - Configuración de estilos para jsPDF-autoTable
- */
 export const getTableStyles = (color = 'primary') => {
   const colorMap = {
     primary: COLORS.primary,
@@ -311,202 +133,117 @@ export const getTableStyles = (color = 'primary') => {
     danger: COLORS.danger,
     info: COLORS.info
   };
-  
   const headerColor = colorMap[color] || COLORS.primary;
-  
+
   return {
     theme: 'grid',
-    headStyles: { 
+    headStyles: {
       fillColor: headerColor,
       textColor: COLORS.white,
-      fontSize: 9,
+      font: 'helvetica',
+      fontSize: 8,
       fontStyle: 'bold',
-      halign: 'center',
+      halign: 'left',
       valign: 'middle',
-      lineWidth: 0.15,
-      lineColor: [255, 255, 255],
-      cellPadding: { top: 6, right: 5, bottom: 6, left: 5 }
+      lineWidth: 0,
+      cellPadding: { top: 3.5, right: 3, bottom: 3.5, left: 3 }
     },
-    bodyStyles: { 
-      fontSize: 9,
-      cellPadding: { top: 5, right: 4, bottom: 5, left: 4 },
+    bodyStyles: {
+      font: 'helvetica',
+      fontSize: 8,
+      cellPadding: { top: 3, right: 3, bottom: 3, left: 3 },
       lineWidth: 0.15,
       lineColor: COLORS.gray[200],
-      textColor: COLORS.gray[800]
+      textColor: COLORS.gray[800],
+      valign: 'middle'
     },
-    alternateRowStyles: { 
-      fillColor: [250, 251, 252]
-    },
-    styles: {
-      overflow: 'linebreak',
-      cellWidth: 'wrap',
-      minCellHeight: 9
-    },
-    margin: { left: 15, right: 15 },
-    tableLineColor: COLORS.gray[300],
-    tableLineWidth: 0.15
+    alternateRowStyles: { fillColor: COLORS.gray[50] },
+    styles: { overflow: 'linebreak', cellWidth: 'wrap', minCellHeight: 7 },
+    margin: { top: 18, bottom: 23, left: 15, right: 15 },
+    tableLineColor: COLORS.gray[200],
+    tableLineWidth: 0.15,
+    showHead: 'everyPage'
   };
 };
 
-/**
- * Agrega una sección con título destacado
- * @param {jsPDF} doc - Instancia de jsPDF
- * @param {number} yPos - Posición Y inicial
- * @param {string} title - Título de la sección
- * @param {string} description - Descripción opcional
- * @returns {number} - Nueva posición Y
- */
 export const addSection = (doc, yPos, title, description = null) => {
   const pageWidth = doc.internal.pageSize.getWidth();
-  
-  // Barra lateral decorativa
-  doc.setFillColor(...COLORS.secondary);
-  doc.rect(15, yPos, 4, 10, 'F');
-  
-  // Título de la sección
-  doc.setFontSize(13);
-  doc.setFont(undefined, 'bold');
-  doc.setTextColor(...COLORS.gray[800]);
-  doc.text(title, 22, yPos + 7);
-  
-  let newY = yPos + 12;
-  
-  // Descripción si existe
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.setTextColor(...COLORS.gray[900]);
+  doc.text(String(title), 15, yPos + 5);
+
+  let nextY = yPos + 10;
   if (description) {
-    doc.setFontSize(9);
-    doc.setFont(undefined, 'normal');
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8.5);
     doc.setTextColor(...COLORS.gray[600]);
-    const lines = doc.splitTextToSize(description, pageWidth - 30);
-    doc.text(lines, 15, newY);
-    newY += lines.length * 4 + 2;
+    const lines = doc.splitTextToSize(String(description), pageWidth - 30);
+    doc.text(lines, 15, nextY);
+    nextY += lines.length * 4 + 1;
   }
-  
-  // Línea separadora suave
+
   doc.setDrawColor(...COLORS.gray[200]);
-  doc.setLineWidth(0.5);
-  doc.line(15, newY, pageWidth - 15, newY);
-  
-  return newY + 6;
+  doc.setLineWidth(0.35);
+  doc.line(15, nextY, pageWidth - 15, nextY);
+  return nextY + 5;
 };
 
-/**
- * Agrega una caja informativa destacada
- * @param {jsPDF} doc - Instancia de jsPDF
- * @param {number} yPos - Posición Y
- * @param {string} title - Título de la caja
- * @param {string} content - Contenido
- * @param {string} type - Tipo (info, success, warning, danger)
- * @returns {number} - Nueva posición Y
- */
 export const addInfoBox = (doc, yPos, title, content, type = 'info') => {
   const pageWidth = doc.internal.pageSize.getWidth();
-  const boxWidth = pageWidth - 30;
-  
-  const colorMap = {
-    info: { bg: [219, 234, 254], border: COLORS.info, text: [30, 64, 175] },
-    success: { bg: [220, 252, 231], border: COLORS.success, text: [21, 128, 61] },
-    warning: { bg: [254, 243, 199], border: COLORS.warning, text: [146, 64, 14] },
-    danger: { bg: [254, 226, 226], border: COLORS.danger, text: [153, 27, 27] }
-  };
-  
-  const colors = colorMap[type] || colorMap.info;
-  
-  // Calcular altura necesaria
-  const contentLines = doc.splitTextToSize(content, boxWidth - 10);
-  const boxHeight = 12 + (contentLines.length * 4);
-  
-  // Fondo de la caja
-  doc.setFillColor(...colors.bg);
-  doc.setDrawColor(...colors.border);
-  doc.setLineWidth(0.8);
-  doc.roundedRect(15, yPos, boxWidth, boxHeight, 3, 3, 'FD');
-  
-  // Título
-  doc.setFontSize(10);
-  doc.setFont(undefined, 'bold');
-  doc.setTextColor(...colors.text);
-  doc.text(title, 20, yPos + 7);
-  
-  // Contenido
+  const palette = {
+    info: { bg: [239, 246, 255], border: COLORS.info, text: [30, 64, 175] },
+    success: { bg: [240, 253, 244], border: COLORS.success, text: [21, 128, 61] },
+    warning: { bg: [255, 251, 235], border: COLORS.warning, text: [146, 64, 14] },
+    danger: { bg: [254, 242, 242], border: COLORS.danger, text: [153, 27, 27] }
+  }[type] || { bg: COLORS.gray[50], border: COLORS.gray[300], text: COLORS.gray[700] };
+  const lines = doc.splitTextToSize(String(content), pageWidth - 44);
+  const boxHeight = 13 + lines.length * 4;
+
+  doc.setFillColor(...palette.bg);
+  doc.setDrawColor(...palette.border);
+  doc.setLineWidth(0.4);
+  doc.roundedRect(15, yPos, pageWidth - 30, boxHeight, 2, 2, 'FD');
+  doc.setFont('helvetica', 'bold');
   doc.setFontSize(9);
-  doc.setFont(undefined, 'normal');
-  doc.text(contentLines, 20, yPos + 13);
-  
+  doc.setTextColor(...palette.text);
+  doc.text(String(title), 20, yPos + 7);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.text(lines, 20, yPos + 12);
   return yPos + boxHeight + 5;
 };
 
-/**
- * Crea un PDF con formato estándar profesional
- * @param {string} title - Título del documento
- * @param {string} subtitle - Subtítulo opcional
- * @param {string} type - Tipo de documento
- * @returns {Promise<{doc: jsPDF, startY: number}>}
- */
-export const createStandardPDF = async (title, subtitle = null, type = 'DOCUMENTO') => {
+export const createStandardPDF = async (title, subtitle = null, type = 'REPORTE') => {
   const { jsPDF } = await import('jspdf');
-  const doc = new jsPDF({
-    orientation: 'portrait',
-    unit: 'mm',
-    format: 'a4',
-    compress: true
-  });
-  
-  // Agregar header con logo
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4', compress: true });
   const startY = await addPDFHeader(doc, title, subtitle, type);
-  
   return { doc, startY };
 };
 
-/**
- * Genera nombre de archivo con formato estándar
- * @param {string} type - Tipo de documento
- * @param {string} description - Descripción adicional
- * @returns {string} - Nombre del archivo
- */
 export const getPDFFileName = (type, description = '') => {
-  const fecha = new Date().toISOString().split('T')[0];
-  const hora = new Date().toTimeString().split(' ')[0].replace(/:/g, '-');
-  const desc = description ? `_${description}` : '';
-  return `RV_${type}${desc}_${fecha}_${hora}.pdf`;
+  const now = new Date();
+  const date = now.toISOString().split('T')[0];
+  const time = now.toTimeString().split(' ')[0].replace(/:/g, '-');
+  const suffix = description ? `_${description}` : '';
+  return `RV_${type}${suffix}_${date}_${time}.pdf`;
 };
 
-/**
- * Agrega marca de agua al documento
- * @param {jsPDF} doc - Instancia de jsPDF
- * @param {string} text - Texto de la marca de agua
- * @param {string} type - Tipo (draft, confidential, copy)
- */
-export const addWatermark = (doc, text = 'COPIA', type = 'draft') => {
+export const addWatermark = (doc, text = 'COPIA') => {
   const pageCount = doc.internal.getNumberOfPages();
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
-  
-  for (let i = 1; i <= pageCount; i++) {
-    doc.setPage(i);
-    
+  for (let page = 1; page <= pageCount; page += 1) {
+    doc.setPage(page);
     doc.saveGraphicsState();
-    doc.setGState(new doc.GState({ opacity: 0.1 }));
-    
+    doc.setGState(new doc.GState({ opacity: 0.08 }));
     doc.setTextColor(...COLORS.gray[400]);
-    doc.setFontSize(60);
-    doc.setFont(undefined, 'bold');
-    
-    // Rotar el texto 45 grados
-    const centerX = pageWidth / 2;
-    const centerY = pageHeight / 2;
-    const textWidth = doc.getTextWidth(text);
-    
-    // Guardar el contexto actual
-    const radians = (45 * Math.PI) / 180;
-    const cos = Math.cos(radians);
-    const sin = Math.sin(radians);
-    
-    // Aplicar la transformación de rotación manualmente
-    doc.text(text, centerX - textWidth/2, centerY);
-    
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(54);
+    doc.text(String(text), pageWidth / 2, pageHeight / 2, { align: 'center', angle: 35 });
     doc.restoreGraphicsState();
   }
 };
 
 export { COLORS };
-

@@ -20,6 +20,33 @@ import Loading from '../components/Loading';
 import StatCard from '../components/StatCard';
 import { useToast } from '../context/ToastContext';
 
+const textOrDash = (value) => {
+  if (value === null || value === undefined || String(value).trim() === '') return '-';
+  return String(value).trim();
+};
+
+const formatReportDate = (value) => {
+  if (!value) return '-';
+  const date = /^\d{4}-\d{2}-\d{2}$/.test(String(value))
+    ? new Date(`${value}T12:00:00`)
+    : new Date(value);
+  if (Number.isNaN(date.getTime())) return '-';
+  return date.toLocaleDateString('es-UY', { day: '2-digit', month: '2-digit', year: 'numeric' });
+};
+
+const getPagoEstado = (pago) => {
+  if (pago.estado === 'pagado') return 'Pagado';
+  const vencimiento = pago.fechaVencimiento ? new Date(pago.fechaVencimiento) : null;
+  return vencimiento && vencimiento < new Date() ? 'Vencido' : 'Pendiente';
+};
+
+const getPagoMonto = (pago) => {
+  const value = pago.estado === 'pagado' && pago.montoPagado !== null && pago.montoPagado !== undefined
+    ? pago.montoPagado
+    : pago.monto;
+  return parseFloat(value) || 0;
+};
+
 const Reportes = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
@@ -107,32 +134,36 @@ const Reportes = () => {
   const handleExportClientesPDF = async () => {
     try {
       const clientes = await clientesService.getAll();
+      if (!clientes || clientes.length === 0) {
+        showToast('No hay clientes para incluir en el reporte', 'warning');
+        return;
+      }
       const doc = new jsPDF();
       
       // Agregar encabezado profesional
       const startY = await addPDFHeader(
         doc,
-        'Base de Datos de Clientes',
-        `Total de clientes registrados: ${clientes.length}`,
-        'Base de Clientes'
+        'Directorio de clientes',
+        `${clientes.length} cliente${clientes.length === 1 ? '' : 's'} registrado${clientes.length === 1 ? '' : 's'}`,
+        'Clientes'
       );
       
       // Sección descriptiva
       const sectionY = addSection(
         doc,
         startY,
-        'Listado Completo de Clientes',
-        'Información de contacto y datos personales'
+        'Datos de contacto',
+        'Listado de clientes y medios de contacto disponibles en el sistema.'
       );
       
       // Tabla profesional con toda la información
       const tableData = clientes.map((cliente, index) => [
         String(index + 1), // Número de fila
-        String(cliente.nombre || '-'),
-        String(cliente.cedula || '-'),
-        String(cliente.telefono || '-'),
-        String(cliente.email || 'Sin email'),
-        String(cliente.direccion || 'Sin dirección')
+        textOrDash(cliente.nombre),
+        textOrDash(cliente.cedula),
+        textOrDash(cliente.telefono),
+        textOrDash(cliente.email),
+        textOrDash(cliente.direccion)
       ]);
       
       autoTable(doc, {
@@ -146,7 +177,7 @@ const Reportes = () => {
           2: { cellWidth: 22, halign: 'center' },
           3: { cellWidth: 24, halign: 'center' },
           4: { cellWidth: 40 },
-          5: { cellWidth: 46 }
+          5: { cellWidth: 44 }
         },
         didParseCell: function(data) {
           // Alternar colores más suaves
@@ -156,25 +187,7 @@ const Reportes = () => {
         }
       });
       
-      // Agregar estadística al final si hay espacio
-      const finalY = doc.lastAutoTable.finalY + 10;
-      if (finalY < 250) {
-        doc.setFillColor(...COLORS.gray[50]);
-        doc.roundedRect(14, finalY, 182, 20, 2, 2, 'F');
-        doc.setDrawColor(...COLORS.gray[200]);
-        doc.roundedRect(14, finalY, 182, 20, 2, 2);
-        
-        doc.setFontSize(10);
-        doc.setFont(undefined, 'bold');
-        doc.setTextColor(...COLORS.gray[700]);
-        doc.text('RESUMEN:', 18, finalY + 7);
-        
-        doc.setFont(undefined, 'normal');
-        doc.setTextColor(...COLORS.gray[600]);
-        doc.text(`Total de clientes activos en el sistema: ${clientes.length}`, 18, finalY + 14);
-      }
-      
-      await addPDFFooter(doc);
+      await addPDFFooter(doc, { label: 'Directorio de clientes' });
       doc.save(getPDFFileName('Clientes', 'Base'));
       showToast('PDF de clientes generado exitosamente', 'success');
     } catch (error) {
@@ -194,33 +207,37 @@ const Reportes = () => {
         return;
       }
       const doc = new jsPDF();
-      const periodoStr = `${new Date(dateRange.start).toLocaleDateString('es-UY', { day: '2-digit', month: 'long', year: 'numeric' })} - ${new Date(dateRange.end).toLocaleDateString('es-UY', { day: '2-digit', month: 'long', year: 'numeric' })}`;
+      const periodoStr = `${formatReportDate(dateRange.start)} al ${formatReportDate(dateRange.end)}`;
       
       // Agregar encabezado profesional con rango de fechas estricto
       const startY = await addPDFHeader(
         doc,
         'Historial de Pagos',
-        `Período: ${periodoStr} | ${pagos.length} cuota(s) en rango`,
-        'Historial de Pagos'
+        `Período de vencimiento: ${periodoStr} | ${pagos.length} cuota${pagos.length === 1 ? '' : 's'}`,
+        'Pagos'
       );
 
       // Calcular totales
       const totalPagado = pagos
-        .filter(p => p.estado === 'pagado')
-        .reduce((sum, p) => sum + (parseFloat(p.monto) || 0), 0);
+        .filter(p => getPagoEstado(p) === 'Pagado')
+        .reduce((sum, p) => sum + getPagoMonto(p), 0);
       
       const totalPendiente = pagos
-        .filter(p => p.estado !== 'pagado')
-        .reduce((sum, p) => sum + (parseFloat(p.monto) || 0), 0);
+        .filter(p => getPagoEstado(p) !== 'Pagado')
+        .reduce((sum, p) => sum + getPagoMonto(p), 0);
 
-      const cuotasPagadas = pagos.filter(p => p.estado === 'pagado').length;
-      const cuotasPendientes = pagos.filter(p => p.estado !== 'pagado').length;
+      const cuotasPagadas = pagos.filter(p => getPagoEstado(p) === 'Pagado').length;
+      const cuotasPendientes = pagos.filter(p => getPagoEstado(p) === 'Pendiente').length;
+      const cuotasVencidas = pagos.filter(p => getPagoEstado(p) === 'Vencido').length;
+      const montoPendiente = pagos.filter(p => getPagoEstado(p) === 'Pendiente').reduce((sum, p) => sum + getPagoMonto(p), 0);
+      const montoVencido = pagos.filter(p => getPagoEstado(p) === 'Vencido').reduce((sum, p) => sum + getPagoMonto(p), 0);
 
       // Tabla de resumen al inicio con diseño mejorado
       const resumenData = [
         ['Cuotas Pagadas', cuotasPagadas.toString(), formatCurrency(totalPagado)],
-        ['Cuotas Pendientes', cuotasPendientes.toString(), formatCurrency(totalPendiente)],
-        ['TOTAL GENERAL', (cuotasPagadas + cuotasPendientes).toString(), formatCurrency(totalPagado + totalPendiente)]
+        ['Cuotas Pendientes', cuotasPendientes.toString(), formatCurrency(montoPendiente)],
+        ['Cuotas Vencidas', cuotasVencidas.toString(), formatCurrency(montoVencido)],
+        ['Total del período', pagos.length.toString(), formatCurrency(totalPagado + totalPendiente)]
       ];
 
       autoTable(doc, {
@@ -230,8 +247,8 @@ const Reportes = () => {
         ...getTableStyles('success'),
         columnStyles: {
           0: { cellWidth: 80, fontStyle: 'bold' },
-          1: { cellWidth: 50, halign: 'center', fontStyle: 'bold', fontSize: 10 },
-          2: { cellWidth: 52, halign: 'right', fontStyle: 'bold', fontSize: 10 }
+          1: { cellWidth: 45, halign: 'center', fontStyle: 'bold', fontSize: 10 },
+          2: { cellWidth: 55, halign: 'right', fontStyle: 'bold', fontSize: 10 }
         },
         didParseCell: function(data) {
           if (data.section === 'body') {
@@ -242,7 +259,8 @@ const Reportes = () => {
               // Fila de pendientes en amarillo
               data.cell.styles.textColor = COLORS.warning;
             } else if (data.row.index === 2) {
-              // Fila total en azul y más grande
+              data.cell.styles.textColor = COLORS.danger;
+            } else if (data.row.index === 3) {
               data.cell.styles.textColor = COLORS.primary;
               data.cell.styles.fontSize = 11;
               data.cell.styles.fillColor = COLORS.gray[50];
@@ -261,7 +279,7 @@ const Reportes = () => {
       // Agrupar pagos por cliente
       const pagosPorCliente = pagos.reduce((acc, pago) => {
         const clienteId = pago.auto?.cliente?.id || 'sin-cliente';
-        const clienteNombre = pago.auto?.cliente?.nombre || 'Sin Cliente';
+        const clienteNombre = textOrDash(pago.auto?.cliente?.nombre);
         if (!acc[clienteId]) {
           acc[clienteId] = {
             cliente: pago.auto?.cliente,
@@ -285,12 +303,12 @@ const Reportes = () => {
 
         // Calcular totales del cliente
         const clienteTotalPagado = pagoCliente
-          .filter(p => p.estado === 'pagado')
-          .reduce((sum, p) => sum + (parseFloat(p.monto) || 0), 0);
+          .filter(p => getPagoEstado(p) === 'Pagado')
+          .reduce((sum, p) => sum + getPagoMonto(p), 0);
         
         const clienteTotalPendiente = pagoCliente
-          .filter(p => p.estado !== 'pagado')
-          .reduce((sum, p) => sum + (parseFloat(p.monto) || 0), 0);
+          .filter(p => getPagoEstado(p) !== 'Pagado')
+          .reduce((sum, p) => sum + getPagoMonto(p), 0);
 
         // Título del cliente con diseño mejorado
         doc.setFillColor(...COLORS.primary);
@@ -317,10 +335,10 @@ const Reportes = () => {
         const clienteInfoData = [];
         if (cliente) {
           if (cliente.cedula) {
-            clienteInfoData.push(['Cédula', cliente.cedula, 'Teléfono', cliente.telefono || 'N/A']);
+            clienteInfoData.push(['Cédula', textOrDash(cliente.cedula), 'Teléfono', textOrDash(cliente.telefono)]);
           }
           if (cliente.email) {
-            clienteInfoData.push(['Email', cliente.email, 'Dirección', cliente.direccion || 'Sin dirección']);
+            clienteInfoData.push(['Email', textOrDash(cliente.email), 'Dirección', textOrDash(cliente.direccion)]);
           } else if (cliente.direccion) {
             clienteInfoData.push(['Dirección', cliente.direccion, '', '']);
           }
@@ -337,10 +355,10 @@ const Reportes = () => {
               fillColor: [249, 250, 251]
             },
             columnStyles: {
-              0: { cellWidth: 22, fontStyle: 'bold', textColor: COLORS.gray[600] },
-              1: { cellWidth: 68 },
-              2: { cellWidth: 22, fontStyle: 'bold', textColor: COLORS.gray[600] },
-              3: { cellWidth: 70 }
+              0: { cellWidth: 20, fontStyle: 'bold', textColor: COLORS.gray[600] },
+              1: { cellWidth: 66 },
+              2: { cellWidth: 20, fontStyle: 'bold', textColor: COLORS.gray[600] },
+              3: { cellWidth: 74 }
             }
           });
           currentY = doc.lastAutoTable.finalY + 5;
@@ -348,17 +366,16 @@ const Reportes = () => {
 
         // Tabla de pagos del cliente con mejor diseño
         const tableData = pagoCliente.map(pago => {
-          const monto = formatCurrency(parseFloat(pago.monto || 0));
-          const estado = pago.estado === 'pagado' ? 'Pagado' : 
-                        pago.estado === 'pendiente' ? 'Pendiente' : 'Vencido';
+          const monto = formatCurrency(getPagoMonto(pago));
+          const estado = getPagoEstado(pago);
           return [
-            String(`${pago.auto?.marca || ''} ${pago.auto?.modelo || ''}`.trim() || 'N/A'),
-            String(pago.auto?.matricula || '0km'),
-            `#${String(pago.numeroCuota || '')}`,
+            textOrDash(`${pago.auto?.marca || ''} ${pago.auto?.modelo || ''}`.trim()),
+            textOrDash(pago.auto?.matricula || '0 km'),
+            pago.numeroCuota ? `#${pago.numeroCuota}` : '-',
             monto,
-            pago.fechaVencimiento ? new Date(pago.fechaVencimiento).toLocaleDateString('es-ES', {day: '2-digit', month: '2-digit', year: 'numeric'}) : '-',
+            formatReportDate(pago.fechaVencimiento),
             estado,
-            pago.fechaPago ? new Date(pago.fechaPago).toLocaleDateString('es-ES', {day: '2-digit', month: '2-digit', year: 'numeric'}) : '-'
+            formatReportDate(pago.fechaPago)
           ];
         });
 
@@ -427,14 +444,14 @@ const Reportes = () => {
             2: { cellWidth: 30, fontStyle: 'bold', textColor: COLORS.warning },
             3: { cellWidth: 30, halign: 'right', fontStyle: 'bold', textColor: COLORS.warning },
             4: { cellWidth: 30, fontStyle: 'bold', textColor: COLORS.primary, fontSize: 10 },
-            5: { cellWidth: 32, halign: 'right', fontStyle: 'bold', textColor: COLORS.primary, fontSize: 10 }
+            5: { cellWidth: 30, halign: 'right', fontStyle: 'bold', textColor: COLORS.primary, fontSize: 10 }
           }
         });
 
         currentY = doc.lastAutoTable.finalY + 10;
       });
 
-      await addPDFFooter(doc);
+      await addPDFFooter(doc, { label: `Historial de pagos - ${periodoStr}` });
       doc.save(getPDFFileName('Pagos', 'Historial'));
       showToast('Historial de pagos generado exitosamente', 'success');
     } catch (error) {
@@ -450,9 +467,9 @@ const Reportes = () => {
       // Agregar encabezado profesional
       const startY = await addPDFHeader(
         doc,
-        'Reporte General del Sistema',
-        `Periodo: ${new Date(dateRange.start).toLocaleDateString('es-ES')} - ${new Date(dateRange.end).toLocaleDateString('es-ES')}`,
-        'Reporte General'
+        'Resumen general del negocio',
+        `Estado actual de la información registrada al ${formatReportDate(new Date())}`,
+        'Resumen general'
       );
       
       // Sección de Autos
@@ -471,7 +488,7 @@ const Reportes = () => {
         ...getTableStyles('primary'),
         columnStyles: {
           0: { fontStyle: 'bold', cellWidth: 100 },
-          1: { halign: 'right', cellWidth: 82, fontStyle: 'bold' }
+          1: { halign: 'right', cellWidth: 80, fontStyle: 'bold' }
         }
       });
       
@@ -489,7 +506,7 @@ const Reportes = () => {
         ...getTableStyles('secondary'),
         columnStyles: {
           0: { fontStyle: 'bold', cellWidth: 100 },
-          1: { halign: 'right', cellWidth: 82, fontStyle: 'bold' }
+          1: { halign: 'right', cellWidth: 80, fontStyle: 'bold' }
         }
       });
       
@@ -511,7 +528,7 @@ const Reportes = () => {
         ...getTableStyles('success'),
         columnStyles: {
           0: { fontStyle: 'bold', cellWidth: 100 },
-          1: { halign: 'right', cellWidth: 82, fontStyle: 'bold' }
+          1: { halign: 'right', cellWidth: 80, fontStyle: 'bold' }
         },
         didParseCell: function(data) {
           if (data.section === 'body' && data.row.index === 4) {
@@ -521,37 +538,31 @@ const Reportes = () => {
         }
       });
       
-      // Resumen Financiero Final
-      currentY = doc.lastAutoTable.finalY + 15;
-      
-      // Caja de resumen con diseño profesional
-      doc.setFillColor(...COLORS.primary);
-      doc.roundedRect(14, currentY, 182, 40, 3, 3, 'F');
-      
-      // Borde decorativo
-      doc.setDrawColor(...COLORS.accent);
-      doc.setLineWidth(1);
-      doc.roundedRect(14, currentY, 182, 40, 3, 3);
-      
-      doc.setFontSize(14);
-      doc.setFont(undefined, 'bold');
-      doc.setTextColor(255, 255, 255);
-      doc.text('RESUMEN FINANCIERO', 105, currentY + 10, { align: 'center' });
-      
+      // Indicadores financieros calculados a partir de los importes registrados.
+      currentY = doc.lastAutoTable.finalY + 13;
       const totalActivo = (stats?.pagos?.totalRecaudado || 0) + (stats?.pagos?.totalPendiente || 0);
       const tasaRecuperacion = totalActivo > 0 ? ((stats?.pagos?.totalRecaudado || 0) / totalActivo) * 100 : 0;
-      
-      doc.setFontSize(11);
-      doc.setFont(undefined, 'normal');
-      doc.text(`Total en Financiamientos Activos: ${formatCurrency(totalActivo)}`, 105, currentY + 20, { align: 'center' });
-      doc.text(`Tasa de Recuperación: ${tasaRecuperacion.toFixed(1)}%`, 105, currentY + 28, { align: 'center' });
-      
-      const estadoFinanciero = tasaRecuperacion >= 80 ? 'Excelente' : tasaRecuperacion >= 60 ? 'Bueno' : 'Requiere Atención';
-      doc.setFontSize(9);
-      doc.setFont(undefined, 'italic');
-      doc.text(`Estado: ${estadoFinanciero}`, 105, currentY + 35, { align: 'center' });
-      
-      await addPDFFooter(doc);
+
+      if (currentY > 238) {
+        doc.addPage();
+        currentY = 25;
+      }
+      currentY = addSection(doc, currentY, 'Indicadores de cartera', 'Importes acumulados según los pagos registrados en el sistema.');
+      autoTable(doc, {
+        startY: currentY,
+        head: [['Indicador', 'Resultado']],
+        body: [
+          ['Cartera registrada', formatCurrency(totalActivo)],
+          ['Porcentaje cobrado', `${tasaRecuperacion.toFixed(1)}%`]
+        ],
+        ...getTableStyles('primary'),
+        columnStyles: {
+          0: { cellWidth: 110, fontStyle: 'bold' },
+          1: { cellWidth: 70, halign: 'right', fontStyle: 'bold' }
+        }
+      });
+
+      await addPDFFooter(doc, { label: 'Resumen general del negocio' });
       doc.save(getPDFFileName('ReporteGeneral', 'Sistema'));
       showToast('PDF de reporte general exportado exitosamente', 'success');
     } catch (error) {
@@ -577,73 +588,64 @@ const Reportes = () => {
         const fecha = new Date(p.fechaRecepcion || p.createdAt);
         return fecha >= desde && fecha <= hasta;
       });
+      if (permutas.length === 0) {
+        showToast('No hay permutas en el rango de fechas seleccionado', 'warning');
+        return;
+      }
       
       const doc = new jsPDF();
-      const periodoStr = `${new Date(dateRange.start).toLocaleDateString('es-UY', { day: '2-digit', month: 'long', year: 'numeric' })} - ${new Date(dateRange.end).toLocaleDateString('es-UY', { day: '2-digit', month: 'long', year: 'numeric' })}`;
+      const periodoStr = `${formatReportDate(dateRange.start)} al ${formatReportDate(dateRange.end)}`;
       
       // Agregar encabezado profesional con rango de fechas estricto
       const startY = await addPDFHeader(
         doc,
         'Reporte de Permutas',
-        `Período: ${periodoStr} | ${permutas.length} operación(es) en rango`,
+        `Período de recepción: ${periodoStr} | ${permutas.length} operación${permutas.length === 1 ? '' : 'es'}`,
         'Permutas'
       );
       
-      // Estadísticas Generales
-      if (permutasStats) {
-        const statsY = addSection(doc, startY, 'Estadísticas Generales', 'Resumen de permutas por tipo y valor');
-        
-        const statsData = [
-          ['Total de Permutas Registradas', String(permutasStats.total || 0)],
-          ['Permutas de Automóviles', String(permutasStats.porTipo?.find(t => t.tipo === 'auto')?._count || 0)],
-          ['Permutas de Motocicletas', String(permutasStats.porTipo?.find(t => t.tipo === 'moto')?._count || 0)],
-          ['Otras Permutas', String(permutasStats.porTipo?.find(t => t.tipo === 'otros')?._count || 0)],
-          ['Valor Total Estimado', formatCurrency(permutasStats.valorTotal || 0)]
-        ];
-        
-        autoTable(doc, {
-          startY: statsY,
-          body: statsData,
-          ...getTableStyles('warning'),
-          columnStyles: {
-            0: { fontStyle: 'bold', cellWidth: 100 },
-            1: { halign: 'right', cellWidth: 82, fontStyle: 'bold' }
-          },
-          didParseCell: function(data) {
-            if (data.section === 'body' && data.row.index === 4) {
-              // Resaltar valor total
-              data.cell.styles.fillColor = COLORS.gray[50];
-              data.cell.styles.textColor = COLORS.warning;
-              data.cell.styles.fontSize = 10;
-            }
-          }
-        });
-      }
+      // Resumen calculado exclusivamente con las operaciones del período.
+      const totalValorPermutas = permutas.reduce((sum, p) => sum + (parseFloat(p.valorEstimado) || 0), 0);
+      const countByType = (type) => permutas.filter(p => p.tipo === type).length;
+      const statsY = addSection(doc, startY, 'Resumen del período', 'Cantidad y valor estimado de las operaciones incluidas en este reporte.');
+      const statsData = [
+        ['Operaciones incluidas', String(permutas.length)],
+        ['Automóviles', String(countByType('auto'))],
+        ['Motocicletas', String(countByType('moto'))],
+        ['Otros bienes', String(countByType('otros'))],
+        ['Valor estimado total', formatCurrency(totalValorPermutas)]
+      ];
+      autoTable(doc, {
+        startY: statsY,
+        head: [['Indicador', 'Resultado']],
+        body: statsData,
+        ...getTableStyles('warning'),
+        columnStyles: {
+          0: { fontStyle: 'bold', cellWidth: 108 },
+          1: { halign: 'right', cellWidth: 72, fontStyle: 'bold' }
+        }
+      });
       
       // Detalle de Permutas
       let currentY = doc.lastAutoTable?.finalY + 15 || 100;
-      currentY = addSection(doc, currentY, 'Detalle de Permutas', 'Lista completa de todas las permutas registradas');
+      currentY = addSection(doc, currentY, 'Detalle de operaciones', 'Bien recibido, valor estimado, cliente asociado y fecha de recepción.');
       
       const permutasTableData = permutas.map(p => [
         p.tipo === 'auto' ? 'AUTO' : p.tipo === 'moto' ? 'MOTO' : 'OTROS',
-        p.descripcion || '-',
+        textOrDash(p.descripcion),
         formatCurrency(p.valorEstimado || 0),
-        p.cliente?.nombre || 'Sin asignar',
-        new Date(p.createdAt).toLocaleDateString('es-ES', {
-          day: '2-digit',
-          month: '2-digit',
-          year: 'numeric'
-        })
+        textOrDash(p.cliente?.nombre),
+        formatReportDate(p.fechaRecepcion || p.createdAt)
       ]);
       
       autoTable(doc, {
         startY: currentY,
-        head: [['Tipo', 'Descripción', 'Valor Estimado', 'Cliente', 'Fecha']],
+        head: [['Tipo', 'Bien recibido', 'Valor estimado', 'Cliente', 'Recepción']],
         body: permutasTableData,
         ...getTableStyles('warning'),
         columnStyles: {
           0: { cellWidth: 20, halign: 'center', fontStyle: 'bold' },
-          1: { cellWidth: 60 },
+          1: { cellWidth: 58 },
           2: { cellWidth: 32, halign: 'right', fontStyle: 'bold' },
           3: { cellWidth: 42 },
           4: { cellWidth: 28, halign: 'center' }
@@ -662,7 +664,7 @@ const Reportes = () => {
         }
       });
       
-      await addPDFFooter(doc);
+      await addPDFFooter(doc, { label: `Permutas - ${periodoStr}` });
       doc.save(getPDFFileName('Permutas', 'Reporte'));
       showToast('PDF de permutas exportado exitosamente', 'success');
     } catch (error) {
