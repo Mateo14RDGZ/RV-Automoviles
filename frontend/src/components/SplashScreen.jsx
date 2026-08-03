@@ -5,7 +5,7 @@ function SplashScreen({ onFinish }) {
     // Cerrar splash después de que termine la animación del logo.
     const timer = setTimeout(() => {
       onFinish();
-    }, 3200);
+    }, 2600);
 
     return () => clearTimeout(timer);
   }, [onFinish]);
@@ -16,31 +16,26 @@ function SplashScreen({ onFinish }) {
         @keyframes splashLogoReveal {
           0% {
             clip-path: circle(0% at 50% 50%);
-            filter: blur(8px);
             opacity: 0;
             transform: scale(0.92);
           }
           24% {
             clip-path: circle(72% at 50% 50%);
-            filter: blur(0);
             opacity: 1;
             transform: scale(1);
           }
           72% {
             clip-path: circle(72% at 50% 50%);
-            filter: blur(0);
             opacity: 1;
             transform: scale(1);
           }
           86% {
             clip-path: circle(72% at 50% 50%);
-            filter: blur(0);
             opacity: 1;
             transform: scale(1.015);
           }
           100% {
             clip-path: circle(72% at 50% 50%);
-            filter: blur(4px);
             opacity: 0;
             transform: scale(0.97);
           }
@@ -53,21 +48,21 @@ function SplashScreen({ onFinish }) {
         }
 
         @keyframes splashBackdropExit {
-          0%, 88% { opacity: 1; }
+          0%, 84% { opacity: 1; }
           100% { opacity: 0; }
         }
 
         .splash-backdrop {
-          animation: splashBackdropExit 3.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          animation: splashBackdropExit 2.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
         .splash-logo {
-          animation: splashLogoReveal 3.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-          will-change: transform, opacity, filter, clip-path;
+          animation: splashLogoReveal 2.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          will-change: transform, opacity, clip-path;
         }
 
         .splash-aura {
-          animation: splashAura 3.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          animation: splashAura 2.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
         @media (prefers-reduced-motion: reduce) {
