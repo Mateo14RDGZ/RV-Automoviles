@@ -1,7 +1,6 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import PageTransition from './PageTransition';
-import RFStudioModal from './RFStudioModal';
 import { 
   LayoutDashboard, 
   Car, 
@@ -23,7 +22,6 @@ const Layout = () => {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [cuotasVencidas, setCuotasVencidas] = useState(0);
-  const [showRFModal, setShowRFModal] = useState(false);
   const isStaff = user?.rol === 'admin' || user?.rol === 'empleado';
 
   // Cargar cuotas vencidas para staff
@@ -172,14 +170,18 @@ const Layout = () => {
               </button>
             </div>
             
-            {/* Desarrollado por RF Digital Studio */}
+            {/* Crédito del desarrollador */}
             <div className="text-center">
-              <button
-                onClick={() => setShowRFModal(true)}
-                className="text-xs text-gray-400 hover:text-blue-500 transition-colors duration-200 inline-flex items-center gap-1 cursor-pointer"
+              <a
+                href="https://www.mateordgz.dev"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Visitar el sitio de MR14"
+                className="text-xs text-gray-400 hover:text-blue-500 transition-colors duration-200 inline-flex items-baseline gap-1.5 tracking-[0.08em]"
               >
-                Desarrollado por <span className="font-semibold">RF Digital Studio</span>
-              </button>
+                <span>Desarrollado por</span>
+                <span className="text-sm font-bold italic tracking-[0.04em]" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>MR14</span>
+              </a>
             </div>
           </div>
         </div>
@@ -274,14 +276,18 @@ const Layout = () => {
                 </button>
               </div>
               
-              {/* Desarrollado por RF Digital Studio */}
+              {/* Crédito del desarrollador */}
               <div className="text-center">
-                <button
-                  onClick={() => setShowRFModal(true)}
-                  className="text-xs text-gray-400 hover:text-blue-500 transition-colors duration-200 inline-flex items-center gap-1 cursor-pointer"
+                <a
+                  href="https://www.mateordgz.dev"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Visitar el sitio de MR14"
+                  className="text-xs text-gray-400 hover:text-blue-500 transition-colors duration-200 inline-flex items-baseline gap-1.5 tracking-[0.08em]"
                 >
-                  Desarrollado por <span className="font-semibold">RF Digital Studio</span>
-                </button>
+                  <span>Desarrollado por</span>
+                  <span className="text-sm font-bold italic tracking-[0.04em]" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>MR14</span>
+                </a>
               </div>
             </div>
           </div>
@@ -310,8 +316,6 @@ const Layout = () => {
         </main>
       </div>
 
-      {/* Modal de RF Studio Digital */}
-      <RFStudioModal isOpen={showRFModal} onClose={() => setShowRFModal(false)} />
     </div>
   );
 };

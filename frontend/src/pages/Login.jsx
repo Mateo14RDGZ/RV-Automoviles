@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import RFStudioModal from '../components/RFStudioModal';
 import { Car, Lock, Mail, ArrowRight, Sparkles, ShieldCheck, CreditCard, IdCard, Eye, EyeOff } from 'lucide-react';
 
 const Login = () => {
@@ -16,7 +15,6 @@ const Login = () => {
   const [focusedInput, setFocusedInput] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordCliente, setShowPasswordCliente] = useState(false);
-  const [showRFModal, setShowRFModal] = useState(false);
   const { login, loginCliente } = useAuth();
   const navigate = useNavigate();
 
@@ -295,20 +293,23 @@ const Login = () => {
           )}
         </div>
 
-        {/* Footer - Desarrollado por RF Digital Studio */}
+        {/* Crédito del desarrollador */}
         <div className="text-center mt-6 animate-fadeInUp" style={{animationDelay: '0.3s'}}>
-          <button
-            onClick={() => setShowRFModal(true)}
-            className="text-sm text-gray-500 hover:text-blue-400 transition-colors duration-200 inline-flex flex-col items-center gap-0.5 cursor-pointer"
+          <a
+            href="https://www.mateordgz.dev"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Visitar el sitio de MR14"
+            className="text-sm text-gray-500 hover:text-blue-400 transition-colors duration-200 inline-flex flex-col items-center gap-0.5"
           >
-            <span className="whitespace-nowrap">Desarrollado por <span className="font-semibold">RF Digital Studio</span></span>
+            <span className="whitespace-nowrap inline-flex items-baseline gap-2 tracking-[0.12em]">
+              <span>Desarrollado por</span>
+              <span className="text-xl font-bold italic tracking-[0.04em]" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>MR14</span>
+            </span>
             <span className="text-[10px] md:text-xs text-gray-400 font-normal">v 1.14</span>
-          </button>
+          </a>
         </div>
       </div>
-
-      {/* Modal de RF Studio Digital */}
-      <RFStudioModal isOpen={showRFModal} onClose={() => setShowRFModal(false)} />
     </div>
   );
 };

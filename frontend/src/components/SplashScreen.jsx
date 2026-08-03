@@ -62,21 +62,30 @@ function SplashScreen({ onFinish }) {
 
       {/* Contenido principal */}
       <div className="relative z-10 text-center px-8 w-full">
-        {/* "Desarrollado por" - entra y sale por la izquierda */}
-        <div className="slide-left">
-          <p className="text-sm md:text-base font-light text-white/70 tracking-[0.3em] uppercase mb-3">
-            Desarrollado por
-          </p>
-        </div>
+        <a
+          href="https://www.mateordgz.dev"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Visitar el sitio de MR14"
+          className="inline-block rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-4 focus-visible:ring-offset-blue-900"
+        >
+          {/* "Desarrollado por" - entra y sale por la izquierda */}
+          <div className="slide-left">
+            <p className="text-sm md:text-base font-light text-white/70 tracking-[0.3em] uppercase mb-3">
+              Desarrollado por
+            </p>
+          </div>
 
-        {/* "RF Digital Studio" - entra y sale por la derecha */}
-        <div className="slide-right">
-          <h2 className="text-2xl md:text-3xl font-medium tracking-wide">
-            <span className="bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent">
-              RF Digital Studio
-            </span>
-          </h2>
-        </div>
+          {/* "MR14" - entra y sale por la derecha */}
+          <div className="slide-right">
+            <h2
+              className="text-3xl md:text-4xl font-bold italic tracking-[0.06em] text-white"
+              style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
+            >
+              MR14
+            </h2>
+          </div>
+        </a>
 
         {/* Spinner de carga - siempre visible, sin animaciones de entrada/salida */}
         <div 
