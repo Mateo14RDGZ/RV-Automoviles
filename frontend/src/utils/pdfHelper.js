@@ -34,13 +34,45 @@ const formatGeneratedAt = (date = new Date()) =>
     hour12: false
   }).format(date);
 
-const drawBrandMark = (doc, x, y) => {
+let brandLogoDataUrlPromise;
+
+const loadBrandLogo = async () => {
+  if (!brandLogoDataUrlPromise) {
+    brandLogoDataUrlPromise = fetch('/icon-512.png')
+      .then((response) => {
+        if (!response.ok) throw new Error('No se pudo cargar el logo');
+        return response.arrayBuffer();
+      })
+      .then((buffer) => {
+        const bytes = new Uint8Array(buffer);
+        let binary = '';
+        const chunkSize = 0x8000;
+        for (let offset = 0; offset < bytes.length; offset += chunkSize) {
+          binary += String.fromCharCode(...bytes.subarray(offset, offset + chunkSize));
+        }
+        return `data:image/png;base64,${btoa(binary)}`;
+      })
+      .catch(() => null);
+  }
+  return brandLogoDataUrlPromise;
+};
+
+const drawBrandFallback = (doc, x, y) => {
   doc.setFillColor(...COLORS.primary);
   doc.roundedRect(x, y, 22, 22, 2.5, 2.5, 'F');
   doc.setTextColor(...COLORS.white);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(13);
   doc.text('RV', x + 11, y + 14, { align: 'center' });
+};
+
+const drawBrandMark = async (doc, x, y) => {
+  const logo = await loadBrandLogo();
+  if (logo) {
+    doc.addImage(logo, 'PNG', x, y, 22, 22, undefined, 'FAST');
+    return;
+  }
+  drawBrandFallback(doc, x, y);
 };
 
 /**
@@ -53,7 +85,7 @@ export const addPDFHeader = async (doc, title, subtitle = null, type = 'REPORTE'
 
   doc.setFillColor(...COLORS.primary);
   doc.rect(0, 0, pageWidth, 7, 'F');
-  drawBrandMark(doc, margin, 15);
+  await drawBrandMark(doc, margin, 15);
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(11);
