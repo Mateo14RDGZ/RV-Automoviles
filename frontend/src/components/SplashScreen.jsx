@@ -2,10 +2,10 @@ import { useEffect } from 'react';
 
 function SplashScreen({ onFinish }) {
   useEffect(() => {
-    // Cerrar splash después de que terminen todas las animaciones
+    // Cerrar splash después de que termine la animación del logo.
     const timer = setTimeout(() => {
       onFinish();
-    }, 3000);
+    }, 3200);
 
     return () => clearTimeout(timer);
   }, [onFinish]);
@@ -13,106 +13,96 @@ function SplashScreen({ onFinish }) {
   return (
     <>
       <style>{`
-        @keyframes slideFromLeft {
-          0% { transform: translate3d(-1200px, 0, 0); opacity: 1; }
-          30% { transform: translate3d(0, 0, 0); opacity: 1; }
-          70% { transform: translate3d(0, 0, 0); opacity: 1; }
-          100% { transform: translate3d(-1200px, 0, 0); opacity: 1; }
+        @keyframes splashLogoReveal {
+          0% {
+            clip-path: circle(0% at 50% 50%);
+            filter: blur(8px);
+            opacity: 0;
+            transform: scale(0.92);
+          }
+          24% {
+            clip-path: circle(72% at 50% 50%);
+            filter: blur(0);
+            opacity: 1;
+            transform: scale(1);
+          }
+          72% {
+            clip-path: circle(72% at 50% 50%);
+            filter: blur(0);
+            opacity: 1;
+            transform: scale(1);
+          }
+          86% {
+            clip-path: circle(72% at 50% 50%);
+            filter: blur(0);
+            opacity: 1;
+            transform: scale(1.015);
+          }
+          100% {
+            clip-path: circle(72% at 50% 50%);
+            filter: blur(4px);
+            opacity: 0;
+            transform: scale(0.97);
+          }
         }
-        
-        @keyframes slideFromRight {
-          0% { transform: translate3d(1200px, 0, 0); opacity: 1; }
-          30% { transform: translate3d(0, 0, 0); opacity: 1; }
-          70% { transform: translate3d(0, 0, 0); opacity: 1; }
-          100% { transform: translate3d(1200px, 0, 0); opacity: 1; }
+
+        @keyframes splashAura {
+          0%, 100% { opacity: 0; transform: scale(0.8); }
+          30% { opacity: 0.42; transform: scale(1); }
+          74% { opacity: 0.28; transform: scale(1.06); }
         }
-        
-        @keyframes slideFromBottom {
-          0% { transform: translate3d(0, 200px, 0); opacity: 0; }
-          30% { transform: translate3d(0, 0, 0); opacity: 1; }
-          70% { transform: translate3d(0, 0, 0); opacity: 1; }
-          100% { transform: translate3d(0, 200px, 0); opacity: 0; }
+
+        @keyframes splashBackdropExit {
+          0%, 88% { opacity: 1; }
+          100% { opacity: 0; }
         }
-        
-        .slide-left {
-          animation: slideFromLeft 3s ease-in-out forwards;
+
+        .splash-backdrop {
+          animation: splashBackdropExit 3.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
-        
-        .slide-right {
-          animation: slideFromRight 3s ease-in-out forwards;
+
+        .splash-logo {
+          animation: splashLogoReveal 3.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          will-change: transform, opacity, filter, clip-path;
         }
-        
-        .slide-bottom {
-          animation: slideFromBottom 3s ease-in-out forwards;
+
+        .splash-aura {
+          animation: splashAura 3.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .splash-backdrop,
+          .splash-logo,
+          .splash-aura {
+            animation: none;
+          }
         }
       `}</style>
+
       <div
-        className="fixed top-0 left-0 right-0 bottom-0 z-[9999] flex items-center justify-center overflow-hidden"
-        style={{ 
+        className="splash-backdrop fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden"
+        role="status"
+        aria-label="Cargando RV Automóviles"
+        style={{
           width: '100vw',
           height: '100dvh',
           background: 'linear-gradient(to bottom right, #0A1929, #1565C0, #0D47A1)'
         }}
       >
-      {/* Efectos de fondo animados */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl scale-150 opacity-100"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-400/10 rounded-full blur-3xl scale-150 opacity-100"></div>
-      </div>
+        {/* Halo de profundidad detrás del logo */}
+        <div className="splash-aura absolute h-[min(82vw,25rem)] w-[min(82vw,25rem)] rounded-full bg-white/35 blur-3xl" />
 
-      {/* Contenido principal */}
-      <div className="relative z-10 text-center px-8 w-full">
-        <a
-          href="https://www.mateordgz.dev"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Visitar el sitio de MR14"
-          className="inline-block rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-4 focus-visible:ring-offset-blue-900"
-        >
-          {/* "Desarrollado por" - entra y sale por la izquierda */}
-          <div className="slide-left">
-            <p className="text-sm md:text-base font-light text-white/70 tracking-[0.3em] uppercase mb-3">
-              Desarrollado por
-            </p>
-          </div>
-
-          {/* "MR14" - entra y sale por la derecha */}
-          <div className="slide-right">
-            <h2
-              className="text-3xl md:text-4xl font-bold italic tracking-[0.06em] text-white"
-              style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
-            >
-              MR14
-            </h2>
-          </div>
-        </a>
-
-        {/* Spinner de carga - siempre visible, sin animaciones de entrada/salida */}
-        <div 
-          className="mt-10 flex justify-center slide-bottom"
-        >
-          <div className="relative w-11 h-11">
-            {/* Círculo exterior */}
-            <div 
-              className="absolute inset-0 rounded-full"
-              style={{
-                border: '3px solid rgba(255, 255, 255, 0.2)'
-              }}
-            ></div>
-            {/* Arco animado giratorio */}
-            <div 
-              className="absolute inset-0 rounded-full animate-spin"
-              style={{
-                border: '3px solid transparent',
-                borderTopColor: 'rgba(255, 255, 255, 0.9)',
-                borderRightColor: 'rgba(255, 255, 255, 0.6)',
-                animationDuration: '0.7s'
-              }}
-            ></div>
-          </div>
+        {/* El archivo original se muestra completo, sin recortes ni retoques */}
+        <div className="splash-logo relative z-10 h-[min(72vw,20rem)] w-[min(72vw,20rem)] overflow-hidden bg-white shadow-[0_24px_70px_rgba(0,0,0,0.28)]">
+          <img
+            src="/mr14-logo.jpg"
+            alt="MR14"
+            className="h-full w-full object-contain"
+            fetchPriority="high"
+            draggable="false"
+          />
         </div>
       </div>
-    </div>
     </>
   );
 }
